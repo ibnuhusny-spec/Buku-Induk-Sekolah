@@ -59,7 +59,8 @@
         .theme-controls input[type="color"] { border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; padding: 0; background: transparent;}
 
         /* --- LAYAR LOGIN ELEGAN (SPLASH SCREEN) --- */
-        .login-wrapper { display: flex; justify-content: center; align-items: center; min-height: 80vh; padding: 20px; }
+        /* PERBAIKAN: flexbox dipisah agar view lain tidak ikut jadi flex secara otomatis */
+        .login-wrapper { justify-content: center; align-items: center; min-height: 80vh; padding: 20px; }
         .login-card { 
             background: var(--card-bg); border-radius: 12px; padding: 40px 30px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 420px; 
@@ -77,7 +78,6 @@
         }
         .btn-3d:active { transform: translateY(5px); box-shadow: 0 0 0 #0284c7; }
         
-        /* Tombol teks untuk pengaturan server */
         .btn-text-link {
             background: transparent; color: #94a3b8; border: none; cursor: pointer; 
             font-size: 0.85rem; margin-top: 25px; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px;
@@ -116,7 +116,9 @@
             .ortu-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 10.5pt; page-break-inside: avoid; }
             .ortu-table th, .ortu-table td { border: 1px solid black; padding: 3px 5px; vertical-align: top;}
             .ortu-table th { text-align: center; font-weight: bold; background: transparent;}
-            .print-photo-box { position: absolute; right: 20px; top: 160px; width: 3cm; height: 4cm; border: 1px solid black; display: flex; justify-content: center; align-items: center; text-align: center; font-size: 9pt;}
+            
+            /* PERBAIKAN: Posisi top dinaikkan ke 125px agar tidak menimpa teks */
+            .print-photo-box { position: absolute; right: 20px; top: 125px; width: 3cm; height: 4cm; border: 1px solid black; display: flex; justify-content: center; align-items: center; text-align: center; font-size: 9pt;}
             .print-photo-box img { width: 100%; height: 100%; object-fit: cover; }
             .page-break { page-break-before: always; }
         }
@@ -159,7 +161,7 @@
         <!-- ================================== -->
         <!-- VIEW 1: LAYAR LOGIN ELEGAN         -->
         <!-- ================================== -->
-        <div id="login-view" class="view-section login-wrapper" style="display: flex;">
+        <div id="login-view" class="view-section login-wrapper active" style="display: flex;">
             <div class="login-card">
                 <img src="maros.png" alt="Logo Wilayah" class="login-logo" onerror="this.style.display='none'">
                 
@@ -181,7 +183,6 @@
                 
                 <button class="btn-3d" onclick="prosesLogin()">MASUK APLIKASI ➔</button>
 
-                <!-- Tombol Pengaturan Server -->
                 <button class="btn-text-link" onclick="bukaPengaturanServer()">⚙️ Pengaturan Server Database</button>
             </div>
         </div>
@@ -269,24 +270,40 @@
 
                 <div class="form-grid">
                     <div class="form-grid-3">
-                        <div class="form-group"><label>NISN *</label><input type="text" id="f_nisn" class="form-control" required></div>
-                        <div class="form-group"><label>Kelas Saat Ini *</label><input type="text" id="f_kelas" class="form-control" required></div>
+                        <div class="form-group"><label>NISN <span style="color:var(--danger)">*</span></label><input type="text" id="f_nisn" class="form-control" required></div>
+                        <div class="form-group"><label>Kelas Saat Ini <span style="color:var(--danger)">*</span></label><input type="text" id="f_kelas" class="form-control" required></div>
                         <div class="form-group"><label>No. Seri Rapor</label><input type="text" id="f_no_rapor" class="form-control"></div>
                     </div>
 
                     <div class="form-section-title">A. Keterangan Pribadi</div>
-                    <div class="form-group"><label>1. a. Nama Lengkap *</label><input type="text" id="f_nama" class="form-control" required></div>
+                    <div class="form-group"><label>1. a. Nama Lengkap <span style="color:var(--danger)">*</span></label><input type="text" id="f_nama" class="form-control" required></div>
                     <div class="form-group"><label>1. b. Nama Panggilan</label><input type="text" id="f_panggilan" class="form-control"></div>
                     <div class="form-group"><label>2. Jenis Kelamin</label><select id="f_jk" class="form-control"><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div>
                     <div class="form-group"><label>3. Tempat & Tanggal Lahir</label><div style="display:flex; gap:5px;"><input type="text" id="f_tempat_lahir" class="form-control" placeholder="Tempat"><input type="date" id="f_tgl_lahir" class="form-control"></div></div>
                     <div class="form-group"><label>4. Agama</label><input type="text" id="f_agama" class="form-control" value="Islam"></div>
                     <div class="form-group"><label>5. Kewarganegaraan</label><input type="text" id="f_wn" class="form-control" value="Indonesia"></div>
-                    <div class="form-group"><label>6. Anak Keberapa</label><input type="number" id="f_anak_ke" class="form-control"></div>
-                    <div class="form-grid-3">
-                        <div class="form-group"><label>7. Sdr. Kandung</label><input type="number" id="f_sdr_kandung" class="form-control"></div>
-                        <div class="form-group"><label>8. Sdr. Tiri</label><input type="number" id="f_sdr_tiri" class="form-control"></div>
-                        <div class="form-group"><label>9. Sdr. Angkat</label><input type="number" id="f_sdr_angkat" class="form-control"></div>
+                    
+                    <!-- PERBAIKAN: Validasi khusus angka -->
+                    <div class="form-group">
+                        <label>6. Anak Keberapa <span style="color:var(--danger)">*</span></label>
+                        <input type="number" id="f_anak_ke" class="form-control" required min="1" placeholder="Contoh: 1">
                     </div>
+                    
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label>7. Sdr. Kandung <span style="color:var(--danger)">*</span></label>
+                            <input type="number" id="f_sdr_kandung" class="form-control" required min="0" placeholder="Isi 0 jika tdk ada">
+                        </div>
+                        <div class="form-group">
+                            <label>8. Sdr. Tiri <span style="color:var(--danger)">*</span></label>
+                            <input type="number" id="f_sdr_tiri" class="form-control" required min="0" placeholder="Isi 0 jika tdk ada">
+                        </div>
+                        <div class="form-group">
+                            <label>9. Sdr. Angkat <span style="color:var(--danger)">*</span></label>
+                            <input type="number" id="f_sdr_angkat" class="form-control" required min="0" placeholder="Isi 0 jika tdk ada">
+                        </div>
+                    </div>
+                    
                     <div class="form-group"><label>10. Status Yatim</label><select id="f_yatim" class="form-control"><option value="-">Tidak / Lengkap</option><option value="Yatim">Yatim</option><option value="Piatu">Piatu</option><option value="Yatim Piatu">Yatim Piatu</option></select></div>
                     <div class="form-group"><label>11. Bahasa Sehari-hari</label><input type="text" id="f_bahasa" class="form-control" value="Indonesia / Daerah"></div>
 
@@ -335,7 +352,7 @@
                     <div class="form-group"><label>Diterima di Kelas (Awal)</label><input type="text" id="f_kelas_masuk" class="form-control" placeholder="Contoh: Kelas 1"></div>
 
                     <div class="form-group full-width photo-area">
-                        <label style="text-align: left; font-size: 1rem;">Pas Foto Siswa (3x4) *</label>
+                        <label style="text-align: left; font-size: 1rem;">Pas Foto Siswa (3x4) <span style="color:var(--danger)">*</span></label>
                         <img id="photo-preview-img" class="photo-preview" src="">
                         <input type="hidden" id="photo-data">
                         
@@ -574,17 +591,21 @@
 
         // --- SISTEM VIEW ---
         function showView(id) {
+            // Sembunyikan semua elemen
             document.querySelectorAll('.view-section').forEach(v => {
                 v.classList.remove('active');
                 v.style.display = 'none'; 
             });
             
+            // Tampilkan elemen yang dituju
             const activeView = document.getElementById(id);
             activeView.classList.add('active');
-            activeView.style.display = 'block'; 
             
+            // Perbaikan Flexbox Layout
             if (id === 'login-view' || id === 'server-settings-view') {
                 activeView.style.display = 'flex';
+            } else {
+                activeView.style.display = 'block'; 
             }
         }
 

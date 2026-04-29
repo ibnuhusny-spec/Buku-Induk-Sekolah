@@ -59,7 +59,6 @@
         .theme-controls input[type="color"] { border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; padding: 0; background: transparent;}
 
         /* --- LAYAR LOGIN ELEGAN (SPLASH SCREEN) --- */
-        /* PERBAIKAN: flexbox dipisah agar view lain tidak ikut jadi flex secara otomatis */
         .login-wrapper { justify-content: center; align-items: center; min-height: 80vh; padding: 20px; }
         .login-card { 
             background: var(--card-bg); border-radius: 12px; padding: 40px 30px; 
@@ -117,7 +116,6 @@
             .ortu-table th, .ortu-table td { border: 1px solid black; padding: 3px 5px; vertical-align: top;}
             .ortu-table th { text-align: center; font-weight: bold; background: transparent;}
             
-            /* PERBAIKAN: Posisi top dinaikkan ke 125px agar tidak menimpa teks */
             .print-photo-box { position: absolute; right: 20px; top: 125px; width: 3cm; height: 4cm; border: 1px solid black; display: flex; justify-content: center; align-items: center; text-align: center; font-size: 9pt;}
             .print-photo-box img { width: 100%; height: 100%; object-fit: cover; }
             .page-break { page-break-before: always; }
@@ -283,7 +281,6 @@
                     <div class="form-group"><label>4. Agama</label><input type="text" id="f_agama" class="form-control" value="Islam"></div>
                     <div class="form-group"><label>5. Kewarganegaraan</label><input type="text" id="f_wn" class="form-control" value="Indonesia"></div>
                     
-                    <!-- PERBAIKAN: Validasi khusus angka -->
                     <div class="form-group">
                         <label>6. Anak Keberapa <span style="color:var(--danger)">*</span></label>
                         <input type="number" id="f_anak_ke" class="form-control" required min="1" placeholder="Contoh: 1">
@@ -591,17 +588,14 @@
 
         // --- SISTEM VIEW ---
         function showView(id) {
-            // Sembunyikan semua elemen
             document.querySelectorAll('.view-section').forEach(v => {
                 v.classList.remove('active');
                 v.style.display = 'none'; 
             });
             
-            // Tampilkan elemen yang dituju
             const activeView = document.getElementById(id);
             activeView.classList.add('active');
             
-            // Perbaikan Flexbox Layout
             if (id === 'login-view' || id === 'server-settings-view') {
                 activeView.style.display = 'flex';
             } else {
@@ -660,6 +654,7 @@
             reader.readAsDataURL(file);
         }
 
+        // --- PERBAIKAN: TOMBOL HAPUS DIMASUKKAN KEMBALI ---
         function renderTable() {
             const tbody = document.querySelector('#student-table tbody');
             const search = document.getElementById('search-input').value.toLowerCase();
@@ -669,11 +664,22 @@
             if(filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Belum ada data murid atau sedang loading...</td></tr>'; return; }
 
             filtered.forEach((s, i) => {
-                let actionBtns = `<button class="btn btn-sm btn-success" onclick="viewStudent('${s.id}')">👁️ Cetak</button>
-                                  <button class="btn btn-sm btn-primary" onclick="editStudent('${s.id}')">✏️ Edit</button>`;
+                let actionBtns = `
+                    <button class="btn btn-sm btn-success" onclick="viewStudent('${s.id}')">👁️ Cetak</button>
+                    <button class="btn btn-sm btn-primary" onclick="editStudent('${s.id}')">✏️ Edit</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}')">🗑️ Hapus</button>
+                `;
                 tbody.innerHTML += `<tr><td style="text-align:center;">${i+1}</td><td><strong>${s.f_nisn}</strong></td><td>${s.f_nama}</td><td>${s.f_kelas || '-'}</td>
-                    <td><div style="display:flex; gap:5px;">${actionBtns}</div></td></tr>`;
+                    <td><div style="display:flex; gap:5px; flex-wrap:wrap;">${actionBtns}</div></td></tr>`;
             });
+        }
+
+        // --- FUNGSI HAPUS SISWA ---
+        function deleteStudent(id) { 
+            if(confirm('Apakah Anda yakin menyembunyikan data murid ini dari tabel?\n\n(Catatan: Untuk menghapus permanen, Anda tetap harus menghapusnya langsung dari file Google Sheets Anda)')) { 
+                students = students.filter(s => s.id != id); 
+                renderTable(); 
+            } 
         }
 
         async function saveStudent(e) {

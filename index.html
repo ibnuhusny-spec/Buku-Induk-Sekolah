@@ -210,14 +210,12 @@
         <!-- ================================== -->
         <div id="home-view" class="view-section card">
             
-            <!-- PERBAIKAN: Penambahan Keterangan Jumlah Data & Optimalisasi Search Box -->
             <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap:10px;">
                 <div style="flex: 1; min-width: 250px;">
                     <input type="text" id="search-input" class="form-control" style="width: 100%; max-width: 400px;" 
                            placeholder="🔍 Cari Nama / NISN / Kelas / Jenis Kelamin..." 
-                           oninput="renderTable()" autocomplete="off" spellcheck="false">
+                           oninput="debounceSearch()" autocomplete="off" spellcheck="false">
                     
-                    <!-- TEKS TOTAL SISWA -->
                     <div id="student-count" style="margin-top: 8px; font-weight: bold; color: var(--primary); font-size: 0.95rem;">
                         Total Data: 0 Siswa
                     </div>
@@ -540,7 +538,7 @@
 
         const ADMIN_PIN = "@dm1nKu77";
         const ORTU_PIN = "m4r0s77";
-        const PENGAWAS_PIN = "p3ngaw4s"; // Kunci khusus Pengawas
+        const PENGAWAS_PIN = "p3ngaw4s"; 
         
         let appSettings = JSON.parse(localStorage.getItem('settings_sekolah')) || {
             pemda: "PEMERINTAH DAERAH", dinas: "DINAS PENDIDIKAN",
@@ -722,25 +720,44 @@
             reader.readAsDataURL(file);
         }
 
-        // --- FUNGSI RENDER TABEL & PENCARIAN CERDAS ---
+        // --- FITUR DEBOUNCE PENCARIAN (ANTI LAG DI HP) & PENCARIAN CERDAS ---
+        let searchTimeout;
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                renderTable();
+            }, 400); 
+        }
+
         function renderTable() {
             const tbody = document.querySelector('#student-table tbody');
-            const searchRaw = document.getElementById('search-input').value.toLowerCase();
+            let searchRaw = document.getElementById('search-input').value.toLowerCase();
             
-            // Pisahkan kata kunci berdasarkan spasi agar bisa mencari kombinasi (misal: "kelas 5 laki")
+            // 1. Alias pintar untuk jenis kelamin
+            searchRaw = searchRaw.replace(/\bputra\b/g, 'laki-laki')
+                                 .replace(/\bpria\b/g, 'laki-laki')
+                                 .replace(/\bputri\b/g, 'perempuan')
+                                 .replace(/\bwanita\b/g, 'perempuan');
+                                 
+            // 2. Kunci frasa "kelas X" menjadi satu kata agar angka kelas tidak bocor mencari NISN
+            searchRaw = searchRaw.replace(/kelas\s+([0-9a-z]+)/g, 'kelas_$1');
+            
             const searchTerms = searchRaw.split(' ').filter(t => t.trim() !== '');
             
             tbody.innerHTML = '';
             
             let filtered = students.filter(s => {
-                // Gabungkan teks data yang ingin dijadikan target pencarian
-                const textData = `${s.f_nama} ${s.f_nisn} ${s.f_kelas} ${s.f_jk}`.toLowerCase();
+                // Konversi kelas asli di database menjadi format terkunci juga
+                let kelasAsli = (s.f_kelas || '').toLowerCase();
+                let kelasMod = kelasAsli.replace(/kelas\s+([0-9a-z]+)/g, 'kelas_$1');
                 
-                // Pastikan SEMUA kata kunci yang diketik ada di dalam teks data siswa tersebut
+                // Gabungkan data yang ingin dicari
+                const textData = `${s.f_nama} ${s.f_nisn} ${kelasMod} ${s.f_jk}`.toLowerCase();
+                
+                // Pastikan semua kata kunci cocok dengan data siswa
                 return searchTerms.every(term => textData.includes(term));
             });
             
-            // Update teks jumlah siswa
             document.getElementById('student-count').innerText = `Total Data: ${filtered.length} Siswa`;
             
             if(filtered.length === 0) { 

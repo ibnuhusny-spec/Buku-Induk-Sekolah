@@ -57,8 +57,14 @@
         .theme-controls { display: flex; gap: 15px; align-items: center; font-size: 0.85rem; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px;}
         .theme-controls input[type="color"] { border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; padding: 0; background: transparent;}
 
-        /* TAMPILAN CETAK */
+        /* TAMPILAN CETAK A4 */
         @media print {
+            /* 1. PAKSA UKURAN KERTAS A4 DAN MARGINNYA */
+            @page {
+                size: A4;
+                margin: 1.5cm;
+            }
+
             body { background: white !important; color: black !important; }
             body * { visibility: hidden; }
             #detail-view, #detail-view * { visibility: visible; }
@@ -66,72 +72,38 @@
             .no-print { display: none !important; }
             .card { box-shadow: none; border: none; padding: 0; background: white !important;}
             
-            .print-container { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.4; color: black; }
+            /* 2. PERKECIL HURUF & SPASI SEDIKIT AGAR MUAT DI A4 */
+            .print-container { font-family: 'Times New Roman', Times, serif; font-size: 10.5pt; line-height: 1.3; color: black; }
             
-            /* STYLING KOP SURAT UNTUK PRINT */
-            /* STYLING KOP SURAT UNTUK PRINT (DIUBAH) */
-            .kop-surat { 
-                position: relative; 
-                display: flex; 
-                align-items: center; 
-                padding-bottom: 15px; 
-                margin-bottom: 25px; 
-            }
-            
-            /* Efek Garis Ganda Resmi Instansi (Atas tebal, bawah tipis) */
-            .kop-surat::after { 
-                content: ""; 
-                position: absolute; 
-                bottom: 3px; 
-                left: 0; 
-                width: 100%; 
-                border-bottom: 4px solid black; 
-            }
-            .kop-surat::before { 
-                content: ""; 
-                position: absolute; 
-                bottom: -2px; 
-                left: 0; 
-                width: 100%; 
-                border-bottom: 1px solid black; 
-            }
+            /* STYLING KOP SURAT UNTUK PRINT (GARIS GANDA & RATA TENGAH PRESISI) */
+            .kop-surat { position: relative; display: flex; align-items: center; padding-bottom: 10px; margin-bottom: 15px; }
+            .kop-surat::after { content: ""; position: absolute; bottom: 3px; left: 0; width: 100%; border-bottom: 4px solid black; }
+            .kop-surat::before { content: ""; position: absolute; bottom: -2px; left: 0; width: 100%; border-bottom: 1px solid black; }
+            .kop-surat img { width: 2.8cm; height: 2.8cm; object-fit: contain; flex-shrink: 0; }
+            .kop-text { flex-grow: 1; text-align: center; padding-right: 2.8cm; /* Trik agar presisi di tengah */ }
+            .kop-text h4 { margin: 0; font-size: 12pt; font-weight: normal; text-transform: uppercase; }
+            .kop-text h3 { margin: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase; }
+            .kop-text h2 { margin: 0; font-size: 16pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+            .kop-text p { margin: 3px 0 0 0; font-size: 10pt; font-style: normal; }
 
-            /* Logo posisi kiri */
-            .kop-surat img { 
-                width: 3cm; 
-                height: 3cm; 
-                object-fit: contain; 
-                flex-shrink: 0; 
-            }
+            .print-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; }
             
-            /* Teks Instansi */
-            .kop-text { 
-                flex-grow: 1; 
-                text-align: center; 
-                /* Padding kanan disamakan dengan lebar logo (3cm) agar teks benar-benar rata tengah kertas, tidak berat ke kanan */
-                padding-right: 3cm; 
-            }
-            .kop-text h4 { margin: 0; font-size: 13pt; font-weight: normal; text-transform: uppercase; }
-            .kop-text h3 { margin: 0; font-size: 15pt; font-weight: bold; text-transform: uppercase; }
-            .kop-text h2 { margin: 0; font-size: 18pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-            .kop-text p { margin: 5px 0 0 0; font-size: 11pt; font-style: normal; }
-
-            .print-header { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; }
-            
-            .buku-induk-table { width: 100%; border-collapse: collapse; border: none; margin-bottom: 15px;}
-            .buku-induk-table td { border: none; padding: 3px 5px; vertical-align: top; font-size: 11pt;}
-            .col-num { width: 3%; text-align: right; padding-right: 10px; }
+            /* 3. RAPATKAN TABEL */
+            .buku-induk-table { width: 100%; border-collapse: collapse; border: none; margin-bottom: 10px;}
+            .buku-induk-table td { border: none; padding: 2px 4px; vertical-align: top; font-size: 10.5pt;}
+            .col-num { width: 3%; text-align: right; padding-right: 8px; }
             .col-label { width: 35%; }
             .col-separator { width: 2%; text-align: center; }
             .col-value { width: 60%; border-bottom: 1px dotted #666 !important; }
             
-            .section-header { font-weight: bold; margin-top: 15px; margin-bottom: 5px; text-transform: uppercase; font-size: 11pt;}
+            .section-header { font-weight: bold; margin-top: 10px; margin-bottom: 3px; text-transform: uppercase; font-size: 10.5pt;}
             
-            .ortu-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 11pt;}
-            .ortu-table th, .ortu-table td { border: 1px solid black; padding: 5px; vertical-align: top;}
+            .ortu-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 10.5pt; page-break-inside: avoid; }
+            .ortu-table th, .ortu-table td { border: 1px solid black; padding: 3px 5px; vertical-align: top;}
             .ortu-table th { text-align: center; font-weight: bold; background: transparent;}
             
-            .print-photo-box { position: absolute; right: 20px; top: 180px; width: 3cm; height: 4cm; border: 1px solid black; display: flex; justify-content: center; align-items: center; text-align: center; font-size: 9pt;}
+            /* Sesuaikan posisi foto agar tidak menabrak teks */
+            .print-photo-box { position: absolute; right: 20px; top: 160px; width: 3cm; height: 4cm; border: 1px solid black; display: flex; justify-content: center; align-items: center; text-align: center; font-size: 9pt;}
             .print-photo-box img { width: 100%; height: 100%; object-fit: cover; }
             
             .page-break { page-break-before: always; }
@@ -150,11 +122,9 @@
             .view-section.card > div:first-child { flex-direction: column; }
             .view-section.card > div:first-child button { width: 100%; }
             
-            /* Sembunyikan kolom tabel yang tidak penting di HP */
             #student-table th:nth-child(4), 
             #student-table td:nth-child(4) { display: none; }
             
-            /* Penyesuaian Tombol Aksi di Tabel */
             #student-table td:last-child { display: flex; flex-direction: column; gap: 5px; }
         }
     </style>
@@ -363,15 +333,15 @@
         <div id="detail-view" class="view-section card">
             <div class="no-print" style="margin-bottom:20px; background:#e2e8f0; padding:15px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
                 <div>
-    <button class="btn btn-secondary" onclick="showView('home-view')">⬅ Kembali</button>
-    <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Langsung</button>
-    <button class="btn btn-success" style="background:#2563eb;" onclick="exportToWord()">📄 Download Word</button>
-</div>
+                    <button class="btn btn-secondary" onclick="showView('home-view')">⬅ Kembali</button>
+                    <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Langsung</button>
+                    <button class="btn btn-success" style="background:#2563eb;" onclick="exportToWord()">📄 Download Word</button>
+                </div>
                 <div style="font-size: 0.85rem; color:#475569;">Pastikan Kop Surat sudah diatur di menu Pengaturan. Gunakan ukuran kertas A4/F4.</div>
             </div>
             
             <div class="print-container">
-                <!-- BAGIAN CETAK (Sama seperti sebelumnya) -->
+                <!-- BAGIAN CETAK -->
                 <div class="kop-surat">
                     <img id="print_logo" src="" alt="Logo" style="display:none;">
                     <div class="kop-text">
@@ -482,13 +452,13 @@
 
     <script>
         // PASTE URL APLIKASI WEB GOOGLE APPS SCRIPT ANDA DI SINI
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbzpozanYjymsmNAFR-FWB9AmvHlTE9J6NV3whPTULXBK62pEOZO_gnmUj8AKX7nb4Is/exec';
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxIHLJTIdxzeznX1ryB7zDAtXmZ_2il--F81BKQbcENUe8WCrQUSVz6IEzc4mAW3-V0/exec';
         
         let students = [];
         
         // --- KONFIGURASI KEAMANAN ADMIN ---
         let isAdmin = false;
-        const ADMIN_PIN = "@dm1nKu77"; // PIN ADMIN SESUAI PERMINTAAN
+        const ADMIN_PIN = "@dm1nKu77";
         
         // DATABASE PENGATURAN KOP SURAT
         let appSettings = JSON.parse(localStorage.getItem('settings_sdn21')) || {
@@ -505,7 +475,6 @@
             fetchData();
         };
 
-        // FUNGSI MODE ADMIN
         function toggleAdminMode() {
             if (!isAdmin) {
                 let pin = prompt("Masukkan Password Admin:");
@@ -647,7 +616,6 @@
             filtered.forEach((s, i) => {
                 let actionButtons = `<button class="btn btn-sm btn-success" onclick="viewStudent(${s.id})">👁️ Lihat/Cetak</button>`;
                 
-                // Tampilkan Edit/Hapus hanya jika mode admin aktif
                 if (isAdmin) {
                     actionButtons += `
                         <button class="btn btn-sm btn-primary" onclick="editStudent(${s.id})">✏️ Edit</button>
@@ -691,7 +659,6 @@
                 
                 const result = await response.json();
                 
-                // Menangkap pesan error khusus dari Apps Script terkait kunci akses
                 if(result.status === "error") {
                     alert("❌ " + result.message);
                 } else if(result.status === "success") {
@@ -788,6 +755,12 @@
             
             document.getElementById('photo-data').value = s.photo || "";
             document.getElementById('photo-preview-img').src = s.photo || "";
+            
+            if (isAdmin) {
+                document.getElementById('f_kunci_akses').value = ADMIN_PIN;
+                document.getElementById('f_kunci_akses').parentElement.style.display = 'none';
+            }
+            
             showView('form-view');
         }
 
@@ -803,6 +776,9 @@
             document.getElementById('student-id').value = "";
             document.getElementById('photo-preview-img').src = "";
             document.getElementById('photo-data').value = "";
+            
+            document.getElementById('f_kunci_akses').parentElement.style.display = 'block';
+            
             stopCamera();
         }
 
@@ -902,134 +878,141 @@
             a.download = 'Rekap_Buku_Induk_SDIT_Qurratu_Ayun.csv'; 
             a.click();
         }
-        // FUNGSI UNTUK EXPORT KE MS WORD (.doc)
-function exportToWord() {
-    // Ambil ID siswa yang sedang dilihat dari input tersembunyi, atau ambil dari tampilan
-    let nisnSiswa = document.getElementById('p_nisn').innerText;
-    let s = students.find(x => x.f_nisn === nisnSiswa);
-    
-    if (!s) {
-        alert("Gagal mengambil data siswa untuk diexport.");
-        return;
-    }
 
-    // Menggabungkan HTML khusus untuk dikenali oleh Microsoft Word
-    let preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Buku Induk</title>";
-    
-    // Style khusus untuk Word
-    let style = `
-        <style>
-            body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 10pt; }
-            td { vertical-align: top; padding: 2pt 4pt; }
-            .header-word { text-align: center; border-bottom: 3px solid black; margin-bottom: 15pt; padding-bottom: 10pt; }
-            .header-word h4, .header-word h3, .header-word h2 { margin: 0; padding: 0; text-transform: uppercase; }
-            .judul { text-align: center; font-weight: bold; font-size: 14pt; margin-bottom: 15pt; text-decoration: underline; }
-            .bold { font-weight: bold; }
-            .tabel-ortu th, .tabel-ortu td { border: 1pt solid black; padding: 4pt; text-align: left; }
-            .kotak-foto { width: 90pt; height: 120pt; border: 1pt solid black; float: right; text-align: center; line-height: 120pt; font-size: 9pt; color: #666; margin-left: 10pt; }
-        </style>
-    </head><body>`;
+        // FUNGSI UNTUK EXPORT KE MS WORD (.doc) DENGAN FOTO DAN LOGO
+        function exportToWord() {
+            let nisnSiswa = document.getElementById('p_nisn').innerText;
+            let s = students.find(x => x.f_nisn === nisnSiswa);
+            
+            if (!s) {
+                alert("Gagal mengambil data siswa untuk diexport.");
+                return;
+            }
 
-    let kopSurat = `
-        <div class="header-word">
-            <h4>${appSettings.pemda}</h4>
-            <h3>${appSettings.dinas}</h3>
-            <h2>${appSettings.sekolah}</h2>
-            <p>${appSettings.alamat}</p>
-        </div>
-    `;
+            let preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Buku Induk</title>";
+            
+            let style = `
+                <style>
+                    body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 10pt; }
+                    td { vertical-align: top; padding: 2pt 4pt; }
+                    .judul { text-align: center; font-weight: bold; font-size: 14pt; margin-bottom: 15pt; text-decoration: underline; }
+                    .bold { font-weight: bold; }
+                    .tabel-ortu th, .tabel-ortu td { border: 1pt solid black; padding: 4pt; text-align: left; }
+                </style>
+            </head><body>`;
 
-    // Susun isi kontennya
-    let konten = `
-        <div class="judul">LEMBAR BUKU INDUK SISWA</div>
-        
-        <div class="kotak-foto">[ TEMPEL FOTO 3x4 ]</div>
+            let logoImg = appSettings.logo ? `<img src="${appSettings.logo}" style="width: 75pt; height: 75pt;">` : '';
+            let kopSurat = `
+                <table style="width: 100%; border-bottom: 3px solid black; margin-bottom: 15pt; padding-bottom: 10pt; border-collapse: collapse;">
+                    <tr>
+                        <td style="width: 15%; text-align: center; vertical-align: middle; border: none;">
+                            ${logoImg}
+                        </td>
+                        <td style="width: 85%; text-align: center; vertical-align: middle; border: none;">
+                            <h4 style="margin: 0; padding: 0; font-size: 12pt; font-weight: normal; text-transform: uppercase;">${appSettings.pemda}</h4>
+                            <h3 style="margin: 0; padding: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase;">${appSettings.dinas}</h3>
+                            <h2 style="margin: 0; padding: 0; font-size: 16pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">${appSettings.sekolah}</h2>
+                            <p style="margin: 3pt 0 0 0; padding: 0; font-size: 10pt; font-style: normal;">${appSettings.alamat}</p>
+                        </td>
+                    </tr>
+                </table>
+            `;
 
-        <table>
-            <tr><td width="30%">Nama Lengkap Murid</td><td width="3%">:</td><td class="bold">${s.f_nama || '-'}</td></tr>
-            <tr><td>Nomor Induk Siswa Nasional</td><td>:</td><td>${s.f_nisn || '-'}</td></tr>
-            <tr><td>Kelas Saat Ini</td><td>:</td><td>${s.f_kelas || '-'}</td></tr>
-            <tr><td>No. Seri Buku Rapor</td><td>:</td><td>${s.f_no_rapor || '-'}</td></tr>
-        </table>
-        <br style="clear: both;">
+            let fotoImg = s.photo ? `<img src="${s.photo}" style="width: 90pt; height: 120pt;">` : '<div style="line-height: 120pt; color: #666;">[ KOSONG ]</div>';
+            let topSection = `
+                <div class="judul">LEMBAR BUKU INDUK SISWA</div>
+                <table style="width: 100%; margin-bottom: 15pt; border: none;">
+                    <tr>
+                        <td style="width: 75%; border: none;">
+                            <table style="width: 100%;">
+                                <tr><td style="width: 35%; border: none;">Nama Lengkap Murid</td><td style="width: 3%; border: none;">:</td><td style="border: none;" class="bold">${s.f_nama || '-'}</td></tr>
+                                <tr><td style="border: none;">Nomor Induk Siswa Nasional</td><td style="border: none;">:</td><td style="border: none;">${s.f_nisn || '-'}</td></tr>
+                                <tr><td style="border: none;">Kelas Saat Ini</td><td style="border: none;">:</td><td style="border: none;">${s.f_kelas || '-'}</td></tr>
+                                <tr><td style="border: none;">No. Seri Buku Rapor</td><td style="border: none;">:</td><td style="border: none;">${s.f_no_rapor || '-'}</td></tr>
+                            </table>
+                        </td>
+                        <td style="width: 25%; text-align: right; border: none;">
+                            <div style="width: 90pt; height: 120pt; border: 1pt solid black; display: inline-block; text-align: center;">
+                                ${fotoImg}
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            `;
 
-        <div class="bold">A. KETERANGAN PRIBADI</div>
-        <table>
-            <tr><td width="5%">1.</td><td width="35%">Nama Lengkap</td><td width="3%">:</td><td>${s.f_nama || '-'}</td></tr>
-            <tr><td></td><td>Nama Panggilan</td><td>:</td><td>${s.f_panggilan || '-'}</td></tr>
-            <tr><td>2.</td><td>Jenis Kelamin</td><td>:</td><td>${s.f_jk || '-'}</td></tr>
-            <tr><td>3.</td><td>Tempat & Tanggal Lahir</td><td>:</td><td>${s.f_tempat_lahir || '-'}, ${s.f_tgl_lahir || '-'}</td></tr>
-            <tr><td>4.</td><td>Agama</td><td>:</td><td>${s.f_agama || '-'}</td></tr>
-            <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>${s.f_wn || '-'}</td></tr>
-            <tr><td>6.</td><td>Anak Keberapa</td><td>:</td><td>${s.f_anak_ke || '-'}</td></tr>
-            <tr><td>7.</td><td>Jumlah Saudara Kandung</td><td>:</td><td>${s.f_sdr_kandung || '-'}</td></tr>
-            <tr><td>8.</td><td>Jumlah Saudara Tiri</td><td>:</td><td>${s.f_sdr_tiri || '-'}</td></tr>
-            <tr><td>9.</td><td>Jumlah Saudara Angkat</td><td>:</td><td>${s.f_sdr_angkat || '-'}</td></tr>
-            <tr><td>10.</td><td>Anak Yatim / Piatu</td><td>:</td><td>${s.f_yatim || '-'}</td></tr>
-            <tr><td>11.</td><td>Bahasa Sehari-hari</td><td>:</td><td>${s.f_bahasa || '-'}</td></tr>
-        </table>
+            let konten = `
+                <div class="bold">A. KETERANGAN PRIBADI</div>
+                <table>
+                    <tr><td width="5%">1.</td><td width="35%">Nama Lengkap</td><td width="3%">:</td><td>${s.f_nama || '-'}</td></tr>
+                    <tr><td></td><td>Nama Panggilan</td><td>:</td><td>${s.f_panggilan || '-'}</td></tr>
+                    <tr><td>2.</td><td>Jenis Kelamin</td><td>:</td><td>${s.f_jk || '-'}</td></tr>
+                    <tr><td>3.</td><td>Tempat & Tanggal Lahir</td><td>:</td><td>${s.f_tempat_lahir || '-'}, ${s.f_tgl_lahir || '-'}</td></tr>
+                    <tr><td>4.</td><td>Agama</td><td>:</td><td>${s.f_agama || '-'}</td></tr>
+                    <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>${s.f_wn || '-'}</td></tr>
+                    <tr><td>6.</td><td>Anak Keberapa</td><td>:</td><td>${s.f_anak_ke || '-'}</td></tr>
+                    <tr><td>7.</td><td>Jumlah Saudara Kandung</td><td>:</td><td>${s.f_sdr_kandung || '-'}</td></tr>
+                    <tr><td>8.</td><td>Jumlah Saudara Tiri</td><td>:</td><td>${s.f_sdr_tiri || '-'}</td></tr>
+                    <tr><td>9.</td><td>Jumlah Saudara Angkat</td><td>:</td><td>${s.f_sdr_angkat || '-'}</td></tr>
+                    <tr><td>10.</td><td>Anak Yatim / Piatu</td><td>:</td><td>${s.f_yatim || '-'}</td></tr>
+                    <tr><td>11.</td><td>Bahasa Sehari-hari</td><td>:</td><td>${s.f_bahasa || '-'}</td></tr>
+                </table>
 
-        <div class="bold">B. KETERANGAN TEMPAT TINGGAL</div>
-        <table>
-            <tr><td width="5%">12.</td><td width="35%">Alamat Lengkap</td><td width="3%">:</td><td>${s.f_alamat || '-'}</td></tr>
-            <tr><td>13.</td><td>No. Telepon / HP</td><td>:</td><td>${s.f_telp || '-'}</td></tr>
-            <tr><td>14.</td><td>Tinggal Bersama</td><td>:</td><td>${s.f_tinggal || '-'}</td></tr>
-            <tr><td>15.</td><td>Jarak ke Sekolah</td><td>:</td><td>${s.f_jarak || '-'} Km</td></tr>
-            <tr><td>16.</td><td>Ke Sekolah Dengan</td><td>:</td><td>${s.f_transport || '-'}</td></tr>
-        </table>
+                <div class="bold">B. KETERANGAN TEMPAT TINGGAL</div>
+                <table>
+                    <tr><td width="5%">12.</td><td width="35%">Alamat Lengkap</td><td width="3%">:</td><td>${s.f_alamat || '-'}</td></tr>
+                    <tr><td>13.</td><td>No. Telepon / HP</td><td>:</td><td>${s.f_telp || '-'}</td></tr>
+                    <tr><td>14.</td><td>Tinggal Bersama</td><td>:</td><td>${s.f_tinggal || '-'}</td></tr>
+                    <tr><td>15.</td><td>Jarak ke Sekolah</td><td>:</td><td>${s.f_jarak || '-'} Km</td></tr>
+                    <tr><td>16.</td><td>Ke Sekolah Dengan</td><td>:</td><td>${s.f_transport || '-'}</td></tr>
+                </table>
 
-        <div class="bold">C. KESEHATAN & D. PENDIDIKAN SEBELUMNYA</div>
-        <table>
-            <tr><td width="5%">17.</td><td width="35%">Berat / Tinggi Badan</td><td width="3%">:</td><td>${s.f_bb || '-'} Kg / ${s.f_tb || '-'} Cm</td></tr>
-            <tr><td>18.</td><td>Golongan Darah</td><td>:</td><td>${s.f_goldar || '-'}</td></tr>
-            <tr><td>19.</td><td>Kelainan / Penyakit</td><td>:</td><td>${s.f_kelainan || '-'} / ${s.f_penyakit || '-'}</td></tr>
-            <tr><td>20.</td><td>Asal Sekolah (TK/PAUD)</td><td>:</td><td>${s.f_asal_sekolah || '-'}</td></tr>
-            <tr><td>21.</td><td>Tgl & No Ijazah</td><td>:</td><td>${s.f_ijazah_asal || '-'}</td></tr>
-            <tr><td>22.</td><td>Pindahan / Alasan</td><td>:</td><td>${s.f_pindahan || '-'}</td></tr>
-        </table>
+                <div class="bold">C. KESEHATAN & D. PENDIDIKAN SEBELUMNYA</div>
+                <table>
+                    <tr><td width="5%">17.</td><td width="35%">Berat / Tinggi Badan</td><td width="3%">:</td><td>${s.f_bb || '-'} Kg / ${s.f_tb || '-'} Cm</td></tr>
+                    <tr><td>18.</td><td>Golongan Darah</td><td>:</td><td>${s.f_goldar || '-'}</td></tr>
+                    <tr><td>19.</td><td>Kelainan / Penyakit</td><td>:</td><td>${s.f_kelainan || '-'} / ${s.f_penyakit || '-'}</td></tr>
+                    <tr><td>20.</td><td>Asal Sekolah (TK/PAUD)</td><td>:</td><td>${s.f_asal_sekolah || '-'}</td></tr>
+                    <tr><td>21.</td><td>Tgl & No Ijazah</td><td>:</td><td>${s.f_ijazah_asal || '-'}</td></tr>
+                    <tr><td>22.</td><td>Pindahan / Alasan</td><td>:</td><td>${s.f_pindahan || '-'}</td></tr>
+                </table>
 
-        <div class="bold">E. KETERANGAN ORANG TUA KANDUNG</div>
-        <table class="tabel-ortu">
-            <tr><th>No</th><th>Orang Tua Kandung</th><th>Ayah</th><th>Ibu</th></tr>
-            <tr><td>24.</td><td>Nama</td><td>${s.f_ayah_nama || '-'}</td><td>${s.f_ibu_nama || '-'}</td></tr>
-            <tr><td>25.</td><td>Tempat, Tgl Lahir</td><td>${s.f_ayah_ttl || '-'}</td><td>${s.f_ibu_ttl || '-'}</td></tr>
-            <tr><td>26.</td><td>Agama</td><td>${s.f_ayah_agama || '-'}</td><td>${s.f_ibu_agama || '-'}</td></tr>
-            <tr><td>27.</td><td>Ijazah Tertinggi</td><td>${s.f_ayah_pend || '-'}</td><td>${s.f_ibu_pend || '-'}</td></tr>
-            <tr><td>28.</td><td>Pekerjaan</td><td>${s.f_ayah_kerja || '-'}</td><td>${s.f_ibu_kerja || '-'}</td></tr>
-            <tr><td>29.</td><td>Penghasilan / Bulan</td><td>${s.f_ayah_gaji || '-'}</td><td>${s.f_ibu_gaji || '-'}</td></tr>
-            <tr><td>30.</td><td>Masih Hidup / Meninggal</td><td>${s.f_ayah_status || '-'}</td><td>${s.f_ibu_status || '-'}</td></tr>
-        </table>
+                <div class="bold">E. KETERANGAN ORANG TUA KANDUNG</div>
+                <table class="tabel-ortu">
+                    <tr><th>No</th><th>Orang Tua Kandung</th><th>Ayah</th><th>Ibu</th></tr>
+                    <tr><td>24.</td><td>Nama</td><td>${s.f_ayah_nama || '-'}</td><td>${s.f_ibu_nama || '-'}</td></tr>
+                    <tr><td>25.</td><td>Tempat, Tgl Lahir</td><td>${s.f_ayah_ttl || '-'}</td><td>${s.f_ibu_ttl || '-'}</td></tr>
+                    <tr><td>26.</td><td>Agama</td><td>${s.f_ayah_agama || '-'}</td><td>${s.f_ibu_agama || '-'}</td></tr>
+                    <tr><td>27.</td><td>Ijazah Tertinggi</td><td>${s.f_ayah_pend || '-'}</td><td>${s.f_ibu_pend || '-'}</td></tr>
+                    <tr><td>28.</td><td>Pekerjaan</td><td>${s.f_ayah_kerja || '-'}</td><td>${s.f_ibu_kerja || '-'}</td></tr>
+                    <tr><td>29.</td><td>Penghasilan / Bulan</td><td>${s.f_ayah_gaji || '-'}</td><td>${s.f_ibu_gaji || '-'}</td></tr>
+                    <tr><td>30.</td><td>Masih Hidup / Meninggal</td><td>${s.f_ayah_status || '-'}</td><td>${s.f_ibu_status || '-'}</td></tr>
+                </table>
 
-        <div class="bold">F. KETERANGAN WALI & G. PERKEMBANGAN</div>
-        <table>
-            <tr><td width="5%">31.</td><td width="35%">Nama Wali</td><td width="3%">:</td><td>${s.f_wali_nama || '-'}</td></tr>
-            <tr><td>32.</td><td>Pekerjaan / Alamat</td><td>:</td><td>${s.f_wali_kerja || '-'} / ${s.f_wali_alamat || '-'}</td></tr>
-            <tr><td>33.</td><td>Bakat / Prestasi</td><td>:</td><td>${s.f_bakat || '-'}</td></tr>
-            <tr><td>34.</td><td>Diterima di Kelas</td><td>:</td><td>${s.f_kelas_masuk || '-'}</td></tr>
-        </table>
-    `;
+                <div class="bold">F. KETERANGAN WALI & G. PERKEMBANGAN</div>
+                <table>
+                    <tr><td width="5%">31.</td><td width="35%">Nama Wali</td><td width="3%">:</td><td>${s.f_wali_nama || '-'}</td></tr>
+                    <tr><td>32.</td><td>Pekerjaan / Alamat</td><td>:</td><td>${s.f_wali_kerja || '-'} / ${s.f_wali_alamat || '-'}</td></tr>
+                    <tr><td>33.</td><td>Bakat / Prestasi</td><td>:</td><td>${s.f_bakat || '-'}</td></tr>
+                    <tr><td>34.</td><td>Diterima di Kelas</td><td>:</td><td>${s.f_kelas_masuk || '-'}</td></tr>
+                </table>
+            `;
 
-    let postHtml = "</body></html>";
-    let fullHtml = preHtml + style + kopSurat + konten + postHtml;
+            let postHtml = "</body></html>";
+            let fullHtml = preHtml + style + kopSurat + topSection + konten + postHtml;
 
-    // Membungkus format file sebagai MS Word Document
-    let blob = new Blob(['\ufeff', fullHtml], { type: 'application/msword' });
-    
-    // Proses pembuatan link donwload
-    let url = URL.createObjectURL(blob);
-    let link = document.createElement('a');
-    link.href = url;
-    
-    // Format nama file: Buku_Induk_NamaSiswa.doc
-    let namaFile = (s.f_nama || 'Siswa').replace(/\s+/g, '_');
-    link.download = 'Buku_Induk_' + namaFile + '.doc';
-    
-    // Klik otomatis untuk memulai unduhan
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
+            let blob = new Blob(['\ufeff', fullHtml], { type: 'application/msword' });
+            let url = URL.createObjectURL(blob);
+            let link = document.createElement('a');
+            link.href = url;
+            
+            let namaFile = (s.f_nama || 'Siswa').replace(/\s+/g, '_');
+            link.download = 'Buku_Induk_' + namaFile + '.doc';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 </body>
 </html>

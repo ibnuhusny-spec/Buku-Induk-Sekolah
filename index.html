@@ -25,7 +25,6 @@
         
         .card { background: var(--card-bg); border-radius: 8px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
-        /* Modifikasi untuk memastikan view hilang total */
         .view-section { display: none; }
         .view-section.active { animation: fadeIn 0.3s; }
 
@@ -77,6 +76,13 @@
             margin-top: 10px;
         }
         .btn-3d:active { transform: translateY(5px); box-shadow: 0 0 0 #0284c7; }
+        
+        /* Tombol teks untuk pengaturan server */
+        .btn-text-link {
+            background: transparent; color: #94a3b8; border: none; cursor: pointer; 
+            font-size: 0.85rem; margin-top: 25px; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px;
+        }
+        .btn-text-link:hover { color: var(--primary); text-decoration: underline; }
 
         /* TAMPILAN CETAK A4 */
         @media print {
@@ -174,6 +180,28 @@
                 </div>
                 
                 <button class="btn-3d" onclick="prosesLogin()">MASUK APLIKASI ➔</button>
+
+                <!-- Tombol Pengaturan Server -->
+                <button class="btn-text-link" onclick="bukaPengaturanServer()">⚙️ Pengaturan Server Database</button>
+            </div>
+        </div>
+
+        <!-- ================================== -->
+        <!-- VIEW 1.B: LAYAR PENGATURAN SERVER  -->
+        <!-- ================================== -->
+        <div id="server-settings-view" class="view-section login-wrapper">
+            <div class="login-card">
+                <h2 class="login-title" style="font-size: 1.4rem;">⚙️ Pengaturan Server</h2>
+                <p class="login-subtitle">Tautkan aplikasi ke Google Sheets Anda</p>
+                
+                <div style="text-align: left; margin-bottom: 25px; background: #fffbeb; padding: 15px; border-left: 4px solid #f59e0b; border-radius: 4px;">
+                    <label style="font-weight: 600; display: block; margin-bottom: 5px; color: #475569;">URL Google Apps Script (Web App):</label>
+                    <input type="text" id="input-gas-url" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
+                    <small style="display: block; margin-top: 8px; color: #64748b;">* Pastikan URL diakhiri dengan <strong>/exec</strong></small>
+                </div>
+                
+                <button class="btn-3d" style="background: var(--success); box-shadow: 0 5px 0 #059669;" onclick="simpanURLServer()">💾 SIMPAN SERVER</button>
+                <button class="btn btn-secondary" style="width: 100%; margin-top: 15px; padding: 10px;" onclick="showView('login-view')">Batal / Kembali</button>
             </div>
         </div>
 
@@ -344,7 +372,6 @@
                 <div>
                     <button class="btn btn-secondary" onclick="showView('home-view')">⬅ Kembali</button>
                     <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Langsung</button>
-                    <!-- TOMBOL DOWNLOAD WORD YANG SUDAH DIPERBAIKI -->
                     <button class="btn btn-success" style="background:#2563eb;" onclick="exportToWord()">📄 Download Word</button>
                 </div>
             </div>
@@ -447,13 +474,11 @@
     </div>
 
     <script>
-        // PASTE URL APLIKASI WEB GOOGLE APPS SCRIPT ANDA DI SINI
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxIHLJTIdxzeznX1ryB7zDAtXmZ_2il--F81BKQbcENUe8WCrQUSVz6IEzc4mAW3-V0/exec';
+        // --- PENGATURAN URL SERVER DINAMIS ---
+        let GAS_URL = localStorage.getItem('gas_url_sekolah') || '';
         
         let students = [];
         let isAdmin = false;
-        
-        // VARIABEL GLOBAL BARU UNTUK DOWNLOAD WORD
         let currentSiswaID = null;
 
         const ADMIN_PIN = "@dm1nKu77";
@@ -467,17 +492,34 @@
         window.onload = () => { 
             initTheme(); 
             loadSettings();
-            fetchData();
+            if(GAS_URL) { fetchData(); } // Hanya ambil data jika URL sudah diatur
         };
 
+        // --- SISTEM PENGATURAN SERVER ---
+        function bukaPengaturanServer() {
+            document.getElementById('input-gas-url').value = GAS_URL;
+            showView('server-settings-view');
+        }
+
+        function simpanURLServer() {
+            const urlBaru = document.getElementById('input-gas-url').value.trim();
+            if(urlBaru && urlBaru.includes('script.google.com/macros/s/')) {
+                GAS_URL = urlBaru;
+                localStorage.setItem('gas_url_sekolah', urlBaru);
+                alert("✅ URL Server Berhasil Disimpan!\nAplikasi siap digunakan.");
+                showView('login-view');
+                fetchData(); 
+            } else {
+                alert("❌ URL tidak valid!\nPastikan Anda menyalin link 'Web App' yang benar dari Google Apps Script (berakhiran /exec).");
+            }
+        }
+
+        // --- SISTEM LOGIN ---
         function toggleLoginType() {
             const role = document.getElementById('login-role').value;
             const label = document.getElementById('login-label');
-            if (role === 'admin') {
-                label.innerText = 'Password Administrator:';
-            } else {
-                label.innerText = 'Kunci Akses Pendaftaran:';
-            }
+            if (role === 'admin') { label.innerText = 'Password Administrator:'; } 
+            else { label.innerText = 'Kunci Akses Pendaftaran:'; }
             document.getElementById('login-password').value = '';
             document.getElementById('login-password').focus();
         }
@@ -487,6 +529,11 @@
         }
 
         function prosesLogin() {
+            if(!GAS_URL) {
+                alert("⚠️ Sistem belum terhubung ke Database!\nSilakan klik 'Pengaturan Server Database' terlebih dahulu.");
+                return;
+            }
+
             const role = document.getElementById('login-role').value;
             const pass = document.getElementById('login-password').value;
 
@@ -527,7 +574,7 @@
             }
         }
 
-        // --- PERBAIKAN: HILANGKAN TOTAL VIEW YANG TIDAK AKTIF ---
+        // --- SISTEM VIEW ---
         function showView(id) {
             document.querySelectorAll('.view-section').forEach(v => {
                 v.classList.remove('active');
@@ -538,7 +585,8 @@
             activeView.classList.add('active');
             activeView.style.display = 'block'; 
             
-            if (id === 'login-view') {
+            // Pengecualian khusus form login dan settings agar tetap rata tengah (flex)
+            if (id === 'login-view' || id === 'server-settings-view') {
                 activeView.style.display = 'flex';
             }
         }
@@ -550,11 +598,13 @@
             showView('form-view');
         }
 
+        // --- MANAJEMEN DATABASE ---
         async function fetchData() {
+            if(!GAS_URL) return;
             try {
                 const response = await fetch(GAS_URL);
                 students = await response.json();
-                renderTable(); 
+                if(isAdmin) renderTable(); // Hanya render tabel jika admin sedang aktif
             } catch (error) { console.error('Gagal memuat data:', error); }
         }
 
@@ -596,7 +646,7 @@
             const tbody = document.querySelector('#student-table tbody');
             const search = document.getElementById('search-input').value.toLowerCase();
             tbody.innerHTML = '';
-            let filtered = students.filter(s => (s.f_nama || '').toLowerCase().includes(search) || (s.f_nisn || '').includes(search));
+            let filtered = students.filter(s => (s.f_nama || '').toLowerCase().includes(search) || (String(s.f_nisn) || '').includes(search));
             
             if(filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Belum ada data murid atau sedang loading...</td></tr>'; return; }
 
@@ -610,6 +660,8 @@
 
         async function saveStudent(e) {
             e.preventDefault();
+            if(!GAS_URL) { alert("⚠️ URL Server belum diatur!"); return; }
+
             const btnSubmit = e.target.querySelector('button[type="submit"]');
             const originalText = btnSubmit.innerHTML;
             btnSubmit.innerHTML = "⏳ Menyimpan..."; btnSubmit.disabled = true; 
@@ -655,7 +707,6 @@
         }
 
         function viewStudent(id) {
-            // SIMPAN ID SISWA KE MEMORI AGAR DOWNLOAD WORD PASTI BERHASIL
             currentSiswaID = id;
 
             const s = students.find(x => x.id == id);
@@ -670,6 +721,7 @@
             showView('detail-view');
         }
 
+        // --- KAMERA ---
         let cameraStream = null;
         async function startCamera() { try { cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } }); document.getElementById('camera-video').srcObject = cameraStream; document.getElementById('camera-container').style.display = 'block'; document.getElementById('photo-buttons').style.display = 'none'; } catch (err) { alert("❌ Akses kamera ditolak."); } }
         function stopCamera() { if (cameraStream) cameraStream.getTracks().forEach(track => track.stop()); document.getElementById('camera-container').style.display = 'none'; document.getElementById('photo-buttons').style.display = 'flex'; }
@@ -688,13 +740,13 @@
             const b64 = canvas.toDataURL('image/jpeg', 0.6); document.getElementById('photo-data').value = b64; document.getElementById('photo-preview-img').src = b64;
         }
 
+        // --- FITUR DOWNLOAD EXCEL & WORD ---
         function exportExcel() {
             let csv = "NISN,Nama Lengkap,Kelas Saat Ini,Jenis Kelamin,Tempat Lahir,Tgl Lahir,Agama\n";
             students.forEach(s => { csv += `"${s.f_nisn}","${s.f_nama}","${s.f_kelas || '-'}","${s.f_jk}","${s.f_tempat_lahir}","${s.f_tgl_lahir}","${s.f_agama}"\n`; });
             const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'Rekap_Siswa.csv'; a.click();
         }
 
-        // --- PERBAIKAN: DOWNLOAD WORD MENGGUNAKAN ID SISWA DARI MEMORI ---
         function exportToWord() {
             if (!currentSiswaID) return alert("❌ Silakan pilih siswa terlebih dahulu.");
             

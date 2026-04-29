@@ -213,7 +213,7 @@
             <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap:10px;">
                 <div style="flex: 1; min-width: 250px;">
                     <input type="text" id="search-input" class="form-control" style="width: 100%; max-width: 400px;" 
-                           placeholder="🔍 Cari Nama / NISN / Kelas / Jenis Kelamin..." 
+                           placeholder="🔍 Cari Nama / NISN / Kelas / Putra / Putri..." 
                            oninput="debounceSearch()" autocomplete="off" spellcheck="false">
                     
                     <div id="student-count" style="margin-top: 8px; font-weight: bold; color: var(--primary); font-size: 0.95rem;">
@@ -257,13 +257,10 @@
                     <li style="margin-bottom: 8px;">Buka file Excel unduhan Dapodik Anda di laptop.</li>
                     <li style="margin-bottom: 8px;">Buka file <strong>Google Sheets</strong> (database aplikasi ini) di tab browser baru.</li>
                     <li style="margin-bottom: 8px;">Buka *sheet* bernama <strong>DB_Induk</strong>.</li>
-                    <li style="margin-bottom: 8px;">Cukup <strong>Copy (Salin)</strong> kolom data dari Excel (misal: kolom Nama, NISN, Tempat Lahir), lalu <strong>Paste (Tempel)</strong> ke kolom yang sesuai di Google Sheets tersebut, mulai dari Baris ke-2.</li>
+                    <li style="margin-bottom: 8px;">Cukup <strong>Copy (Salin)</strong> kolom data dari Excel (misal: kolom Nama, NISN, Tempat Lahir), lalu <strong>Paste (Tempel)</strong> ke baris dan kolom yang sesuai di Google Sheets tersebut, mulai dari Baris ke-2.</li>
+                    <li style="margin-bottom: 8px;">Jangan lupa salin seluruh data NISN atau NIPD siswa ke <strong>Kolom A (id)</strong> agar tombol Cetak dapat bekerja.</li>
                     <li style="margin-bottom: 8px;">Data yang Anda masukkan akan langsung otomatis terbaca di aplikasi Buku Induk ini saat halaman di-<i>refresh</i>.</li>
                 </ol>
-                <br>
-                <div style="background: #fffbeb; padding: 12px; border-left: 4px solid #f59e0b; border-radius: 4px; font-size: 0.9rem;">
-                    💡 <strong>Tips:</strong> Pastikan Anda meletakkan data di bawah baris judul kolom (Header) yang benar agar tampilannya tidak tertukar di aplikasi.
-                </div>
             </div>
             
             <div style="margin-top:20px; text-align:right;">
@@ -720,7 +717,7 @@
             reader.readAsDataURL(file);
         }
 
-        // --- FITUR DEBOUNCE PENCARIAN (ANTI LAG DI HP) & PENCARIAN CERDAS ---
+        // --- FITUR DEBOUNCE PENCARIAN & ALGORITMA CERDAS ---
         let searchTimeout;
         function debounceSearch() {
             clearTimeout(searchTimeout);
@@ -733,13 +730,8 @@
             const tbody = document.querySelector('#student-table tbody');
             let searchRaw = document.getElementById('search-input').value.toLowerCase();
             
-            // 1. Alias pintar untuk jenis kelamin
-            searchRaw = searchRaw.replace(/\bputra\b/g, 'laki-laki')
-                                 .replace(/\bpria\b/g, 'laki-laki')
-                                 .replace(/\bputri\b/g, 'perempuan')
-                                 .replace(/\bwanita\b/g, 'perempuan');
-                                 
-            // 2. Kunci frasa "kelas X" menjadi satu kata agar angka kelas tidak bocor mencari NISN
+            // Kunci frasa "kelas X" jadi satu kesatuan (kelas_X)
+            // Agar kalau ngetik "kelas 5", angka 5 tidak nyasar mencari ke kolom NISN
             searchRaw = searchRaw.replace(/kelas\s+([0-9a-z]+)/g, 'kelas_$1');
             
             const searchTerms = searchRaw.split(' ').filter(t => t.trim() !== '');
@@ -747,14 +739,24 @@
             tbody.innerHTML = '';
             
             let filtered = students.filter(s => {
-                // Konversi kelas asli di database menjadi format terkunci juga
+                // 1. Kunci juga data kelas asli siswa
                 let kelasAsli = (s.f_kelas || '').toLowerCase();
                 let kelasMod = kelasAsli.replace(/kelas\s+([0-9a-z]+)/g, 'kelas_$1');
                 
-                // Gabungkan data yang ingin dicari
-                const textData = `${s.f_nama} ${s.f_nisn} ${kelasMod} ${s.f_jk}`.toLowerCase();
+                // 2. Kumpulkan semua data mentah siswa
+                let textData = `${s.f_nama} ${s.f_nisn} ${kelasMod} ${s.f_jk}`.toLowerCase();
                 
-                // Pastikan semua kata kunci cocok dengan data siswa
+                // 3. INJEKSI KATA BAYANGAN (Tanpa merusak teks aslinya)
+                // Jadi user bebas mencari pakai kata putra/pria/laki
+                let jk = (s.f_jk || '').toLowerCase();
+                if (jk === 'l' || jk.includes('laki')) {
+                    textData += ' putra pria cowok';
+                }
+                if (jk === 'p' || jk.includes('perempuan')) {
+                    textData += ' putri wanita cewek';
+                }
+                
+                // 4. Pastikan semua kata yang diketik ada di textData siswa ini
                 return searchTerms.every(term => textData.includes(term));
             });
             

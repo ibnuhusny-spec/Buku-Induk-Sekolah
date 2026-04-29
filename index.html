@@ -363,9 +363,10 @@
         <div id="detail-view" class="view-section card">
             <div class="no-print" style="margin-bottom:20px; background:#e2e8f0; padding:15px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
                 <div>
-                    <button class="btn btn-secondary" onclick="showView('home-view')">⬅ Kembali ke Beranda</button>
-                    <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Lembar Buku Induk</button>
-                </div>
+    <button class="btn btn-secondary" onclick="showView('home-view')">⬅ Kembali</button>
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Langsung</button>
+    <button class="btn btn-success" style="background:#2563eb;" onclick="exportToWord()">📄 Download Word</button>
+</div>
                 <div style="font-size: 0.85rem; color:#475569;">Pastikan Kop Surat sudah diatur di menu Pengaturan. Gunakan ukuran kertas A4/F4.</div>
             </div>
             
@@ -901,6 +902,134 @@
             a.download = 'Rekap_Buku_Induk_SDIT_Qurratu_Ayun.csv'; 
             a.click();
         }
+        // FUNGSI UNTUK EXPORT KE MS WORD (.doc)
+function exportToWord() {
+    // Ambil ID siswa yang sedang dilihat dari input tersembunyi, atau ambil dari tampilan
+    let nisnSiswa = document.getElementById('p_nisn').innerText;
+    let s = students.find(x => x.f_nisn === nisnSiswa);
+    
+    if (!s) {
+        alert("Gagal mengambil data siswa untuk diexport.");
+        return;
+    }
+
+    // Menggabungkan HTML khusus untuk dikenali oleh Microsoft Word
+    let preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Buku Induk</title>";
+    
+    // Style khusus untuk Word
+    let style = `
+        <style>
+            body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 10pt; }
+            td { vertical-align: top; padding: 2pt 4pt; }
+            .header-word { text-align: center; border-bottom: 3px solid black; margin-bottom: 15pt; padding-bottom: 10pt; }
+            .header-word h4, .header-word h3, .header-word h2 { margin: 0; padding: 0; text-transform: uppercase; }
+            .judul { text-align: center; font-weight: bold; font-size: 14pt; margin-bottom: 15pt; text-decoration: underline; }
+            .bold { font-weight: bold; }
+            .tabel-ortu th, .tabel-ortu td { border: 1pt solid black; padding: 4pt; text-align: left; }
+            .kotak-foto { width: 90pt; height: 120pt; border: 1pt solid black; float: right; text-align: center; line-height: 120pt; font-size: 9pt; color: #666; margin-left: 10pt; }
+        </style>
+    </head><body>`;
+
+    let kopSurat = `
+        <div class="header-word">
+            <h4>${appSettings.pemda}</h4>
+            <h3>${appSettings.dinas}</h3>
+            <h2>${appSettings.sekolah}</h2>
+            <p>${appSettings.alamat}</p>
+        </div>
+    `;
+
+    // Susun isi kontennya
+    let konten = `
+        <div class="judul">LEMBAR BUKU INDUK SISWA</div>
+        
+        <div class="kotak-foto">[ TEMPEL FOTO 3x4 ]</div>
+
+        <table>
+            <tr><td width="30%">Nama Lengkap Murid</td><td width="3%">:</td><td class="bold">${s.f_nama || '-'}</td></tr>
+            <tr><td>Nomor Induk Siswa Nasional</td><td>:</td><td>${s.f_nisn || '-'}</td></tr>
+            <tr><td>Kelas Saat Ini</td><td>:</td><td>${s.f_kelas || '-'}</td></tr>
+            <tr><td>No. Seri Buku Rapor</td><td>:</td><td>${s.f_no_rapor || '-'}</td></tr>
+        </table>
+        <br style="clear: both;">
+
+        <div class="bold">A. KETERANGAN PRIBADI</div>
+        <table>
+            <tr><td width="5%">1.</td><td width="35%">Nama Lengkap</td><td width="3%">:</td><td>${s.f_nama || '-'}</td></tr>
+            <tr><td></td><td>Nama Panggilan</td><td>:</td><td>${s.f_panggilan || '-'}</td></tr>
+            <tr><td>2.</td><td>Jenis Kelamin</td><td>:</td><td>${s.f_jk || '-'}</td></tr>
+            <tr><td>3.</td><td>Tempat & Tanggal Lahir</td><td>:</td><td>${s.f_tempat_lahir || '-'}, ${s.f_tgl_lahir || '-'}</td></tr>
+            <tr><td>4.</td><td>Agama</td><td>:</td><td>${s.f_agama || '-'}</td></tr>
+            <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>${s.f_wn || '-'}</td></tr>
+            <tr><td>6.</td><td>Anak Keberapa</td><td>:</td><td>${s.f_anak_ke || '-'}</td></tr>
+            <tr><td>7.</td><td>Jumlah Saudara Kandung</td><td>:</td><td>${s.f_sdr_kandung || '-'}</td></tr>
+            <tr><td>8.</td><td>Jumlah Saudara Tiri</td><td>:</td><td>${s.f_sdr_tiri || '-'}</td></tr>
+            <tr><td>9.</td><td>Jumlah Saudara Angkat</td><td>:</td><td>${s.f_sdr_angkat || '-'}</td></tr>
+            <tr><td>10.</td><td>Anak Yatim / Piatu</td><td>:</td><td>${s.f_yatim || '-'}</td></tr>
+            <tr><td>11.</td><td>Bahasa Sehari-hari</td><td>:</td><td>${s.f_bahasa || '-'}</td></tr>
+        </table>
+
+        <div class="bold">B. KETERANGAN TEMPAT TINGGAL</div>
+        <table>
+            <tr><td width="5%">12.</td><td width="35%">Alamat Lengkap</td><td width="3%">:</td><td>${s.f_alamat || '-'}</td></tr>
+            <tr><td>13.</td><td>No. Telepon / HP</td><td>:</td><td>${s.f_telp || '-'}</td></tr>
+            <tr><td>14.</td><td>Tinggal Bersama</td><td>:</td><td>${s.f_tinggal || '-'}</td></tr>
+            <tr><td>15.</td><td>Jarak ke Sekolah</td><td>:</td><td>${s.f_jarak || '-'} Km</td></tr>
+            <tr><td>16.</td><td>Ke Sekolah Dengan</td><td>:</td><td>${s.f_transport || '-'}</td></tr>
+        </table>
+
+        <div class="bold">C. KESEHATAN & D. PENDIDIKAN SEBELUMNYA</div>
+        <table>
+            <tr><td width="5%">17.</td><td width="35%">Berat / Tinggi Badan</td><td width="3%">:</td><td>${s.f_bb || '-'} Kg / ${s.f_tb || '-'} Cm</td></tr>
+            <tr><td>18.</td><td>Golongan Darah</td><td>:</td><td>${s.f_goldar || '-'}</td></tr>
+            <tr><td>19.</td><td>Kelainan / Penyakit</td><td>:</td><td>${s.f_kelainan || '-'} / ${s.f_penyakit || '-'}</td></tr>
+            <tr><td>20.</td><td>Asal Sekolah (TK/PAUD)</td><td>:</td><td>${s.f_asal_sekolah || '-'}</td></tr>
+            <tr><td>21.</td><td>Tgl & No Ijazah</td><td>:</td><td>${s.f_ijazah_asal || '-'}</td></tr>
+            <tr><td>22.</td><td>Pindahan / Alasan</td><td>:</td><td>${s.f_pindahan || '-'}</td></tr>
+        </table>
+
+        <div class="bold">E. KETERANGAN ORANG TUA KANDUNG</div>
+        <table class="tabel-ortu">
+            <tr><th>No</th><th>Orang Tua Kandung</th><th>Ayah</th><th>Ibu</th></tr>
+            <tr><td>24.</td><td>Nama</td><td>${s.f_ayah_nama || '-'}</td><td>${s.f_ibu_nama || '-'}</td></tr>
+            <tr><td>25.</td><td>Tempat, Tgl Lahir</td><td>${s.f_ayah_ttl || '-'}</td><td>${s.f_ibu_ttl || '-'}</td></tr>
+            <tr><td>26.</td><td>Agama</td><td>${s.f_ayah_agama || '-'}</td><td>${s.f_ibu_agama || '-'}</td></tr>
+            <tr><td>27.</td><td>Ijazah Tertinggi</td><td>${s.f_ayah_pend || '-'}</td><td>${s.f_ibu_pend || '-'}</td></tr>
+            <tr><td>28.</td><td>Pekerjaan</td><td>${s.f_ayah_kerja || '-'}</td><td>${s.f_ibu_kerja || '-'}</td></tr>
+            <tr><td>29.</td><td>Penghasilan / Bulan</td><td>${s.f_ayah_gaji || '-'}</td><td>${s.f_ibu_gaji || '-'}</td></tr>
+            <tr><td>30.</td><td>Masih Hidup / Meninggal</td><td>${s.f_ayah_status || '-'}</td><td>${s.f_ibu_status || '-'}</td></tr>
+        </table>
+
+        <div class="bold">F. KETERANGAN WALI & G. PERKEMBANGAN</div>
+        <table>
+            <tr><td width="5%">31.</td><td width="35%">Nama Wali</td><td width="3%">:</td><td>${s.f_wali_nama || '-'}</td></tr>
+            <tr><td>32.</td><td>Pekerjaan / Alamat</td><td>:</td><td>${s.f_wali_kerja || '-'} / ${s.f_wali_alamat || '-'}</td></tr>
+            <tr><td>33.</td><td>Bakat / Prestasi</td><td>:</td><td>${s.f_bakat || '-'}</td></tr>
+            <tr><td>34.</td><td>Diterima di Kelas</td><td>:</td><td>${s.f_kelas_masuk || '-'}</td></tr>
+        </table>
+    `;
+
+    let postHtml = "</body></html>";
+    let fullHtml = preHtml + style + kopSurat + konten + postHtml;
+
+    // Membungkus format file sebagai MS Word Document
+    let blob = new Blob(['\ufeff', fullHtml], { type: 'application/msword' });
+    
+    // Proses pembuatan link donwload
+    let url = URL.createObjectURL(blob);
+    let link = document.createElement('a');
+    link.href = url;
+    
+    // Format nama file: Buku_Induk_NamaSiswa.doc
+    let namaFile = (s.f_nama || 'Siswa').replace(/\s+/g, '_');
+    link.download = 'Buku_Induk_' + namaFile + '.doc';
+    
+    // Klik otomatis untuk memulai unduhan
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
     </script>
 </body>
 </html>

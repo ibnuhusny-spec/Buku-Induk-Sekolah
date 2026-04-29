@@ -24,8 +24,10 @@
         .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; flex: 1; width: 100%;}
         
         .card { background: var(--card-bg); border-radius: 8px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        /* Modifikasi untuk memastikan view hilang total */
         .view-section { display: none; }
-        .view-section.active { display: block; animation: fadeIn 0.3s; }
+        .view-section.active { animation: fadeIn 0.3s; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -62,13 +64,12 @@
         .login-card { 
             background: var(--card-bg); border-radius: 12px; padding: 40px 30px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 420px; 
-            text-align: center; border-top: 6px solid var(--primary); position: relative;
+            text-align: center; border-top: 6px solid var(--primary);
         }
         .login-logo { width: 90px; height: auto; margin-bottom: 15px; object-fit: contain; }
         .login-title { color: var(--text-color); margin-bottom: 5px; font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
         .login-subtitle { color: #64748b; margin-bottom: 25px; font-size: 0.95rem; }
         
-        /* Tombol 3D Mewah */
         .btn-3d { 
             background: var(--primary); color: white; border: none; padding: 12px; 
             border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; 
@@ -127,7 +128,6 @@
             #student-table td:last-child { display: flex; flex-direction: column; gap: 5px; }
         }
         
-        /* Footer Text */
         .credit-footer { text-align: center; padding: 20px; font-size: 0.85rem; color: #64748b; margin-top: auto; }
     </style>
 </head>
@@ -153,9 +153,8 @@
         <!-- ================================== -->
         <!-- VIEW 1: LAYAR LOGIN ELEGAN         -->
         <!-- ================================== -->
-        <div id="login-view" class="view-section active login-wrapper">
+        <div id="login-view" class="view-section login-wrapper" style="display: flex;">
             <div class="login-card">
-                <!-- Memanggil file gambar lokal maros.png -->
                 <img src="maros.png" alt="Logo Wilayah" class="login-logo" onerror="this.style.display='none'">
                 
                 <h2 class="login-title">Buku Induk Digital</h2>
@@ -174,13 +173,7 @@
                     <input type="password" id="login-password" class="form-control" placeholder="Masukkan Kunci Rahasia..." onkeypress="handleEnter(event)">
                 </div>
                 
-                <!-- Tombol 3D -->
                 <button class="btn-3d" onclick="prosesLogin()">MASUK APLIKASI ➔</button>
-
-                <!-- LINK PENGATURAN SERVER DI BAWAH TOMBOL LOGIN -->
-                <div style="margin-top: 25px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
-                    <a href="#" onclick="setGasUrl(); return false;" style="color: #64748b; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: color 0.2s;">⚙️ Pengaturan Server (Apps Script)</a>
-                </div>
             </div>
         </div>
 
@@ -351,6 +344,7 @@
                 <div>
                     <button class="btn btn-secondary" onclick="showView('home-view')">⬅ Kembali</button>
                     <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Langsung</button>
+                    <!-- TOMBOL DOWNLOAD WORD YANG SUDAH DIPERBAIKI -->
                     <button class="btn btn-success" style="background:#2563eb;" onclick="exportToWord()">📄 Download Word</button>
                 </div>
             </div>
@@ -449,15 +443,19 @@
 
     <!-- FOOTER CREDIT -->
     <div class="no-print credit-footer">
-        Dikembangkan oleh <strong>Arifin Arif</strong>
+        Dikembangkan pertama kali oleh <strong>Arifin Arif</strong>
     </div>
 
     <script>
-        // VARIABLE GAS URL KINI MENGAMBIL DARI LOCAL STORAGE (TIDAK HARDCODED LAGI)
-        let GAS_URL = localStorage.getItem('gas_url_sekolah') || '';
+        // PASTE URL APLIKASI WEB GOOGLE APPS SCRIPT ANDA DI SINI
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxIHLJTIdxzeznX1ryB7zDAtXmZ_2il--F81BKQbcENUe8WCrQUSVz6IEzc4mAW3-V0/exec';
         
         let students = [];
         let isAdmin = false;
+        
+        // VARIABEL GLOBAL BARU UNTUK DOWNLOAD WORD
+        let currentSiswaID = null;
+
         const ADMIN_PIN = "@dm1nKu77";
         const ORTU_PIN = "m4r0s77";
         
@@ -471,22 +469,6 @@
             loadSettings();
             fetchData();
         };
-
-        // --- FUNGSI MENGATUR LINK GOOGLE APPS SCRIPT ---
-        function setGasUrl() {
-            let newUrl = prompt("🔧 PENGATURAN SERVER\n\nMasukkan Link Aplikasi Web (Google Apps Script) sekolah Anda di sini:\n\n*Kosongkan lalu klik OK jika ingin menghapus link.", GAS_URL);
-            
-            if (newUrl !== null) {
-                GAS_URL = newUrl.trim();
-                localStorage.setItem('gas_url_sekolah', GAS_URL);
-                if (GAS_URL !== "") {
-                    alert("✅ Link Server berhasil disimpan!\nAplikasi akan mencoba memuat ulang data.");
-                    fetchData();
-                } else {
-                    alert("⚠️ Link Server telah dihapus.");
-                }
-            }
-        }
 
         function toggleLoginType() {
             const role = document.getElementById('login-role').value;
@@ -505,12 +487,6 @@
         }
 
         function prosesLogin() {
-            // Cek apakah GAS URL sudah diisi sebelum mengizinkan login
-            if (!GAS_URL) {
-                alert("⚠️ PENTING: Anda belum memasukkan Link Server (Google Apps Script)!\n\nSilakan klik tombol '⚙️ Pengaturan Server (Apps Script)' di bagian bawah layar ini untuk memasukkan link terlebih dahulu agar aplikasi bisa menyimpan dan membaca data.");
-                return;
-            }
-
             const role = document.getElementById('login-role').value;
             const pass = document.getElementById('login-password').value;
 
@@ -551,20 +527,21 @@
             }
         }
 
+        // --- PERBAIKAN: HILANGKAN TOTAL VIEW YANG TIDAK AKTIF ---
         function showView(id) {
-    document.querySelectorAll('.view-section').forEach(v => {
-        v.classList.remove('active');
-        v.style.display = 'none';
-    });
+            document.querySelectorAll('.view-section').forEach(v => {
+                v.classList.remove('active');
+                v.style.display = 'none'; 
+            });
             
-    const activeView = document.getElementById(id);
-    activeView.classList.add('active');
-    activeView.style.display = 'block'; 
+            const activeView = document.getElementById(id);
+            activeView.classList.add('active');
+            activeView.style.display = 'block'; 
             
-    if (id === 'login-view') {
-        activeView.style.display = 'flex';
-    }
-}
+            if (id === 'login-view') {
+                activeView.style.display = 'flex';
+            }
+        }
 
         function bukaFormBaru() {
             let tempKey = document.getElementById('f_kunci_akses').value;
@@ -574,9 +551,6 @@
         }
 
         async function fetchData() {
-            // Jangan fetch jika URL belum ada (mencegah error di console)
-            if (!GAS_URL) return; 
-
             try {
                 const response = await fetch(GAS_URL);
                 students = await response.json();
@@ -627,8 +601,8 @@
             if(filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Belum ada data murid atau sedang loading...</td></tr>'; return; }
 
             filtered.forEach((s, i) => {
-                let actionBtns = `<button class="btn btn-sm btn-success" onclick="viewStudent(${s.id})">👁️ Cetak</button>
-                                  <button class="btn btn-sm btn-primary" onclick="editStudent(${s.id})">✏️ Edit</button>`;
+                let actionBtns = `<button class="btn btn-sm btn-success" onclick="viewStudent('${s.id}')">👁️ Cetak</button>
+                                  <button class="btn btn-sm btn-primary" onclick="editStudent('${s.id}')">✏️ Edit</button>`;
                 tbody.innerHTML += `<tr><td style="text-align:center;">${i+1}</td><td><strong>${s.f_nisn}</strong></td><td>${s.f_nama}</td><td>${s.f_kelas || '-'}</td>
                     <td><div style="display:flex; gap:5px;">${actionBtns}</div></td></tr>`;
             });
@@ -659,7 +633,7 @@
                         else { logout(); }
                     }
                 }
-            } catch (error) { alert("❌ Terjadi kesalahan jaringan atau Link Server tidak valid."); } finally { btnSubmit.innerHTML = originalText; btnSubmit.disabled = false; }
+            } catch (error) { alert("❌ Terjadi kesalahan jaringan."); } finally { btnSubmit.innerHTML = originalText; btnSubmit.disabled = false; }
         }
 
         function editStudent(id) {
@@ -681,6 +655,9 @@
         }
 
         function viewStudent(id) {
+            // SIMPAN ID SISWA KE MEMORI AGAR DOWNLOAD WORD PASTI BERHASIL
+            currentSiswaID = id;
+
             const s = students.find(x => x.id == id);
             document.getElementById('p_nama').innerText = s.f_nama; document.getElementById('p_nisn').innerText = s.f_nisn;
             document.getElementById('p_kelas').innerText = s.f_kelas || '-'; document.getElementById('p_no_rapor').innerText = s.f_no_rapor || '-';
@@ -717,13 +694,12 @@
             const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'Rekap_Siswa.csv'; a.click();
         }
 
+        // --- PERBAIKAN: DOWNLOAD WORD MENGGUNAKAN ID SISWA DARI MEMORI ---
         function exportToWord() {
-            let nisnSiswa = document.getElementById('p_nisn').innerText; 
+            if (!currentSiswaID) return alert("❌ Silakan pilih siswa terlebih dahulu.");
             
-            // PERBAIKAN: Menggunakan String() agar format angka/huruf tetap terbaca sama
-            let s = students.find(x => String(x.f_nisn) === String(nisnSiswa));
-            
-            if (!s) return alert("❌ Gagal mengambil data siswa untuk di-download.");
+            let s = students.find(x => x.id == currentSiswaID);
+            if (!s) return alert("❌ Data siswa tidak ditemukan di sistem.");
 
             let preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Buku Induk</title><style>body{font-family:'Times New Roman',Times,serif;font-size:11pt;}table{width:100%;border-collapse:collapse;margin-bottom:10pt;}td{vertical-align:top;padding:2pt 4pt;}.judul{text-align:center;font-weight:bold;font-size:14pt;margin-bottom:15pt;text-decoration:underline;}.bold{font-weight:bold;}.tabel-ortu th,.tabel-ortu td{border:1pt solid black;padding:4pt;text-align:left;}</style></head><body>";
             

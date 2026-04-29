@@ -212,8 +212,9 @@
             
             <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap:10px;">
                 <div style="flex: 1; min-width: 250px;">
+                    <!-- PERBAIKAN: Placeholder diperbarui untuk mencontohkan fitur multi-saring -->
                     <input type="text" id="search-input" class="form-control" style="width: 100%; max-width: 400px;" 
-                           placeholder="🔍 Cari Nama / NISN / Kelas / Putra / Putri..." 
+                           placeholder="🔍 Cari misal: Kelas 1, Kelas 1 A Putra, Kelas 5..." 
                            oninput="debounceSearch()" autocomplete="off" spellcheck="false">
                     
                     <div id="student-count" style="margin-top: 8px; font-weight: bold; color: var(--primary); font-size: 0.95rem;">
@@ -717,7 +718,7 @@
             reader.readAsDataURL(file);
         }
 
-        // --- FITUR DEBOUNCE PENCARIAN & ALGORITMA CERDAS ---
+        // --- FITUR DEBOUNCE & ALGORITMA PENYARINGAN KELAS JENIUS ---
         let searchTimeout;
         function debounceSearch() {
             clearTimeout(searchTimeout);
@@ -728,36 +729,51 @@
 
         function renderTable() {
             const tbody = document.querySelector('#student-table tbody');
+            
+            // 1. Ambil inputan dari kotak pencarian
             let searchRaw = document.getElementById('search-input').value.toLowerCase();
             
-            // Kunci frasa "kelas X" jadi satu kesatuan (kelas_X)
-            // Agar kalau ngetik "kelas 5", angka 5 tidak nyasar mencari ke kolom NISN
-            searchRaw = searchRaw.replace(/kelas\s+([0-9a-z]+)/g, 'kelas_$1');
+            // NORMALISASI: Kalau ada tulisan tanpa spasi (misal "1A"), kita pisahkan jadi "1 A"
+            searchRaw = searchRaw.replace(/(\d)([a-z])/g, '$1 $2').replace(/([a-z])(\d)/g, '$1 $2');
             
+            // Pecah kata yang diketik menjadi array
             const searchTerms = searchRaw.split(' ').filter(t => t.trim() !== '');
             
             tbody.innerHTML = '';
             
             let filtered = students.filter(s => {
-                // 1. Kunci juga data kelas asli siswa
-                let kelasAsli = (s.f_kelas || '').toLowerCase();
-                let kelasMod = kelasAsli.replace(/kelas\s+([0-9a-z]+)/g, 'kelas_$1');
+                let nama = (s.f_nama || '').toLowerCase();
+                let nisn = (String(s.f_nisn) || '').toLowerCase();
                 
-                // 2. Kumpulkan semua data mentah siswa
-                let textData = `${s.f_nama} ${s.f_nisn} ${kelasMod} ${s.f_jk}`.toLowerCase();
+                // Normalisasi kelas (misal dari Dapodik masuknya "Kelas 1A Putra" -> jadi "kelas 1 a putra")
+                let kelas = (s.f_kelas || '').toLowerCase();
+                kelas = kelas.replace(/(\d)([a-z])/g, '$1 $2').replace(/([a-z])(\d)/g, '$1 $2');
                 
-                // 3. INJEKSI KATA BAYANGAN (Tanpa merusak teks aslinya)
-                // Jadi user bebas mencari pakai kata putra/pria/laki
+                // Gabungkan semua data ini untuk dicari
+                let textData = `${nama} ${nisn} ${kelas}`.toLowerCase();
+                
+                // 2. Injeksi Kata Sinonim Jenis Kelamin
+                // Agar kalau ngetik "putra" tetap muncul yang gender Laki-laki walau nama kelasnya tidak pakai kata Putra
                 let jk = (s.f_jk || '').toLowerCase();
-                if (jk === 'l' || jk.includes('laki')) {
-                    textData += ' putra pria cowok';
-                }
-                if (jk === 'p' || jk.includes('perempuan')) {
-                    textData += ' putri wanita cewek';
-                }
+                if (jk === 'l' || jk.includes('laki')) textData += ' putra pria cowok';
+                if (jk === 'p' || jk.includes('perempuan')) textData += ' putri wanita cewek';
                 
-                // 4. Pastikan semua kata yang diketik ada di textData siswa ini
-                return searchTerms.every(term => textData.includes(term));
+                // 3. Pengecekan Presisi
+                return searchTerms.every(term => {
+                    // Jika kata kunci hanya 1 atau 2 huruf (misal: "1", "A", "VI", "B")
+                    if (term.length <= 2) {
+                        try {
+                            // \b artinya batas kata. Agar angka "1" murni hanya mencari kata "1", bukan "00123"
+                            let regex = new RegExp(`\\b${term}\\b`);
+                            return regex.test(textData);
+                        } catch(e) {
+                            return textData.includes(term);
+                        }
+                    } else {
+                        // Jika lebih dari 2 huruf (misal: "kelas", "putra", "budi")
+                        return textData.includes(term);
+                    }
+                });
             });
             
             document.getElementById('student-count').innerText = `Total Data: ${filtered.length} Siswa`;

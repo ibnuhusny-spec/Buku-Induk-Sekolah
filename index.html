@@ -62,7 +62,7 @@
         .login-card { 
             background: var(--card-bg); border-radius: 12px; padding: 40px 30px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 420px; 
-            text-align: center; border-top: 6px solid var(--primary);
+            text-align: center; border-top: 6px solid var(--primary); position: relative;
         }
         .login-logo { width: 90px; height: auto; margin-bottom: 15px; object-fit: contain; }
         .login-title { color: var(--text-color); margin-bottom: 5px; font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
@@ -155,7 +155,7 @@
         <!-- ================================== -->
         <div id="login-view" class="view-section active login-wrapper">
             <div class="login-card">
-                <!-- Memanggil file gambar lokal maros.png yang satu folder dengan html -->
+                <!-- Memanggil file gambar lokal maros.png -->
                 <img src="maros.png" alt="Logo Wilayah" class="login-logo" onerror="this.style.display='none'">
                 
                 <h2 class="login-title">Buku Induk Digital</h2>
@@ -176,6 +176,11 @@
                 
                 <!-- Tombol 3D -->
                 <button class="btn-3d" onclick="prosesLogin()">MASUK APLIKASI ➔</button>
+
+                <!-- LINK PENGATURAN SERVER DI BAWAH TOMBOL LOGIN -->
+                <div style="margin-top: 25px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+                    <a href="#" onclick="setGasUrl(); return false;" style="color: #64748b; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: color 0.2s;">⚙️ Pengaturan Server (Apps Script)</a>
+                </div>
             </div>
         </div>
 
@@ -448,8 +453,8 @@
     </div>
 
     <script>
-        // PASTE URL APLIKASI WEB GOOGLE APPS SCRIPT ANDA DI SINI
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbzpozanYjymsmNAFR-FWB9AmvHlTE9J6NV3whPTULXBK62pEOZO_gnmUj8AKX7nb4Is/exec';
+        // VARIABLE GAS URL KINI MENGAMBIL DARI LOCAL STORAGE (TIDAK HARDCODED LAGI)
+        let GAS_URL = localStorage.getItem('gas_url_sekolah') || '';
         
         let students = [];
         let isAdmin = false;
@@ -466,6 +471,22 @@
             loadSettings();
             fetchData();
         };
+
+        // --- FUNGSI MENGATUR LINK GOOGLE APPS SCRIPT ---
+        function setGasUrl() {
+            let newUrl = prompt("🔧 PENGATURAN SERVER\n\nMasukkan Link Aplikasi Web (Google Apps Script) sekolah Anda di sini:\n\n*Kosongkan lalu klik OK jika ingin menghapus link.", GAS_URL);
+            
+            if (newUrl !== null) {
+                GAS_URL = newUrl.trim();
+                localStorage.setItem('gas_url_sekolah', GAS_URL);
+                if (GAS_URL !== "") {
+                    alert("✅ Link Server berhasil disimpan!\nAplikasi akan mencoba memuat ulang data.");
+                    fetchData();
+                } else {
+                    alert("⚠️ Link Server telah dihapus.");
+                }
+            }
+        }
 
         function toggleLoginType() {
             const role = document.getElementById('login-role').value;
@@ -484,6 +505,12 @@
         }
 
         function prosesLogin() {
+            // Cek apakah GAS URL sudah diisi sebelum mengizinkan login
+            if (!GAS_URL) {
+                alert("⚠️ PENTING: Anda belum memasukkan Link Server (Google Apps Script)!\n\nSilakan klik tombol '⚙️ Pengaturan Server (Apps Script)' di bagian bawah layar ini untuk memasukkan link terlebih dahulu agar aplikasi bisa menyimpan dan membaca data.");
+                return;
+            }
+
             const role = document.getElementById('login-role').value;
             const pass = document.getElementById('login-password').value;
 
@@ -537,6 +564,9 @@
         }
 
         async function fetchData() {
+            // Jangan fetch jika URL belum ada (mencegah error di console)
+            if (!GAS_URL) return; 
+
             try {
                 const response = await fetch(GAS_URL);
                 students = await response.json();
@@ -619,7 +649,7 @@
                         else { logout(); }
                     }
                 }
-            } catch (error) { alert("❌ Terjadi kesalahan jaringan."); } finally { btnSubmit.innerHTML = originalText; btnSubmit.disabled = false; }
+            } catch (error) { alert("❌ Terjadi kesalahan jaringan atau Link Server tidak valid."); } finally { btnSubmit.innerHTML = originalText; btnSubmit.disabled = false; }
         }
 
         function editStudent(id) {

@@ -552,9 +552,19 @@
         }
 
         function showView(id) {
-            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
+    document.querySelectorAll('.view-section').forEach(v => {
+        v.classList.remove('active');
+        v.style.display = 'none';
+    });
+            
+    const activeView = document.getElementById(id);
+    activeView.classList.add('active');
+    activeView.style.display = 'block'; 
+            
+    if (id === 'login-view') {
+        activeView.style.display = 'flex';
+    }
+}
 
         function bukaFormBaru() {
             let tempKey = document.getElementById('f_kunci_akses').value;

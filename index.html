@@ -170,6 +170,7 @@
                     <label style="font-weight: 600; display: block; margin-bottom: 5px; color: #475569;">Masuk Sebagai:</label>
                     <select id="login-role" class="form-control" onchange="toggleLoginType()">
                         <option value="ortu">Orang Tua / Wali Murid</option>
+                        <option value="pengawas">Pengawas Sekolah / Tamu</option>
                         <option value="admin">Administrator Sekolah</option>
                     </select>
                 </div>
@@ -210,7 +211,10 @@
         <div id="home-view" class="view-section card">
             <div style="display:flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap:10px;">
                 <input type="text" id="search-input" class="form-control" style="width: 350px;" placeholder="🔍 Cari Nama / NISN / Kelas..." onkeyup="renderTable()">
-                <button class="btn btn-primary" onclick="bukaFormBaru()">+ Tambah Data Siswa Baru</button>
+                <div style="display:flex; gap:10px; flex-wrap: wrap;">
+                    <button id="btn-import-data" class="btn btn-success" style="background:#059669; display: none;" onclick="showView('import-view')">📥 Panduan Import Dapodik</button>
+                    <button id="btn-tambah-data" class="btn btn-primary" style="display: none;" onclick="bukaFormBaru()">+ Tambah Data Siswa Baru</button>
+                </div>
             </div>
             
             <div id="table-container" style="overflow-x: auto;">
@@ -226,6 +230,34 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- ================================== -->
+        <!-- VIEW 2.B: PANDUAN IMPORT DAPODIK   -->
+        <!-- ================================== -->
+        <div id="import-view" class="view-section card no-print">
+            <h2 style="margin-bottom: 15px; color: var(--success); border-bottom: 2px solid var(--border); padding-bottom: 10px;">📥 Panduan Import Data dari Dapodik / Excel</h2>
+            
+            <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.6;">
+                <p>Kabar baik! Karena aplikasi Buku Induk ini berbasis <strong>Google Sheets</strong>, Anda tidak perlu mengunggah file yang rawan *error*. Cara tercepat dan teraman untuk memasukkan ratusan data siswa dari Dapodik adalah dengan melakukan <strong>Copy-Paste langsung</strong> ke database.</p>
+                <br>
+                <h4 style="margin-bottom: 10px; color: #334155;">Langkah-langkah Import:</h4>
+                <ol style="margin-left: 20px; color: #475569;">
+                    <li style="margin-bottom: 8px;">Buka file Excel unduhan Dapodik Anda di laptop.</li>
+                    <li style="margin-bottom: 8px;">Buka file <strong>Google Sheets</strong> (database aplikasi ini) di tab browser baru.</li>
+                    <li style="margin-bottom: 8px;">Buka *sheet* bernama <strong>DB_Induk</strong>.</li>
+                    <li style="margin-bottom: 8px;">Cukup <strong>Copy (Salin)</strong> kolom data dari Excel (misal: kolom Nama, NISN, Tempat Lahir), lalu <strong>Paste (Tempel)</strong> ke kolom yang sesuai di Google Sheets tersebut, mulai dari Baris ke-2.</li>
+                    <li style="margin-bottom: 8px;">Data yang Anda masukkan akan langsung otomatis terbaca di aplikasi Buku Induk ini saat halaman di-<i>refresh</i>.</li>
+                </ol>
+                <br>
+                <div style="background: #fffbeb; padding: 12px; border-left: 4px solid #f59e0b; border-radius: 4px; font-size: 0.9rem;">
+                    💡 <strong>Tips:</strong> Pastikan Anda meletakkan data di bawah baris judul kolom (Header) yang benar agar tampilannya tidak tertukar di aplikasi.
+                </div>
+            </div>
+            
+            <div style="margin-top:20px; text-align:right;">
+                <button type="button" class="btn btn-secondary" onclick="showView('home-view')">⬅ Kembali ke Beranda</button>
             </div>
         </div>
 
@@ -385,7 +417,7 @@
             <div class="no-print" style="margin-bottom:20px; background:#e2e8f0; padding:15px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
                 <div>
                     <button class="btn btn-secondary" onclick="showView('home-view')">⬅ Kembali</button>
-                    <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Langsung</button>
+                    <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Langsung Buku Induk</button>
                 </div>
             </div>
             
@@ -483,7 +515,7 @@
 
     <!-- FOOTER CREDIT -->
     <div class="no-print credit-footer">
-        Dikembangkan oleh <strong>Arifin Arif</strong>
+        Dikembangkan pertama kali oleh <strong>Arifin Arif</strong>
     </div>
 
     <script>
@@ -492,9 +524,11 @@
         
         let students = [];
         let isAdmin = false;
+        let isPengawas = false;
 
         const ADMIN_PIN = "@dm1nKu77";
         const ORTU_PIN = "m4r0s77";
+        const PENGAWAS_PIN = "p3ngaw4s"; // Kunci khusus Pengawas
         
         let appSettings = JSON.parse(localStorage.getItem('settings_sekolah')) || {
             pemda: "PEMERINTAH DAERAH", dinas: "DINAS PENDIDIKAN",
@@ -531,6 +565,7 @@
             const role = document.getElementById('login-role').value;
             const label = document.getElementById('login-label');
             if (role === 'admin') { label.innerText = 'Password Administrator:'; } 
+            else if (role === 'pengawas') { label.innerText = 'Kunci Akses Pengawas:'; }
             else { label.innerText = 'Kunci Akses Pendaftaran:'; }
             document.getElementById('login-password').value = '';
             document.getElementById('login-password').focus();
@@ -551,19 +586,39 @@
 
             if (role === 'admin') {
                 if (pass === ADMIN_PIN) {
-                    isAdmin = true;
+                    isAdmin = true; isPengawas = false;
                     document.getElementById('main-navbar').style.display = 'flex';
                     document.getElementById('btn-settings').style.display = 'inline-flex';
                     document.getElementById('btn-excel').style.display = 'inline-flex';
                     document.getElementById('menu-theme').style.display = 'flex';
+                    
+                    document.getElementById('btn-tambah-data').style.display = 'inline-flex'; 
+                    document.getElementById('btn-import-data').style.display = 'inline-flex'; 
+                    
                     document.getElementById('f_kunci_akses').value = ADMIN_PIN; 
                     showView('home-view');
                     document.getElementById('btn-cancel-form').style.display = 'inline-flex'; 
                     renderTable();
                 } else { alert("❌ Password Administrator Salah!"); }
-            } else {
+            } 
+            else if (role === 'pengawas') {
+                if (pass === PENGAWAS_PIN) {
+                    isAdmin = false; isPengawas = true;
+                    document.getElementById('main-navbar').style.display = 'flex';
+                    document.getElementById('btn-settings').style.display = 'none'; // Pengawas tidak bisa ubah kop
+                    document.getElementById('btn-excel').style.display = 'inline-flex'; // Pengawas bisa download rekap
+                    document.getElementById('menu-theme').style.display = 'none';
+                    
+                    document.getElementById('btn-tambah-data').style.display = 'none'; // Sembunyikan tambah data
+                    document.getElementById('btn-import-data').style.display = 'none'; // Sembunyikan panduan import
+                    
+                    showView('home-view');
+                    renderTable();
+                } else { alert("❌ Kunci Akses Pengawas Salah!"); }
+            }
+            else {
                 if (pass === ORTU_PIN) {
-                    isAdmin = false;
+                    isAdmin = false; isPengawas = false;
                     document.getElementById('main-navbar').style.display = 'flex';
                     document.getElementById('btn-settings').style.display = 'none';
                     document.getElementById('btn-excel').style.display = 'none';
@@ -578,6 +633,7 @@
         function logout() {
             if(confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
                 isAdmin = false;
+                isPengawas = false;
                 document.getElementById('main-navbar').style.display = 'none';
                 document.getElementById('login-password').value = '';
                 document.getElementById('f_kunci_akses').value = '';
@@ -616,7 +672,7 @@
             try {
                 const response = await fetch(GAS_URL);
                 students = await response.json();
-                if(isAdmin) renderTable(); 
+                if(isAdmin || isPengawas) renderTable(); 
             } catch (error) { console.error('Gagal memuat data:', error); }
         }
 
@@ -654,7 +710,6 @@
             reader.readAsDataURL(file);
         }
 
-        // --- PERBAIKAN: TOMBOL HAPUS DIMASUKKAN KEMBALI ---
         function renderTable() {
             const tbody = document.querySelector('#student-table tbody');
             const search = document.getElementById('search-input').value.toLowerCase();
@@ -664,17 +719,21 @@
             if(filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Belum ada data murid atau sedang loading...</td></tr>'; return; }
 
             filtered.forEach((s, i) => {
-                let actionBtns = `
-                    <button class="btn btn-sm btn-success" onclick="viewStudent('${s.id}')">👁️ Cetak</button>
-                    <button class="btn btn-sm btn-primary" onclick="editStudent('${s.id}')">✏️ Edit</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}')">🗑️ Hapus</button>
-                `;
+                let actionBtns = `<button class="btn btn-sm btn-success" onclick="viewStudent('${s.id}')">👁️ Lihat Buku Induk</button>`;
+                
+                // Jika Admin, tambahkan tombol Edit dan Hapus
+                if (isAdmin) {
+                    actionBtns += `
+                        <button class="btn btn-sm btn-primary" onclick="editStudent('${s.id}')">✏️ Edit</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}')">🗑️ Hapus</button>
+                    `;
+                }
+
                 tbody.innerHTML += `<tr><td style="text-align:center;">${i+1}</td><td><strong>${s.f_nisn}</strong></td><td>${s.f_nama}</td><td>${s.f_kelas || '-'}</td>
                     <td><div style="display:flex; gap:5px; flex-wrap:wrap;">${actionBtns}</div></td></tr>`;
             });
         }
 
-        // --- FUNGSI HAPUS SISWA ---
         function deleteStudent(id) { 
             if(confirm('Apakah Anda yakin menyembunyikan data murid ini dari tabel?\n\n(Catatan: Untuk menghapus permanen, Anda tetap harus menghapusnya langsung dari file Google Sheets Anda)')) { 
                 students = students.filter(s => s.id != id); 

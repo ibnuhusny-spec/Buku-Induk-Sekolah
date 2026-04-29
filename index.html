@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buku Induk Digital SDIT Qurratu A'yun Maros</title>
+    <title>Aplikasi Buku Induk Sekolah Dasar</title>
     <style>
-        /* CSS Variables untuk Tema yang bisa diubah */
+        /* CSS Variables */
         :root {
             --primary: #0ea5e9; 
             --bg-color: #f1f5f9;
@@ -40,8 +40,8 @@
         .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; grid-column: 1 / -1;}
         .form-group { margin-bottom: 10px; }
         .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 0.85rem; color: #475569;}
-        .form-control { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.9rem; background: #fff;}
-        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2); }
+        .form-control { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; background: #fff;}
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2); }
         .full-width { grid-column: 1 / -1; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
@@ -57,104 +57,135 @@
         .theme-controls { display: flex; gap: 15px; align-items: center; font-size: 0.85rem; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px;}
         .theme-controls input[type="color"] { border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; padding: 0; background: transparent;}
 
+        /* --- LAYAR LOGIN ELEGAN (SPLASH SCREEN) --- */
+        .login-wrapper { display: flex; justify-content: center; align-items: center; min-height: 85vh; padding: 20px; }
+        .login-card { 
+            background: var(--card-bg); border-radius: 12px; padding: 40px 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 420px; 
+            text-align: center; border-top: 6px solid var(--primary);
+        }
+        .login-logo { width: 90px; height: auto; margin-bottom: 15px; object-fit: contain; }
+        .login-title { color: var(--text-color); margin-bottom: 5px; font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
+        .login-subtitle { color: #64748b; margin-bottom: 25px; font-size: 0.95rem; }
+        
+        /* Tombol 3D Mewah */
+        .btn-3d { 
+            background: var(--primary); color: white; border: none; padding: 12px; 
+            border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; 
+            width: 100%; transition: all 0.1s; box-shadow: 0 5px 0 #0284c7; 
+            margin-top: 10px;
+        }
+        .btn-3d:active { transform: translateY(5px); box-shadow: 0 0 0 #0284c7; }
+
         /* TAMPILAN CETAK A4 */
         @media print {
-            /* 1. PAKSA UKURAN KERTAS A4 DAN MARGINNYA */
-            @page {
-                size: A4;
-                margin: 1.5cm;
-            }
-
+            @page { size: A4; margin: 1.5cm; }
             body { background: white !important; color: black !important; }
             body * { visibility: hidden; }
             #detail-view, #detail-view * { visibility: visible; }
             #detail-view { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; background: white !important; box-shadow: none;}
             .no-print { display: none !important; }
             .card { box-shadow: none; border: none; padding: 0; background: white !important;}
-            
-            /* 2. PERKECIL HURUF & SPASI SEDIKIT AGAR MUAT DI A4 */
             .print-container { font-family: 'Times New Roman', Times, serif; font-size: 10.5pt; line-height: 1.3; color: black; }
             
-            /* STYLING KOP SURAT UNTUK PRINT (GARIS GANDA & RATA TENGAH PRESISI) */
             .kop-surat { position: relative; display: flex; align-items: center; padding-bottom: 10px; margin-bottom: 15px; }
             .kop-surat::after { content: ""; position: absolute; bottom: 3px; left: 0; width: 100%; border-bottom: 4px solid black; }
             .kop-surat::before { content: ""; position: absolute; bottom: -2px; left: 0; width: 100%; border-bottom: 1px solid black; }
             .kop-surat img { width: 2.8cm; height: 2.8cm; object-fit: contain; flex-shrink: 0; }
-            .kop-text { flex-grow: 1; text-align: center; padding-right: 2.8cm; /* Trik agar presisi di tengah */ }
+            .kop-text { flex-grow: 1; text-align: center; padding-right: 2.8cm; }
             .kop-text h4 { margin: 0; font-size: 12pt; font-weight: normal; text-transform: uppercase; }
             .kop-text h3 { margin: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase; }
             .kop-text h2 { margin: 0; font-size: 16pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
             .kop-text p { margin: 3px 0 0 0; font-size: 10pt; font-style: normal; }
 
             .print-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; }
-            
-            /* 3. RAPATKAN TABEL */
             .buku-induk-table { width: 100%; border-collapse: collapse; border: none; margin-bottom: 10px;}
             .buku-induk-table td { border: none; padding: 2px 4px; vertical-align: top; font-size: 10.5pt;}
             .col-num { width: 3%; text-align: right; padding-right: 8px; }
             .col-label { width: 35%; }
             .col-separator { width: 2%; text-align: center; }
             .col-value { width: 60%; border-bottom: 1px dotted #666 !important; }
-            
             .section-header { font-weight: bold; margin-top: 10px; margin-bottom: 3px; text-transform: uppercase; font-size: 10.5pt;}
-            
             .ortu-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 10.5pt; page-break-inside: avoid; }
             .ortu-table th, .ortu-table td { border: 1px solid black; padding: 3px 5px; vertical-align: top;}
             .ortu-table th { text-align: center; font-weight: bold; background: transparent;}
-            
-            /* Sesuaikan posisi foto agar tidak menabrak teks */
             .print-photo-box { position: absolute; right: 20px; top: 160px; width: 3cm; height: 4cm; border: 1px solid black; display: flex; justify-content: center; align-items: center; text-align: center; font-size: 9pt;}
             .print-photo-box img { width: 100%; height: 100%; object-fit: cover; }
-            
             .page-break { page-break-before: always; }
         }
 
-        /* --- RESPONSIVE UNTUK HP (MOBILE VIEW) --- */
         @media (max-width: 768px) {
             .navbar { flex-direction: column; gap: 10px; text-align: center; }
             .navbar h1 { font-size: 1.2rem; line-height: 1.3; }
             .theme-controls { flex-wrap: wrap; justify-content: center; }
             .navbar button { width: 100%; }
-            
             .form-grid, .form-grid-3 { grid-template-columns: 1fr; gap: 10px; }
-            
             #search-input { width: 100% !important; margin-bottom: 10px; }
             .view-section.card > div:first-child { flex-direction: column; }
             .view-section.card > div:first-child button { width: 100%; }
-            
-            #student-table th:nth-child(4), 
-            #student-table td:nth-child(4) { display: none; }
-            
+            #student-table th:nth-child(4), #student-table td:nth-child(4) { display: none; }
             #student-table td:last-child { display: flex; flex-direction: column; gap: 5px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="navbar no-print">
-        <h1>BUKU INDUK DIGITAL SDIT QURRATU A'YUN MAROS</h1>
+    <!-- NAVBAR -->
+    <div id="main-navbar" class="navbar no-print" style="display: none;">
+        <h1>BUKU INDUK SEKOLAH DASAR</h1>
         <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; justify-content: center;">
-            <div class="theme-controls">
-                <label style="cursor:pointer;" title="Ganti Warna Latar Aplikasi">Latar: <input type="color" id="color-bg" onchange="changeTheme()"></label>
-                <label style="cursor:pointer;" title="Ganti Warna Header Atas">Header: <input type="color" id="color-primary" onchange="changeTheme()"></label>
-                <button class="btn btn-sm btn-secondary" onclick="resetTheme()" title="Kembali ke warna asal" style="font-size: 0.75rem; padding: 2px 6px;">Reset</button>
+            <div class="theme-controls" id="menu-theme" style="display: none;">
+                <label style="cursor:pointer;" title="Ganti Warna Latar">Latar: <input type="color" id="color-bg" onchange="changeTheme()"></label>
+                <label style="cursor:pointer;" title="Ganti Warna Header">Header: <input type="color" id="color-primary" onchange="changeTheme()"></label>
+                <button class="btn btn-sm btn-secondary" onclick="resetTheme()" title="Reset" style="font-size: 0.75rem; padding: 2px 6px;">Reset</button>
             </div>
-            <button class="btn btn-warning" onclick="showView('settings-view')">⚙️ Pengaturan Kop</button>
-            <button class="btn btn-success" style="background:#10b981;" onclick="exportExcel()">⬇ Rekap Excel</button>
-            <button class="btn btn-danger" id="btn-admin" onclick="toggleAdminMode()">🔒 Mode Admin</button>
+            <button class="btn btn-warning" id="btn-settings" onclick="showView('settings-view')" style="display: none;">⚙️ Kop Surat</button>
+            <button class="btn btn-success" id="btn-excel" style="background:#10b981; display: none;" onclick="exportExcel()">⬇ Rekap Excel</button>
+            <button class="btn btn-danger" onclick="logout()">🚪 Keluar</button>
         </div>
     </div>
 
     <div class="container">
         
-        <div id="home-view" class="view-section active card">
+        <!-- ================================== -->
+        <!-- VIEW 1: LAYAR LOGIN ELEGAN         -->
+        <!-- ================================== -->
+        <div id="login-view" class="view-section active login-wrapper">
+            <div class="login-card">
+                <!-- Memanggil file gambar lokal maros.png yang satu folder dengan html -->
+                <img src="maros.png" alt="Logo Wilayah" class="login-logo" onerror="this.style.display='none'">
+                
+                <h2 class="login-title">Buku Induk Digital</h2>
+                <p class="login-subtitle">Aplikasi Pengelolaan Data Sekolah Dasar</p>
+                
+                <div style="text-align: left; margin-bottom: 15px;">
+                    <label style="font-weight: 600; display: block; margin-bottom: 5px; color: #475569;">Masuk Sebagai:</label>
+                    <select id="login-role" class="form-control" onchange="toggleLoginType()">
+                        <option value="ortu">Orang Tua / Wali Murid</option>
+                        <option value="admin">Administrator Sekolah</option>
+                    </select>
+                </div>
+                
+                <div style="text-align: left; margin-bottom: 25px;">
+                    <label id="login-label" style="font-weight: 600; display: block; margin-bottom: 5px; color: #475569;">Kunci Akses Pendaftaran:</label>
+                    <input type="password" id="login-password" class="form-control" placeholder="Masukkan Kunci Rahasia..." onkeypress="handleEnter(event)">
+                </div>
+                
+                <!-- Tombol 3D -->
+                <button class="btn-3d" onclick="prosesLogin()">MASUK APLIKASI ➔</button>
+            </div>
+        </div>
+
+        <!-- ================================== -->
+        <!-- VIEW 2: HOME / DATA SISWA (ADMIN)  -->
+        <!-- ================================== -->
+        <div id="home-view" class="view-section card">
             <div style="display:flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap:10px;">
                 <input type="text" id="search-input" class="form-control" style="width: 350px;" placeholder="🔍 Cari Nama / NISN / Kelas..." onkeyup="renderTable()">
-                <button class="btn btn-primary" onclick="showView('form-view'); clearForm()">+ Tambah Data Siswa Baru</button>
+                <button class="btn btn-primary" onclick="bukaFormBaru()">+ Tambah Data Siswa Baru</button>
             </div>
             
-            <!-- Tabel disembunyikan secara default -->
-            <div id="table-container" style="display: none; overflow-x: auto;">
+            <div id="table-container" style="overflow-x: auto;">
                 <table id="student-table">
                     <thead>
                         <tr>
@@ -168,39 +199,27 @@
                     <tbody></tbody>
                 </table>
             </div>
-            <div id="table-hidden-msg" style="text-align: center; padding: 40px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; color: #64748b;">
-                🔒 <strong>Data Buku Induk Terkunci.</strong><br>Silakan aktifkan Mode Admin untuk melihat, mengedit, atau menghapus data siswa.
-            </div>
         </div>
 
+        <!-- ================================== -->
+        <!-- VIEW 3: PENGATURAN KOP SURAT       -->
+        <!-- ================================== -->
         <div id="settings-view" class="view-section card no-print">
             <h2 style="margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 10px;">⚙️ Pengaturan Kop Surat & Identitas Sekolah</h2>
             
             <form id="settings-form" onsubmit="saveSettings(event)">
                 <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label>Nama Pemerintah Daerah (Contoh: PEMERINTAH KABUPATEN MAROS)</label>
-                        <input type="text" id="set_pemda" class="form-control" required>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Nama Dinas (Contoh: DINAS PENDIDIKAN DAN KEBUDAYAAN)</label>
-                        <input type="text" id="set_dinas" class="form-control" required>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Nama Instansi / Sekolah</label>
-                        <input type="text" id="set_sekolah" class="form-control" required>
-                    </div>
-                    <div class="form-group full-width">
-                        <label>Alamat Lengkap Sekolah & Kontak</label>
-                        <input type="text" id="set_alamat" class="form-control" required>
-                    </div>
+                    <div class="form-group full-width"><label>Pemerintah Daerah</label><input type="text" id="set_pemda" class="form-control" required></div>
+                    <div class="form-group full-width"><label>Dinas</label><input type="text" id="set_dinas" class="form-control" required></div>
+                    <div class="form-group full-width"><label>Sekolah</label><input type="text" id="set_sekolah" class="form-control" required></div>
+                    <div class="form-group full-width"><label>Alamat Lengkap</label><input type="text" id="set_alamat" class="form-control" required></div>
                     <div class="form-group full-width photo-area" style="text-align: left;">
-                        <label>Logo Sekolah / Daerah (Akan tampil di pojok kiri Kop Surat)</label>
-                        <img id="logo-preview-img" class="logo-preview" src="" alt="Preview Logo">
+                        <label>Logo Sekolah</label>
+                        <img id="logo-preview-img" class="logo-preview" src="">
                         <input type="hidden" id="set_logo">
                         <input type="file" id="upload-logo" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
                         <button type="button" class="btn btn-secondary" onclick="document.getElementById('upload-logo').click()">📁 Pilih File Logo</button>
-                        <small style="display:block; margin-top:5px; color:#64748b;">* Disarankan gambar berlatar transparan (PNG). Ukuran maksimal 500 KB.</small>
+                        <small style="display:block; margin-top:5px; color:#64748b;">* Disarankan format PNG. Maksimal 500 KB.</small>
                     </div>
                 </div>
                 <div style="margin-top:20px; text-align:right;">
@@ -210,22 +229,20 @@
             </form>
         </div>
 
+        <!-- ================================== -->
+        <!-- VIEW 4: FORMULIR ISIAN SISWA       -->
+        <!-- ================================== -->
         <div id="form-view" class="view-section card no-print">
             <h2 id="form-title" style="text-align: center; margin-bottom: 20px; color: var(--primary);">Formulir Isian Buku Induk Siswa</h2>
             <form id="student-form" onsubmit="saveStudent(event)">
                 <input type="hidden" id="student-id">
-                
-                <!-- INPUT KUNCI AKSES -->
-                <div class="form-group full-width" style="background: #fee2e2; padding: 15px; border-radius: 6px; border: 1px solid #f87171; margin-bottom: 15px;">
-                    <label style="color: #b91c1c;">🔑 Kunci Akses Pengisian Data (Dapatkan dari Wali Kelas/Admin) *</label>
-                    <input type="password" id="f_kunci_akses" class="form-control" placeholder="Masukkan kunci rahasia..." required>
-                </div>
+                <input type="hidden" id="f_kunci_akses">
 
                 <div class="form-grid">
                     <div class="form-grid-3">
-                        <div class="form-group"><label>Nomor Induk Siswa Nasional (NISN) *</label><input type="text" id="f_nisn" class="form-control" required></div>
-                        <div class="form-group"><label>Kelas Saat Ini (Cth: 1A, 2, dll) *</label><input type="text" id="f_kelas" class="form-control" required></div>
-                        <div class="form-group"><label>No. Seri Buku Rapor</label><input type="text" id="f_no_rapor" class="form-control"></div>
+                        <div class="form-group"><label>NISN *</label><input type="text" id="f_nisn" class="form-control" required></div>
+                        <div class="form-group"><label>Kelas Saat Ini *</label><input type="text" id="f_kelas" class="form-control" required></div>
+                        <div class="form-group"><label>No. Seri Rapor</label><input type="text" id="f_no_rapor" class="form-control"></div>
                     </div>
 
                     <div class="form-section-title">A. Keterangan Pribadi</div>
@@ -241,26 +258,22 @@
                         <div class="form-group"><label>8. Sdr. Tiri</label><input type="number" id="f_sdr_tiri" class="form-control"></div>
                         <div class="form-group"><label>9. Sdr. Angkat</label><input type="number" id="f_sdr_angkat" class="form-control"></div>
                     </div>
-                    <div class="form-group"><label>10. Status Yatim/Piatu</label><select id="f_yatim" class="form-control"><option value="-">Tidak / Lengkap</option><option value="Yatim">Yatim</option><option value="Piatu">Piatu</option><option value="Yatim Piatu">Yatim Piatu</option></select></div>
+                    <div class="form-group"><label>10. Status Yatim</label><select id="f_yatim" class="form-control"><option value="-">Tidak / Lengkap</option><option value="Yatim">Yatim</option><option value="Piatu">Piatu</option><option value="Yatim Piatu">Yatim Piatu</option></select></div>
                     <div class="form-group"><label>11. Bahasa Sehari-hari</label><input type="text" id="f_bahasa" class="form-control" value="Indonesia / Daerah"></div>
 
                     <div class="form-section-title">B. Keterangan Tempat Tinggal</div>
                     <div class="form-group full-width"><label>12. Alamat Lengkap</label><input type="text" id="f_alamat" class="form-control"></div>
-                    <div class="form-group"><label>13. Nomor Telepon / HP</label><input type="text" id="f_telp" class="form-control"></div>
-                    <div class="form-group"><label>14. Tinggal Bersama</label><select id="f_tinggal" class="form-control"><option value="Orang Tua">Orang Tua</option><option value="Menumpang">Menumpang pada orang lain</option><option value="Asrama">Asrama</option></select></div>
+                    <div class="form-group"><label>13. No Telepon / HP</label><input type="text" id="f_telp" class="form-control"></div>
+                    <div class="form-group"><label>14. Tinggal Bersama</label><select id="f_tinggal" class="form-control"><option value="Orang Tua">Orang Tua</option><option value="Menumpang">Menumpang</option><option value="Asrama">Asrama</option></select></div>
                     <div class="form-group"><label>15. Jarak ke Sekolah (Km)</label><input type="text" id="f_jarak" class="form-control"></div>
                     <div class="form-group"><label>16. Ke Sekolah Dengan</label><select id="f_transport" class="form-control"><option value="Jalan Kaki">Jalan Kaki</option><option value="Kendaraan Pribadi">Kendaraan Pribadi</option><option value="Kendaraan Umum">Kendaraan Umum</option></select></div>
 
-                    <div class="form-section-title">C. Kesehatan / Jasmani</div>
-                    <div class="form-group"><label>Berat Badan (Kg)</label><input type="text" id="f_bb" class="form-control"></div>
-                    <div class="form-group"><label>Tinggi Badan (Cm)</label><input type="text" id="f_tb" class="form-control"></div>
+                    <div class="form-section-title">C. Kesehatan & D. Pendidikan</div>
+                    <div class="form-group"><label>Berat (Kg) / Tinggi (Cm)</label><div style="display:flex; gap:5px;"><input type="text" id="f_bb" class="form-control" placeholder="Berat"><input type="text" id="f_tb" class="form-control" placeholder="Tinggi"></div></div>
                     <div class="form-group"><label>Golongan Darah</label><input type="text" id="f_goldar" class="form-control"></div>
+                    <div class="form-group"><label>Kelainan Jasmani</label><input type="text" id="f_kelainan" class="form-control"></div>
                     <div class="form-group"><label>Penyakit yg Pernah Diderita</label><input type="text" id="f_penyakit" class="form-control"></div>
-                    <div class="form-group full-width"><label>Kelainan Jasmani</label><input type="text" id="f_kelainan" class="form-control"></div>
-
-                    <div class="form-section-title">D. Pendidikan Sebelumnya</div>
-                    <div class="form-group"><label>Asal Sekolah (TK/PAUD)</label><input type="text" id="f_asal_sekolah" class="form-control"></div>
-                    <div class="form-group"><label>Tanggal & No. Ijazah TK</label><input type="text" id="f_ijazah_asal" class="form-control"></div>
+                    <div class="form-group full-width"><label>Asal Sekolah (TK/PAUD) & No Ijazah</label><div style="display:flex; gap:5px;"><input type="text" id="f_asal_sekolah" class="form-control" placeholder="Nama TK/PAUD"><input type="text" id="f_ijazah_asal" class="form-control" placeholder="No Ijazah"></div></div>
                     <div class="form-group full-width"><label>Pindahan (Tanggal Diterima & Alasan Pindah)</label><input type="text" id="f_pindahan" class="form-control" placeholder="Kosongkan jika bukan pindahan"></div>
 
                     <div class="form-section-title">E. Keterangan Orang Tua Kandung</div>
@@ -268,36 +281,32 @@
                         <h4 style="margin-bottom:10px; color:#0284c7;">Data Ayah</h4>
                         <div class="form-group"><label>Nama Ayah</label><input type="text" id="f_ayah_nama" class="form-control"></div>
                         <div class="form-group"><label>TTL Ayah</label><input type="text" id="f_ayah_ttl" class="form-control"></div>
-                        <div class="form-group"><label>Agama Ayah</label><input type="text" id="f_ayah_agama" class="form-control"></div>
+                        <div class="form-group"><label>Agama</label><input type="text" id="f_ayah_agama" class="form-control"></div>
                         <div class="form-group"><label>Ijazah Tertinggi</label><input type="text" id="f_ayah_pend" class="form-control"></div>
                         <div class="form-group"><label>Pekerjaan</label><input type="text" id="f_ayah_kerja" class="form-control"></div>
                         <div class="form-group"><label>Penghasilan / Bln</label><input type="text" id="f_ayah_gaji" class="form-control"></div>
-                        <div class="form-group"><label>Masih Hidup / Meninggal</label><input type="text" id="f_ayah_status" class="form-control" value="Masih Hidup"></div>
+                        <div class="form-group"><label>Masih Hidup/Meninggal</label><input type="text" id="f_ayah_status" class="form-control" value="Masih Hidup"></div>
                     </div>
                     <div style="background:#f8fafc; padding:15px; border:1px solid #e2e8f0; border-radius:6px;">
                         <h4 style="margin-bottom:10px; color:#0284c7;">Data Ibu</h4>
                         <div class="form-group"><label>Nama Ibu</label><input type="text" id="f_ibu_nama" class="form-control"></div>
                         <div class="form-group"><label>TTL Ibu</label><input type="text" id="f_ibu_ttl" class="form-control"></div>
-                        <div class="form-group"><label>Agama Ibu</label><input type="text" id="f_ibu_agama" class="form-control"></div>
+                        <div class="form-group"><label>Agama</label><input type="text" id="f_ibu_agama" class="form-control"></div>
                         <div class="form-group"><label>Ijazah Tertinggi</label><input type="text" id="f_ibu_pend" class="form-control"></div>
                         <div class="form-group"><label>Pekerjaan</label><input type="text" id="f_ibu_kerja" class="form-control"></div>
                         <div class="form-group"><label>Penghasilan / Bln</label><input type="text" id="f_ibu_gaji" class="form-control"></div>
-                        <div class="form-group"><label>Masih Hidup / Meninggal</label><input type="text" id="f_ibu_status" class="form-control" value="Masih Hidup"></div>
+                        <div class="form-group"><label>Masih Hidup/Meninggal</label><input type="text" id="f_ibu_status" class="form-control" value="Masih Hidup"></div>
                     </div>
 
-                    <div class="form-section-title">F. Keterangan Wali (Kosongkan jika tidak ada)</div>
+                    <div class="form-section-title">F. Wali & G. Perkembangan</div>
                     <div class="form-group"><label>Nama Wali</label><input type="text" id="f_wali_nama" class="form-control"></div>
-                    <div class="form-group"><label>Hubungan dgn Murid</label><input type="text" id="f_wali_hub" class="form-control"></div>
-                    <div class="form-group"><label>Pekerjaan Wali</label><input type="text" id="f_wali_kerja" class="form-control"></div>
-                    <div class="form-group"><label>Alamat Wali</label><input type="text" id="f_wali_alamat" class="form-control"></div>
-
-                    <div class="form-section-title">G. Bakat & H. Perkembangan</div>
-                    <div class="form-group"><label>Bakat / Prestasi (Kesenian/Olahraga)</label><input type="text" id="f_bakat" class="form-control"></div>
-                    <div class="form-group"><label>Diterima di Kelas (Awal Masuk)</label><input type="text" id="f_kelas_masuk" class="form-control" placeholder="Contoh: Kelas 1"></div>
+                    <div class="form-group"><label>Hubungan & Pekerjaan Wali</label><div style="display:flex; gap:5px;"><input type="text" id="f_wali_hub" class="form-control" placeholder="Hubungan"><input type="text" id="f_wali_kerja" class="form-control" placeholder="Pekerjaan"></div></div>
+                    <div class="form-group full-width"><label>Alamat Wali</label><input type="text" id="f_wali_alamat" class="form-control"></div>
+                    <div class="form-group"><label>Bakat / Prestasi</label><input type="text" id="f_bakat" class="form-control"></div>
+                    <div class="form-group"><label>Diterima di Kelas (Awal)</label><input type="text" id="f_kelas_masuk" class="form-control" placeholder="Contoh: Kelas 1"></div>
 
                     <div class="form-group full-width photo-area">
                         <label style="text-align: left; font-size: 1rem;">Pas Foto Siswa (3x4) *</label>
-                        
                         <img id="photo-preview-img" class="photo-preview" src="">
                         <input type="hidden" id="photo-data">
                         
@@ -316,20 +325,19 @@
                             <button type="button" class="btn btn-primary" onclick="document.getElementById('upload-photo').click()">📁 Dari Galeri/File</button>
                             <button type="button" class="btn btn-warning" onclick="startCamera()">📷 Buka Kamera</button>
                         </div>
-
-                        <div style="margin-top: 15px; font-size: 0.85rem; color: #334155; text-align: left; background: #e0f2fe; padding: 12px; border-radius: 6px; border: 1px solid #bae6fd;">
-                            <strong style="color: #0284c7;">📌 Sistem akan mengompres & memotong foto menjadi 3x4 secara otomatis agar ringan di server.</strong>
-                        </div>
                     </div>
                 </div>
 
                 <div style="margin-top:20px; text-align:right; border-top: 1px solid var(--border); padding-top: 15px;">
-                    <button type="button" class="btn btn-secondary" onclick="showView('home-view')">✖ Batal</button>
+                    <button type="button" id="btn-cancel-form" class="btn btn-secondary" onclick="showView('home-view')" style="display: none;">⬅ Batal / Kembali</button>
                     <button type="submit" class="btn btn-success" style="padding: 10px 20px; font-size: 1rem; margin-left:10px;">💾 Simpan Data Siswa</button>
                 </div>
             </form>
         </div>
 
+        <!-- ================================== -->
+        <!-- VIEW 5: DETAIL CETAK BUKU INDUK    -->
+        <!-- ================================== -->
         <div id="detail-view" class="view-section card">
             <div class="no-print" style="margin-bottom:20px; background:#e2e8f0; padding:15px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
                 <div>
@@ -337,18 +345,16 @@
                     <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Langsung</button>
                     <button class="btn btn-success" style="background:#2563eb;" onclick="exportToWord()">📄 Download Word</button>
                 </div>
-                <div style="font-size: 0.85rem; color:#475569;">Pastikan Kop Surat sudah diatur di menu Pengaturan. Gunakan ukuran kertas A4/F4.</div>
             </div>
             
             <div class="print-container">
-                <!-- BAGIAN CETAK -->
                 <div class="kop-surat">
                     <img id="print_logo" src="" alt="Logo" style="display:none;">
                     <div class="kop-text">
-                        <h4 id="print_pemda">PEMERINTAH DAERAH</h4>
-                        <h3 id="print_dinas">DINAS PENDIDIKAN</h3>
-                        <h2 id="print_sekolah">NAMA SEKOLAH</h2>
-                        <p id="print_alamat">Alamat Sekolah</p>
+                        <h4 id="print_pemda"></h4>
+                        <h3 id="print_dinas"></h3>
+                        <h2 id="print_sekolah"></h2>
+                        <p id="print_alamat"></p>
                     </div>
                 </div>
 
@@ -362,10 +368,7 @@
                         </table>
                     </div>
                 </div>
-
-                <div class="print-photo-box">
-                    <img id="p_photo" src="" alt="Pas Foto 3x4">
-                </div>
+                <div class="print-photo-box"><img id="p_photo" src="" alt="Pas Foto"></div>
 
                 <div class="section-header">A. KETERANGAN PRIBADI</div>
                 <table class="buku-induk-table">
@@ -393,19 +396,15 @@
                     <tr><td class="col-num">16.</td><td class="col-label">Ke sekolah dengan</td><td class="col-separator">:</td><td class="col-value" id="d_transport"></td></tr>
                 </table>
 
-                <div class="section-header">C. KETERANGAN KESEHATAN / JASMANI</div>
+                <div class="section-header">C. KESEHATAN / JASMANI & D. PENDIDIKAN SEBELUMNYA</div>
                 <table class="buku-induk-table">
                     <tr><td class="col-num">17.</td><td class="col-label">Berat Badan / Tinggi Badan</td><td class="col-separator">:</td><td class="col-value"><span id="d_bb"></span> Kg / <span id="d_tb"></span> Cm</td></tr>
                     <tr><td class="col-num">18.</td><td class="col-label">Golongan Darah</td><td class="col-separator">:</td><td class="col-value" id="d_goldar"></td></tr>
                     <tr><td class="col-num">19.</td><td class="col-label">Penyakit yang pernah diderita</td><td class="col-separator">:</td><td class="col-value" id="d_penyakit"></td></tr>
                     <tr><td class="col-num">20.</td><td class="col-label">Kelainan Jasmani</td><td class="col-separator">:</td><td class="col-value" id="d_kelainan"></td></tr>
-                </table>
-
-                <div class="section-header">D. KETERANGAN PENDIDIKAN SEBELUMNYA</div>
-                <table class="buku-induk-table">
                     <tr><td class="col-num">21.</td><td class="col-label">Asal Sekolah (TK/PAUD)</td><td class="col-separator">:</td><td class="col-value" id="d_asal_sekolah"></td></tr>
                     <tr><td class="col-num">22.</td><td class="col-label">Tgl & No Ijazah</td><td class="col-separator">:</td><td class="col-value" id="d_ijazah_asal"></td></tr>
-                    <tr><td class="col-num">23.</td><td class="col-label">Pindahan dari sekolah / Alasan</td><td class="col-separator">:</td><td class="col-value" id="d_pindahan"></td></tr>
+                    <tr><td class="col-num">23.</td><td class="col-label">Pindahan / Alasan</td><td class="col-separator">:</td><td class="col-value" id="d_pindahan"></td></tr>
                 </table>
 
                 <div class="page-break"></div>
@@ -427,24 +426,14 @@
                     </tbody>
                 </table>
 
-                <div class="section-header">F. KETERANGAN TENTANG WALI</div>
+                <div class="section-header">F. KETERANGAN TENTANG WALI & G. KEGEMARAN</div>
                 <table class="buku-induk-table">
                     <tr><td class="col-num">31.</td><td class="col-label">Nama Wali</td><td class="col-separator">:</td><td class="col-value" id="d_wali_nama"></td></tr>
-                    <tr><td class="col-num">32.</td><td class="col-label">Hubungan dengan Murid</td><td class="col-separator">:</td><td class="col-value" id="d_wali_hub"></td></tr>
-                    <tr><td class="col-num">33.</td><td class="col-label">Pekerjaan</td><td class="col-separator">:</td><td class="col-value" id="d_wali_kerja"></td></tr>
-                    <tr><td class="col-num">34.</td><td class="col-label">Alamat Rumah</td><td class="col-separator">:</td><td class="col-value" id="d_wali_alamat"></td></tr>
+                    <tr><td class="col-num">32.</td><td class="col-label">Hubungan / Pekerjaan Wali</td><td class="col-separator">:</td><td class="col-value"><span id="d_wali_hub"></span> / <span id="d_wali_kerja"></span></td></tr>
+                    <tr><td class="col-num">33.</td><td class="col-label">Alamat Rumah Wali</td><td class="col-separator">:</td><td class="col-value" id="d_wali_alamat"></td></tr>
+                    <tr><td class="col-num">34.</td><td class="col-label">Bakat Khusus / Prestasi</td><td class="col-separator">:</td><td class="col-value" id="d_bakat"></td></tr>
+                    <tr><td class="col-num">35.</td><td class="col-label">Diterima di Kelas</td><td class="col-separator">:</td><td class="col-value" id="d_kelas_masuk"></td></tr>
                 </table>
-
-                <div class="section-header">G. KEGEMARAN</div>
-                <table class="buku-induk-table">
-                    <tr><td class="col-num">35.</td><td class="col-label">Bakat Khusus / Prestasi yang menonjol</td><td class="col-separator">:</td><td class="col-value" id="d_bakat"></td></tr>
-                </table>
-
-                <div class="section-header">H. KETERANGAN PERKEMBANGAN MURID</div>
-                <table class="buku-induk-table">
-                    <tr><td class="col-num">36.</td><td class="col-label">Diterima di Kelas</td><td class="col-separator">:</td><td class="col-value" id="d_kelas_masuk"></td></tr>
-                </table>
-
             </div>
         </div>
 
@@ -455,18 +444,14 @@
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbzpozanYjymsmNAFR-FWB9AmvHlTE9J6NV3whPTULXBK62pEOZO_gnmUj8AKX7nb4Is/exec';
         
         let students = [];
-        
-        // --- KONFIGURASI KEAMANAN ADMIN ---
         let isAdmin = false;
         const ADMIN_PIN = "@dm1nKu77";
+        const ORTU_PIN = "m4r0s77"; // <--- KUNCI ORANG TUA SUDAH DIPERBARUI
         
-        // DATABASE PENGATURAN KOP SURAT
-        let appSettings = JSON.parse(localStorage.getItem('settings_sdn21')) || {
-            pemda: "PEMERINTAH KABUPATEN MAROS",
-            dinas: "DINAS PENDIDIKAN DAN KEBUDAYAAN",
-            sekolah: "SDIT QURRATU A'YUN MAROS",
-            alamat: "Maros, Sulawesi Selatan",
-            logo: ""
+        // Default pengaturan awal diganti menjadi lebih umum
+        let appSettings = JSON.parse(localStorage.getItem('settings_sekolah')) || {
+            pemda: "PEMERINTAH DAERAH", dinas: "DINAS PENDIDIKAN",
+            sekolah: "NAMA SEKOLAH DASAR", alamat: "Alamat Lengkap Sekolah", logo: ""
         };
 
         window.onload = () => { 
@@ -475,65 +460,61 @@
             fetchData();
         };
 
-        function toggleAdminMode() {
-            if (!isAdmin) {
-                let pin = prompt("Masukkan Password Admin:");
-                if (pin === ADMIN_PIN) {
-                    isAdmin = true;
-                    document.getElementById('btn-admin').innerHTML = "🔓 Keluar Admin";
-                    document.getElementById('btn-admin').classList.replace('btn-danger', 'btn-secondary');
-                    document.getElementById('table-container').style.display = 'block'; 
-                    document.getElementById('table-hidden-msg').style.display = 'none'; 
-                    renderTable(); 
-                } else {
-                    alert("Password Salah!");
-                }
+        function toggleLoginType() {
+            const role = document.getElementById('login-role').value;
+            const label = document.getElementById('login-label');
+            if (role === 'admin') {
+                label.innerText = 'Password Administrator:';
             } else {
+                label.innerText = 'Kunci Akses Pendaftaran:';
+            }
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-password').focus();
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') prosesLogin();
+        }
+
+        function prosesLogin() {
+            const role = document.getElementById('login-role').value;
+            const pass = document.getElementById('login-password').value;
+
+            if (role === 'admin') {
+                if (pass === ADMIN_PIN) {
+                    isAdmin = true;
+                    document.getElementById('main-navbar').style.display = 'flex';
+                    document.getElementById('btn-settings').style.display = 'inline-flex';
+                    document.getElementById('btn-excel').style.display = 'inline-flex';
+                    document.getElementById('menu-theme').style.display = 'flex';
+                    document.getElementById('f_kunci_akses').value = ADMIN_PIN; 
+                    showView('home-view');
+                    document.getElementById('btn-cancel-form').style.display = 'inline-flex'; 
+                    renderTable();
+                } else { alert("❌ Password Administrator Salah!"); }
+            } else {
+                if (pass === ORTU_PIN) {
+                    isAdmin = false;
+                    document.getElementById('main-navbar').style.display = 'flex';
+                    document.getElementById('btn-settings').style.display = 'none';
+                    document.getElementById('btn-excel').style.display = 'none';
+                    document.getElementById('menu-theme').style.display = 'none';
+                    document.getElementById('f_kunci_akses').value = ORTU_PIN; 
+                    bukaFormBaru(); 
+                    document.getElementById('btn-cancel-form').style.display = 'none'; 
+                } else { alert("❌ Kunci Akses Pendaftaran Salah!"); }
+            }
+        }
+
+        function logout() {
+            if(confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
                 isAdmin = false;
-                document.getElementById('btn-admin').innerHTML = "🔒 Mode Admin";
-                document.getElementById('btn-admin').classList.replace('btn-secondary', 'btn-danger');
-                document.getElementById('table-container').style.display = 'none'; 
-                document.getElementById('table-hidden-msg').style.display = 'block'; 
-                renderTable();
+                document.getElementById('main-navbar').style.display = 'none';
+                document.getElementById('login-password').value = '';
+                document.getElementById('f_kunci_akses').value = '';
+                clearForm(true);
+                showView('login-view');
             }
-        }
-
-        async function fetchData() {
-            const tbody = document.querySelector('#student-table tbody');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">🔄 Mengunduh data dari server...</td></tr>';
-            
-            try {
-                const response = await fetch(GAS_URL);
-                students = await response.json();
-                renderTable(); 
-            } catch (error) {
-                console.error('Gagal memuat data:', error);
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px; color: red;">❌ Gagal terhubung ke database. Periksa koneksi internet.</td></tr>';
-            }
-        }
-
-        function initTheme() {
-            const savedBg = localStorage.getItem('theme_bg_sdn21') || '#f1f5f9';
-            const savedPrimary = localStorage.getItem('theme_primary_sdn21') || '#0ea5e9';
-            document.documentElement.style.setProperty('--bg-color', savedBg);
-            document.documentElement.style.setProperty('--primary', savedPrimary);
-            document.getElementById('color-bg').value = savedBg;
-            document.getElementById('color-primary').value = savedPrimary;
-        }
-
-        function changeTheme() {
-            const bgColor = document.getElementById('color-bg').value;
-            const primaryColor = document.getElementById('color-primary').value;
-            document.documentElement.style.setProperty('--bg-color', bgColor);
-            document.documentElement.style.setProperty('--primary', primaryColor);
-            localStorage.setItem('theme_bg_sdn21', bgColor);
-            localStorage.setItem('theme_primary_sdn21', primaryColor);
-        }
-
-        function resetTheme() {
-            document.getElementById('color-bg').value = '#f1f5f9';
-            document.getElementById('color-primary').value = '#0ea5e9';
-            changeTheme();
         }
 
         function showView(id) {
@@ -541,58 +522,51 @@
             document.getElementById(id).classList.add('active');
         }
 
-        function loadSettings() {
-            document.getElementById('set_pemda').value = appSettings.pemda;
-            document.getElementById('set_dinas').value = appSettings.dinas;
-            document.getElementById('set_sekolah').value = appSettings.sekolah;
-            document.getElementById('set_alamat').value = appSettings.alamat;
-            document.getElementById('logo-preview-img').src = appSettings.logo || "";
-            document.getElementById('set_logo').value = appSettings.logo || "";
+        function bukaFormBaru() {
+            let tempKey = document.getElementById('f_kunci_akses').value;
+            clearForm();
+            document.getElementById('f_kunci_akses').value = tempKey;
+            showView('form-view');
+        }
 
-            document.getElementById('print_pemda').innerText = appSettings.pemda;
-            document.getElementById('print_dinas').innerText = appSettings.dinas;
-            document.getElementById('print_sekolah').innerText = appSettings.sekolah;
-            document.getElementById('print_alamat').innerText = appSettings.alamat;
+        async function fetchData() {
+            try {
+                const response = await fetch(GAS_URL);
+                students = await response.json();
+                renderTable(); 
+            } catch (error) { console.error('Gagal memuat data:', error); }
+        }
+
+        function loadSettings() {
+            document.getElementById('set_pemda').value = appSettings.pemda; document.getElementById('set_dinas').value = appSettings.dinas;
+            document.getElementById('set_sekolah').value = appSettings.sekolah; document.getElementById('set_alamat').value = appSettings.alamat;
+            document.getElementById('logo-preview-img').src = appSettings.logo || ""; document.getElementById('set_logo').value = appSettings.logo || "";
+
+            document.getElementById('print_pemda').innerText = appSettings.pemda; document.getElementById('print_dinas').innerText = appSettings.dinas;
+            document.getElementById('print_sekolah').innerText = appSettings.sekolah; document.getElementById('print_alamat').innerText = appSettings.alamat;
             
             const logoPrint = document.getElementById('print_logo');
-            if(appSettings.logo) {
-                logoPrint.src = appSettings.logo;
-                logoPrint.style.display = "block";
-            } else {
-                logoPrint.style.display = "none";
-            }
+            if(appSettings.logo) { logoPrint.src = appSettings.logo; logoPrint.style.display = "block"; } else { logoPrint.style.display = "none"; }
         }
 
         function saveSettings(e) {
             e.preventDefault();
             appSettings = {
-                pemda: document.getElementById('set_pemda').value,
-                dinas: document.getElementById('set_dinas').value,
-                sekolah: document.getElementById('set_sekolah').value,
-                alamat: document.getElementById('set_alamat').value,
+                pemda: document.getElementById('set_pemda').value, dinas: document.getElementById('set_dinas').value,
+                sekolah: document.getElementById('set_sekolah').value, alamat: document.getElementById('set_alamat').value,
                 logo: document.getElementById('set_logo').value
             };
-            localStorage.setItem('settings_sdn21', JSON.stringify(appSettings));
-            loadSettings(); 
-            alert("✅ Pengaturan Kop Surat Berhasil Disimpan!");
-            showView('home-view');
+            localStorage.setItem('settings_sekolah', JSON.stringify(appSettings));
+            loadSettings(); alert("✅ Pengaturan Kop Surat Berhasil Disimpan!"); showView('home-view');
         }
 
         function handleLogoUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
-
-            const maxSize = 500 * 1024;
-            if (file.size > maxSize) {
-                alert("⚠️ UKURAN LOGO TERLALU BESAR!\n\nMaksimal yang diizinkan: 500 KB.");
-                e.target.value = ""; 
-                return;
-            }
-
+            if (file.size > 500 * 1024) { alert("⚠️ UKURAN LOGO TERLALU BESAR (Maks: 500 KB)."); e.target.value = ""; return; }
             const reader = new FileReader();
             reader.onload = (event) => { 
-                document.getElementById('set_logo').value = event.target.result;
-                document.getElementById('logo-preview-img').src = event.target.result;
+                document.getElementById('set_logo').value = event.target.result; document.getElementById('logo-preview-img').src = event.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -601,418 +575,131 @@
             const tbody = document.querySelector('#student-table tbody');
             const search = document.getElementById('search-input').value.toLowerCase();
             tbody.innerHTML = '';
+            let filtered = students.filter(s => (s.f_nama || '').toLowerCase().includes(search) || (s.f_nisn || '').includes(search));
             
-            let filtered = students.filter(s => 
-                (s.f_nama || '').toLowerCase().includes(search) || 
-                (s.f_nisn || '').includes(search) || 
-                (s.f_kelas || '').toLowerCase().includes(search)
-            );
-            
-            if(filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Belum ada data murid atau tidak ditemukan.</td></tr>';
-                return;
-            }
+            if(filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Belum ada data murid atau sedang loading...</td></tr>'; return; }
 
             filtered.forEach((s, i) => {
-                let actionButtons = `<button class="btn btn-sm btn-success" onclick="viewStudent(${s.id})">👁️ Lihat/Cetak</button>`;
-                
-                if (isAdmin) {
-                    actionButtons += `
-                        <button class="btn btn-sm btn-primary" onclick="editStudent(${s.id})">✏️ Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteStudent(${s.id})">🗑️ Hapus</button>
-                    `;
-                }
-
-                tbody.innerHTML += `<tr>
-                    <td style="text-align:center;">${i+1}</td>
-                    <td><strong>${s.f_nisn}</strong></td>
-                    <td>${s.f_nama}</td>
-                    <td>${s.f_kelas || '-'}</td>
-                    <td><div style="display:flex; gap:5px; flex-wrap:wrap;">${actionButtons}</div></td>
-                </tr>`;
+                let actionBtns = `<button class="btn btn-sm btn-success" onclick="viewStudent(${s.id})">👁️ Cetak</button>
+                                  <button class="btn btn-sm btn-primary" onclick="editStudent(${s.id})">✏️ Edit</button>`;
+                tbody.innerHTML += `<tr><td style="text-align:center;">${i+1}</td><td><strong>${s.f_nisn}</strong></td><td>${s.f_nama}</td><td>${s.f_kelas || '-'}</td>
+                    <td><div style="display:flex; gap:5px;">${actionBtns}</div></td></tr>`;
             });
         }
 
         async function saveStudent(e) {
             e.preventDefault();
-            
             const btnSubmit = e.target.querySelector('button[type="submit"]');
             const originalText = btnSubmit.innerHTML;
-            btnSubmit.innerHTML = "⏳ Menyimpan ke Server...";
-            btnSubmit.disabled = true; 
+            btnSubmit.innerHTML = "⏳ Menyimpan..."; btnSubmit.disabled = true; 
             
             const formInputs = document.querySelectorAll('#student-form input[id^="f_"], #student-form select[id^="f_"]');
-            let data = { 
-                id: document.getElementById('student-id').value || Date.now(),
-                photo: document.getElementById('photo-data').value 
-            };
-            
-            formInputs.forEach(input => {
-                data[input.id] = input.value;
-            });
+            let data = { id: document.getElementById('student-id').value || Date.now(), photo: document.getElementById('photo-data').value };
+            formInputs.forEach(input => { data[input.id] = input.value; });
 
             try {
-                const response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(data)
-                });
-                
+                const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(data) });
                 const result = await response.json();
                 
                 if(result.status === "error") {
                     alert("❌ " + result.message);
                 } else if(result.status === "success") {
                     alert("✅ Data Siswa Berhasil Disimpan!");
-                    clearForm();
-                    showView('home-view'); 
                     fetchData(); 
+                    if(isAdmin) { showView('home-view'); } 
+                    else { 
+                        if(confirm('Data sukses dikirim. Ingin mendaftarkan siswa/anak lainnya?')) { bukaFormBaru(); } 
+                        else { logout(); }
+                    }
                 }
-            } catch (error) {
-                alert("❌ Terjadi kesalahan jaringan. Data gagal disimpan.");
-                console.error(error);
-            } finally {
-                btnSubmit.innerHTML = originalText;
-                btnSubmit.disabled = false;
-            }
-        }
-
-        function viewStudent(id) {
-            const s = students.find(x => x.id == id);
-            
-            document.getElementById('p_nama').innerText = s.f_nama;
-            document.getElementById('p_nisn').innerText = s.f_nisn;
-            document.getElementById('p_kelas').innerText = s.f_kelas || '-';
-            document.getElementById('p_no_rapor').innerText = s.f_no_rapor || '-';
-            document.getElementById('p_photo').src = s.photo || '';
-            
-            document.getElementById('d_nama').innerText = s.f_nama;
-            document.getElementById('d_panggilan').innerText = s.f_panggilan || '-';
-            document.getElementById('d_jk').innerText = s.f_jk;
-            let tglLahirText = s.f_tgl_lahir ? new Date(s.f_tgl_lahir).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'}) : '';
-            document.getElementById('d_ttl').innerText = `${s.f_tempat_lahir || ''}, ${tglLahirText}`;
-            document.getElementById('d_agama').innerText = s.f_agama;
-            document.getElementById('d_wn').innerText = s.f_wn;
-            document.getElementById('d_anak_ke').innerText = s.f_anak_ke;
-            document.getElementById('d_sdr_kandung').innerText = s.f_sdr_kandung;
-            document.getElementById('d_sdr_tiri').innerText = s.f_sdr_tiri;
-            document.getElementById('d_sdr_angkat').innerText = s.f_sdr_angkat;
-            document.getElementById('d_yatim').innerText = s.f_yatim;
-            document.getElementById('d_bahasa').innerText = s.f_bahasa;
-            
-            document.getElementById('d_alamat').innerText = s.f_alamat;
-            document.getElementById('d_telp').innerText = s.f_telp;
-            document.getElementById('d_tinggal').innerText = s.f_tinggal;
-            document.getElementById('d_jarak').innerText = (s.f_jarak || '-') + ' Km';
-            document.getElementById('d_transport').innerText = s.f_transport;
-
-            document.getElementById('d_bb').innerText = s.f_bb || '-';
-            document.getElementById('d_tb').innerText = s.f_tb || '-';
-            document.getElementById('d_goldar').innerText = s.f_goldar || '-';
-            document.getElementById('d_penyakit').innerText = s.f_penyakit || '-';
-            document.getElementById('d_kelainan').innerText = s.f_kelainan || '-';
-            
-            document.getElementById('d_asal_sekolah').innerText = s.f_asal_sekolah || '-';
-            document.getElementById('d_ijazah_asal').innerText = s.f_ijazah_asal || '-';
-            document.getElementById('d_pindahan').innerText = s.f_pindahan || '-';
-
-            document.getElementById('d_ayah_nama').innerText = s.f_ayah_nama || '-';
-            document.getElementById('d_ayah_ttl').innerText = s.f_ayah_ttl || '-';
-            document.getElementById('d_ayah_agama').innerText = s.f_ayah_agama || '-';
-            document.getElementById('d_ayah_pend').innerText = s.f_ayah_pend || '-';
-            document.getElementById('d_ayah_kerja').innerText = s.f_ayah_kerja || '-';
-            document.getElementById('d_ayah_gaji').innerText = s.f_ayah_gaji || '-';
-            document.getElementById('d_ayah_status').innerText = s.f_ayah_status || '-';
-
-            document.getElementById('d_ibu_nama').innerText = s.f_ibu_nama || '-';
-            document.getElementById('d_ibu_ttl').innerText = s.f_ibu_ttl || '-';
-            document.getElementById('d_ibu_agama').innerText = s.f_ibu_agama || '-';
-            document.getElementById('d_ibu_pend').innerText = s.f_ibu_pend || '-';
-            document.getElementById('d_ibu_kerja').innerText = s.f_ibu_kerja || '-';
-            document.getElementById('d_ibu_gaji').innerText = s.f_ibu_gaji || '-';
-            document.getElementById('d_ibu_status').innerText = s.f_ibu_status || '-';
-
-            document.getElementById('d_wali_nama').innerText = s.f_wali_nama || '-';
-            document.getElementById('d_wali_hub').innerText = s.f_wali_hub || '-';
-            document.getElementById('d_wali_kerja').innerText = s.f_wali_kerja || '-';
-            document.getElementById('d_wali_alamat').innerText = s.f_wali_alamat || '-';
-            
-            document.getElementById('d_bakat').innerText = s.f_bakat || '-';
-            document.getElementById('d_kelas_masuk').innerText = s.f_kelas_masuk || '-';
-
-            showView('detail-view');
+            } catch (error) { alert("❌ Terjadi kesalahan jaringan."); } finally { btnSubmit.innerHTML = originalText; btnSubmit.disabled = false; }
         }
 
         function editStudent(id) {
             const s = students.find(x => x.id == id);
             document.getElementById('student-id').value = s.id;
-            
-            for (let key in s) {
-                if (key.startsWith('f_')) {
-                    let el = document.getElementById(key);
-                    if(el) el.value = s[key];
-                }
-            }
-            
-            document.getElementById('photo-data').value = s.photo || "";
-            document.getElementById('photo-preview-img').src = s.photo || "";
-            
-            if (isAdmin) {
-                document.getElementById('f_kunci_akses').value = ADMIN_PIN;
-                document.getElementById('f_kunci_akses').parentElement.style.display = 'none';
-            }
-            
+            for (let key in s) { if (key.startsWith('f_')) { let el = document.getElementById(key); if(el) el.value = s[key]; } }
+            document.getElementById('photo-data').value = s.photo || ""; document.getElementById('photo-preview-img').src = s.photo || "";
+            document.getElementById('f_kunci_akses').value = ADMIN_PIN; 
             showView('form-view');
         }
 
-        function deleteStudent(id) { 
-            if(confirm('Apakah Anda yakin ingin menyembunyikan data murid ini dari tabel lokal? (Untuk menghapus dari database server, harus lewat file Spreadsheet)')) { 
-                students = students.filter(s => s.id != id); 
-                renderTable(); 
-            } 
-        }
-
-        function clearForm() {
+        function clearForm(isLogout = false) {
             document.getElementById('student-form').reset();
             document.getElementById('student-id').value = "";
             document.getElementById('photo-preview-img').src = "";
             document.getElementById('photo-data').value = "";
-            
-            document.getElementById('f_kunci_akses').parentElement.style.display = 'block';
-            
+            if(isLogout) document.getElementById('f_kunci_akses').value = "";
             stopCamera();
+        }
+
+        function viewStudent(id) {
+            const s = students.find(x => x.id == id);
+            document.getElementById('p_nama').innerText = s.f_nama; document.getElementById('p_nisn').innerText = s.f_nisn;
+            document.getElementById('p_kelas').innerText = s.f_kelas || '-'; document.getElementById('p_no_rapor').innerText = s.f_no_rapor || '-';
+            document.getElementById('p_photo').src = s.photo || '';
+            
+            let dataIds = ['nama','panggilan','jk','agama','wn','anak_ke','sdr_kandung','sdr_tiri','sdr_angkat','yatim','bahasa','alamat','telp','tinggal','jarak','transport','bb','tb','goldar','penyakit','kelainan','asal_sekolah','ijazah_asal','pindahan','ayah_nama','ayah_ttl','ayah_agama','ayah_pend','ayah_kerja','ayah_gaji','ayah_status','ibu_nama','ibu_ttl','ibu_agama','ibu_pend','ibu_kerja','ibu_gaji','ibu_status','wali_nama','wali_hub','wali_kerja','wali_alamat','bakat','kelas_masuk'];
+            dataIds.forEach(k => { let el = document.getElementById('d_'+k); if(el) el.innerText = s['f_'+k] || '-'; });
+            
+            document.getElementById('d_ttl').innerText = `${s.f_tempat_lahir || '-'}, ${s.f_tgl_lahir ? new Date(s.f_tgl_lahir).toLocaleDateString('id-ID') : '-'}`;
+            showView('detail-view');
         }
 
         let cameraStream = null;
-
-        async function startCamera() {
-            const video = document.getElementById('camera-video');
-            const container = document.getElementById('camera-container');
-            const btnGroup = document.getElementById('photo-buttons');
-            
-            try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'user' } 
-                });
-                video.srcObject = cameraStream;
-                container.style.display = 'block';
-                btnGroup.style.display = 'none';
-            } catch (err) {
-                alert("❌ Akses kamera ditolak atau tidak ditemukan di perangkat ini.");
-            }
-        }
-
-        function stopCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-            }
-            document.getElementById('camera-container').style.display = 'none';
-            document.getElementById('photo-buttons').style.display = 'flex';
-        }
-
-        function capturePhoto() {
-            const video = document.getElementById('camera-video');
-            processAndCompressImage(video, video.videoWidth, video.videoHeight, true);
-            stopCamera();
-        }
-
-        function handleFileUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => processAndCompressImage(img, img.width, img.height, false);
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
+        async function startCamera() { try { cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } }); document.getElementById('camera-video').srcObject = cameraStream; document.getElementById('camera-container').style.display = 'block'; document.getElementById('photo-buttons').style.display = 'none'; } catch (err) { alert("❌ Akses kamera ditolak."); } }
+        function stopCamera() { if (cameraStream) cameraStream.getTracks().forEach(track => track.stop()); document.getElementById('camera-container').style.display = 'none'; document.getElementById('photo-buttons').style.display = 'flex'; }
+        function capturePhoto() { const video = document.getElementById('camera-video'); processAndCompressImage(video, video.videoWidth, video.videoHeight, true); stopCamera(); }
+        function handleFileUpload(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { const img = new Image(); img.onload = () => processAndCompressImage(img, img.width, img.height, false); img.src = event.target.result; }; reader.readAsDataURL(file); }
+        
         function processAndCompressImage(sourceElement, sourceWidth, sourceHeight, isCamera) {
-            const canvas = document.createElement('canvas');
-            const TARGET_WIDTH = 300;
-            const TARGET_HEIGHT = 400;
-            canvas.width = TARGET_WIDTH;
-            canvas.height = TARGET_HEIGHT;
-            
-            const ctx = canvas.getContext('2d');
-            
-            const sourceRatio = sourceWidth / sourceHeight;
-            const targetRatio = TARGET_WIDTH / TARGET_HEIGHT;
-            let drawWidth = TARGET_WIDTH;
-            let drawHeight = TARGET_HEIGHT;
-            let offsetX = 0;
-            let offsetY = 0;
-
-            if (sourceRatio > targetRatio) {
-                drawWidth = sourceHeight * targetRatio;
-                offsetX = (sourceWidth - drawWidth) / 2;
-                drawHeight = sourceHeight;
-            } else {
-                drawHeight = sourceWidth / targetRatio;
-                offsetY = (sourceHeight - drawHeight) / 2;
-                drawWidth = sourceWidth;
-            }
-
-            if(isCamera) {
-                ctx.translate(TARGET_WIDTH, 0);
-                ctx.scale(-1, 1);
-            }
-
+            const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+            const TARGET_WIDTH = 300, TARGET_HEIGHT = 400; canvas.width = TARGET_WIDTH; canvas.height = TARGET_HEIGHT;
+            const sourceRatio = sourceWidth / sourceHeight, targetRatio = TARGET_WIDTH / TARGET_HEIGHT;
+            let drawWidth = TARGET_WIDTH, drawHeight = TARGET_HEIGHT, offsetX = 0, offsetY = 0;
+            if (sourceRatio > targetRatio) { drawWidth = sourceHeight * targetRatio; offsetX = (sourceWidth - drawWidth) / 2; drawHeight = sourceHeight; } 
+            else { drawHeight = sourceWidth / targetRatio; offsetY = (sourceHeight - drawHeight) / 2; drawWidth = sourceWidth; }
+            if(isCamera) { ctx.translate(TARGET_WIDTH, 0); ctx.scale(-1, 1); }
             ctx.drawImage(sourceElement, offsetX, offsetY, drawWidth, drawHeight, 0, 0, TARGET_WIDTH, TARGET_HEIGHT);
-            
-            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
-            
-            document.getElementById('photo-data').value = compressedBase64;
-            document.getElementById('photo-preview-img').src = compressedBase64;
+            const b64 = canvas.toDataURL('image/jpeg', 0.6); document.getElementById('photo-data').value = b64; document.getElementById('photo-preview-img').src = b64;
         }
 
         function exportExcel() {
-            let csv = "NISN,Nama Lengkap,Kelas Saat Ini,Jenis Kelamin,Tempat Lahir,Tgl Lahir,Agama,Nama Ayah,Pekerjaan Ayah,Nama Ibu,Pekerjaan Ibu\n";
-            students.forEach(s => {
-                csv += `"${s.f_nisn}","${s.f_nama}","${s.f_kelas || '-'}","${s.f_jk}","${s.f_tempat_lahir}","${s.f_tgl_lahir}","${s.f_agama}","${s.f_ayah_nama}","${s.f_ayah_kerja}","${s.f_ibu_nama}","${s.f_ibu_kerja}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; 
-            a.download = 'Rekap_Buku_Induk_SDIT_Qurratu_Ayun.csv'; 
-            a.click();
+            let csv = "NISN,Nama Lengkap,Kelas Saat Ini,Jenis Kelamin,Tempat Lahir,Tgl Lahir,Agama\n";
+            students.forEach(s => { csv += `"${s.f_nisn}","${s.f_nama}","${s.f_kelas || '-'}","${s.f_jk}","${s.f_tempat_lahir}","${s.f_tgl_lahir}","${s.f_agama}"\n`; });
+            const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'Rekap_Siswa.csv'; a.click();
         }
 
-        // FUNGSI UNTUK EXPORT KE MS WORD (.doc) DENGAN FOTO DAN LOGO
         function exportToWord() {
-            let nisnSiswa = document.getElementById('p_nisn').innerText;
-            let s = students.find(x => x.f_nisn === nisnSiswa);
-            
-            if (!s) {
-                alert("Gagal mengambil data siswa untuk diexport.");
-                return;
-            }
-
-            let preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Buku Induk</title>";
-            
-            let style = `
-                <style>
-                    body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; }
-                    table { width: 100%; border-collapse: collapse; margin-bottom: 10pt; }
-                    td { vertical-align: top; padding: 2pt 4pt; }
-                    .judul { text-align: center; font-weight: bold; font-size: 14pt; margin-bottom: 15pt; text-decoration: underline; }
-                    .bold { font-weight: bold; }
-                    .tabel-ortu th, .tabel-ortu td { border: 1pt solid black; padding: 4pt; text-align: left; }
-                </style>
-            </head><body>`;
-
+            let nisnSiswa = document.getElementById('p_nisn').innerText; let s = students.find(x => x.f_nisn === nisnSiswa);
+            if (!s) return alert("Gagal mengambil data siswa.");
+            let preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Buku Induk</title><style>body{font-family:'Times New Roman',Times,serif;font-size:11pt;}table{width:100%;border-collapse:collapse;margin-bottom:10pt;}td{vertical-align:top;padding:2pt 4pt;}.judul{text-align:center;font-weight:bold;font-size:14pt;margin-bottom:15pt;text-decoration:underline;}.bold{font-weight:bold;}.tabel-ortu th,.tabel-ortu td{border:1pt solid black;padding:4pt;text-align:left;}</style></head><body>";
             let logoImg = appSettings.logo ? `<img src="${appSettings.logo}" style="width: 75pt; height: 75pt;">` : '';
-            let kopSurat = `
-                <table style="width: 100%; border-bottom: 3px solid black; margin-bottom: 15pt; padding-bottom: 10pt; border-collapse: collapse;">
-                    <tr>
-                        <td style="width: 15%; text-align: center; vertical-align: middle; border: none;">
-                            ${logoImg}
-                        </td>
-                        <td style="width: 85%; text-align: center; vertical-align: middle; border: none;">
-                            <h4 style="margin: 0; padding: 0; font-size: 12pt; font-weight: normal; text-transform: uppercase;">${appSettings.pemda}</h4>
-                            <h3 style="margin: 0; padding: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase;">${appSettings.dinas}</h3>
-                            <h2 style="margin: 0; padding: 0; font-size: 16pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">${appSettings.sekolah}</h2>
-                            <p style="margin: 3pt 0 0 0; padding: 0; font-size: 10pt; font-style: normal;">${appSettings.alamat}</p>
-                        </td>
-                    </tr>
-                </table>
-            `;
-
+            let kopSurat = `<table style="width: 100%; border-bottom: 3px solid black; margin-bottom: 15pt; padding-bottom: 10pt; border-collapse: collapse;"><tr><td style="width: 15%; text-align: center; vertical-align: middle; border: none;">${logoImg}</td><td style="width: 85%; text-align: center; vertical-align: middle; border: none;"><h4 style="margin: 0; padding: 0; font-size: 12pt; font-weight: normal; text-transform: uppercase;">${appSettings.pemda}</h4><h3 style="margin: 0; padding: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase;">${appSettings.dinas}</h3><h2 style="margin: 0; padding: 0; font-size: 16pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">${appSettings.sekolah}</h2><p style="margin: 3pt 0 0 0; padding: 0; font-size: 10pt; font-style: normal;">${appSettings.alamat}</p></td></tr></table>`;
             let fotoImg = s.photo ? `<img src="${s.photo}" style="width: 90pt; height: 120pt;">` : '<div style="line-height: 120pt; color: #666;">[ KOSONG ]</div>';
-            let topSection = `
-                <div class="judul">LEMBAR BUKU INDUK SISWA</div>
-                <table style="width: 100%; margin-bottom: 15pt; border: none;">
-                    <tr>
-                        <td style="width: 75%; border: none;">
-                            <table style="width: 100%;">
-                                <tr><td style="width: 35%; border: none;">Nama Lengkap Murid</td><td style="width: 3%; border: none;">:</td><td style="border: none;" class="bold">${s.f_nama || '-'}</td></tr>
-                                <tr><td style="border: none;">Nomor Induk Siswa Nasional</td><td style="border: none;">:</td><td style="border: none;">${s.f_nisn || '-'}</td></tr>
-                                <tr><td style="border: none;">Kelas Saat Ini</td><td style="border: none;">:</td><td style="border: none;">${s.f_kelas || '-'}</td></tr>
-                                <tr><td style="border: none;">No. Seri Buku Rapor</td><td style="border: none;">:</td><td style="border: none;">${s.f_no_rapor || '-'}</td></tr>
-                            </table>
-                        </td>
-                        <td style="width: 25%; text-align: right; border: none;">
-                            <div style="width: 90pt; height: 120pt; border: 1pt solid black; display: inline-block; text-align: center;">
-                                ${fotoImg}
-                            </div>
-                        </td>
-                    </tr>
-                </table>
-            `;
-
-            let konten = `
-                <div class="bold">A. KETERANGAN PRIBADI</div>
-                <table>
-                    <tr><td width="5%">1.</td><td width="35%">Nama Lengkap</td><td width="3%">:</td><td>${s.f_nama || '-'}</td></tr>
-                    <tr><td></td><td>Nama Panggilan</td><td>:</td><td>${s.f_panggilan || '-'}</td></tr>
-                    <tr><td>2.</td><td>Jenis Kelamin</td><td>:</td><td>${s.f_jk || '-'}</td></tr>
-                    <tr><td>3.</td><td>Tempat & Tanggal Lahir</td><td>:</td><td>${s.f_tempat_lahir || '-'}, ${s.f_tgl_lahir || '-'}</td></tr>
-                    <tr><td>4.</td><td>Agama</td><td>:</td><td>${s.f_agama || '-'}</td></tr>
-                    <tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>${s.f_wn || '-'}</td></tr>
-                    <tr><td>6.</td><td>Anak Keberapa</td><td>:</td><td>${s.f_anak_ke || '-'}</td></tr>
-                    <tr><td>7.</td><td>Jumlah Saudara Kandung</td><td>:</td><td>${s.f_sdr_kandung || '-'}</td></tr>
-                    <tr><td>8.</td><td>Jumlah Saudara Tiri</td><td>:</td><td>${s.f_sdr_tiri || '-'}</td></tr>
-                    <tr><td>9.</td><td>Jumlah Saudara Angkat</td><td>:</td><td>${s.f_sdr_angkat || '-'}</td></tr>
-                    <tr><td>10.</td><td>Anak Yatim / Piatu</td><td>:</td><td>${s.f_yatim || '-'}</td></tr>
-                    <tr><td>11.</td><td>Bahasa Sehari-hari</td><td>:</td><td>${s.f_bahasa || '-'}</td></tr>
-                </table>
-
-                <div class="bold">B. KETERANGAN TEMPAT TINGGAL</div>
-                <table>
-                    <tr><td width="5%">12.</td><td width="35%">Alamat Lengkap</td><td width="3%">:</td><td>${s.f_alamat || '-'}</td></tr>
-                    <tr><td>13.</td><td>No. Telepon / HP</td><td>:</td><td>${s.f_telp || '-'}</td></tr>
-                    <tr><td>14.</td><td>Tinggal Bersama</td><td>:</td><td>${s.f_tinggal || '-'}</td></tr>
-                    <tr><td>15.</td><td>Jarak ke Sekolah</td><td>:</td><td>${s.f_jarak || '-'} Km</td></tr>
-                    <tr><td>16.</td><td>Ke Sekolah Dengan</td><td>:</td><td>${s.f_transport || '-'}</td></tr>
-                </table>
-
-                <div class="bold">C. KESEHATAN & D. PENDIDIKAN SEBELUMNYA</div>
-                <table>
-                    <tr><td width="5%">17.</td><td width="35%">Berat / Tinggi Badan</td><td width="3%">:</td><td>${s.f_bb || '-'} Kg / ${s.f_tb || '-'} Cm</td></tr>
-                    <tr><td>18.</td><td>Golongan Darah</td><td>:</td><td>${s.f_goldar || '-'}</td></tr>
-                    <tr><td>19.</td><td>Kelainan / Penyakit</td><td>:</td><td>${s.f_kelainan || '-'} / ${s.f_penyakit || '-'}</td></tr>
-                    <tr><td>20.</td><td>Asal Sekolah (TK/PAUD)</td><td>:</td><td>${s.f_asal_sekolah || '-'}</td></tr>
-                    <tr><td>21.</td><td>Tgl & No Ijazah</td><td>:</td><td>${s.f_ijazah_asal || '-'}</td></tr>
-                    <tr><td>22.</td><td>Pindahan / Alasan</td><td>:</td><td>${s.f_pindahan || '-'}</td></tr>
-                </table>
-
-                <div class="bold">E. KETERANGAN ORANG TUA KANDUNG</div>
-                <table class="tabel-ortu">
-                    <tr><th>No</th><th>Orang Tua Kandung</th><th>Ayah</th><th>Ibu</th></tr>
-                    <tr><td>24.</td><td>Nama</td><td>${s.f_ayah_nama || '-'}</td><td>${s.f_ibu_nama || '-'}</td></tr>
-                    <tr><td>25.</td><td>Tempat, Tgl Lahir</td><td>${s.f_ayah_ttl || '-'}</td><td>${s.f_ibu_ttl || '-'}</td></tr>
-                    <tr><td>26.</td><td>Agama</td><td>${s.f_ayah_agama || '-'}</td><td>${s.f_ibu_agama || '-'}</td></tr>
-                    <tr><td>27.</td><td>Ijazah Tertinggi</td><td>${s.f_ayah_pend || '-'}</td><td>${s.f_ibu_pend || '-'}</td></tr>
-                    <tr><td>28.</td><td>Pekerjaan</td><td>${s.f_ayah_kerja || '-'}</td><td>${s.f_ibu_kerja || '-'}</td></tr>
-                    <tr><td>29.</td><td>Penghasilan / Bulan</td><td>${s.f_ayah_gaji || '-'}</td><td>${s.f_ibu_gaji || '-'}</td></tr>
-                    <tr><td>30.</td><td>Masih Hidup / Meninggal</td><td>${s.f_ayah_status || '-'}</td><td>${s.f_ibu_status || '-'}</td></tr>
-                </table>
-
-                <div class="bold">F. KETERANGAN WALI & G. PERKEMBANGAN</div>
-                <table>
-                    <tr><td width="5%">31.</td><td width="35%">Nama Wali</td><td width="3%">:</td><td>${s.f_wali_nama || '-'}</td></tr>
-                    <tr><td>32.</td><td>Pekerjaan / Alamat</td><td>:</td><td>${s.f_wali_kerja || '-'} / ${s.f_wali_alamat || '-'}</td></tr>
-                    <tr><td>33.</td><td>Bakat / Prestasi</td><td>:</td><td>${s.f_bakat || '-'}</td></tr>
-                    <tr><td>34.</td><td>Diterima di Kelas</td><td>:</td><td>${s.f_kelas_masuk || '-'}</td></tr>
-                </table>
-            `;
+            let topSection = `<div class="judul">LEMBAR BUKU INDUK SISWA</div><table style="width: 100%; margin-bottom: 15pt; border: none;"><tr><td style="width: 75%; border: none;"><table style="width: 100%;"><tr><td style="width: 35%; border: none;">Nama Lengkap Murid</td><td style="width: 3%; border: none;">:</td><td style="border: none;" class="bold">${s.f_nama || '-'}</td></tr><tr><td style="border: none;">NISN</td><td style="border: none;">:</td><td style="border: none;">${s.f_nisn || '-'}</td></tr><tr><td style="border: none;">Kelas Saat Ini</td><td style="border: none;">:</td><td style="border: none;">${s.f_kelas || '-'}</td></tr><tr><td style="border: none;">No. Seri Buku Rapor</td><td style="border: none;">:</td><td style="border: none;">${s.f_no_rapor || '-'}</td></tr></table></td><td style="width: 25%; text-align: right; border: none;"><div style="width: 90pt; height: 120pt; border: 1pt solid black; display: inline-block; text-align: center;">${fotoImg}</div></td></tr></table>`;
+            let kontenLengkap = `<div class="bold">A. KETERANGAN PRIBADI</div><table><tr><td width="5%">1.</td><td width="35%">Nama Lengkap</td><td width="3%">:</td><td>${s.f_nama||'-'}</td></tr><tr><td></td><td>Nama Panggilan</td><td>:</td><td>${s.f_panggilan||'-'}</td></tr><tr><td>2.</td><td>Jenis Kelamin</td><td>:</td><td>${s.f_jk||'-'}</td></tr><tr><td>3.</td><td>Tempat & Tgl Lahir</td><td>:</td><td>${s.f_tempat_lahir||'-'}, ${s.f_tgl_lahir||'-'}</td></tr><tr><td>4.</td><td>Agama</td><td>:</td><td>${s.f_agama||'-'}</td></tr><tr><td>5.</td><td>Kewarganegaraan</td><td>:</td><td>${s.f_wn||'-'}</td></tr><tr><td>6.</td><td>Anak Keberapa</td><td>:</td><td>${s.f_anak_ke||'-'}</td></tr><tr><td>7.</td><td>Jml Sdr Kandung</td><td>:</td><td>${s.f_sdr_kandung||'-'}</td></tr><tr><td>8.</td><td>Jml Sdr Tiri</td><td>:</td><td>${s.f_sdr_tiri||'-'}</td></tr><tr><td>9.</td><td>Jml Sdr Angkat</td><td>:</td><td>${s.f_sdr_angkat||'-'}</td></tr><tr><td>10.</td><td>Status Yatim/Piatu</td><td>:</td><td>${s.f_yatim||'-'}</td></tr><tr><td>11.</td><td>Bahasa</td><td>:</td><td>${s.f_bahasa||'-'}</td></tr></table><div class="bold">B. KETERANGAN TEMPAT TINGGAL</div><table><tr><td width="5%">12.</td><td width="35%">Alamat Lengkap</td><td width="3%">:</td><td>${s.f_alamat||'-'}</td></tr><tr><td>13.</td><td>No. Telepon / HP</td><td>:</td><td>${s.f_telp||'-'}</td></tr><tr><td>14.</td><td>Tinggal Bersama</td><td>:</td><td>${s.f_tinggal||'-'}</td></tr><tr><td>15.</td><td>Jarak ke Sekolah</td><td>:</td><td>${s.f_jarak||'-'} Km</td></tr><tr><td>16.</td><td>Ke Sekolah Dengan</td><td>:</td><td>${s.f_transport||'-'}</td></tr></table><div class="bold">C. KESEHATAN & D. PENDIDIKAN SEBELUMNYA</div><table><tr><td width="5%">17.</td><td width="35%">Berat/Tinggi Badan</td><td width="3%">:</td><td>${s.f_bb||'-'} Kg / ${s.f_tb||'-'} Cm</td></tr><tr><td>18.</td><td>Golongan Darah</td><td>:</td><td>${s.f_goldar||'-'}</td></tr><tr><td>19.</td><td>Kelainan/Penyakit</td><td>:</td><td>${s.f_kelainan||'-'} / ${s.f_penyakit||'-'}</td></tr><tr><td>20.</td><td>Asal Sekolah (TK)</td><td>:</td><td>${s.f_asal_sekolah||'-'}</td></tr><tr><td>21.</td><td>Tgl & No Ijazah</td><td>:</td><td>${s.f_ijazah_asal||'-'}</td></tr><tr><td>22.</td><td>Pindahan/Alasan</td><td>:</td><td>${s.f_pindahan||'-'}</td></tr></table><div class="bold">E. KETERANGAN ORANG TUA KANDUNG</div><table class="tabel-ortu"><tr><th>No</th><th>Orang Tua</th><th>Ayah</th><th>Ibu</th></tr><tr><td>24.</td><td>Nama</td><td>${s.f_ayah_nama||'-'}</td><td>${s.f_ibu_nama||'-'}</td></tr><tr><td>25.</td><td>Tempat, Tgl Lahir</td><td>${s.f_ayah_ttl||'-'}</td><td>${s.f_ibu_ttl||'-'}</td></tr><tr><td>26.</td><td>Agama</td><td>${s.f_ayah_agama||'-'}</td><td>${s.f_ibu_agama||'-'}</td></tr><tr><td>27.</td><td>Ijazah Tertinggi</td><td>${s.f_ayah_pend||'-'}</td><td>${s.f_ibu_pend||'-'}</td></tr><tr><td>28.</td><td>Pekerjaan</td><td>${s.f_ayah_kerja||'-'}</td><td>${s.f_ibu_kerja||'-'}</td></tr><tr><td>29.</td><td>Penghasilan/Bulan</td><td>${s.f_ayah_gaji||'-'}</td><td>${s.f_ibu_gaji||'-'}</td></tr><tr><td>30.</td><td>Status</td><td>${s.f_ayah_status||'-'}</td><td>${s.f_ibu_status||'-'}</td></tr></table><div class="bold">F. KETERANGAN WALI & G. PERKEMBANGAN</div><table><tr><td width="5%">31.</td><td width="35%">Nama Wali</td><td width="3%">:</td><td>${s.f_wali_nama||'-'}</td></tr><tr><td>32.</td><td>Pekerjaan/Alamat</td><td>:</td><td>${s.f_wali_kerja||'-'} / ${s.f_wali_alamat||'-'}</td></tr><tr><td>33.</td><td>Bakat/Prestasi</td><td>:</td><td>${s.f_bakat||'-'}</td></tr><tr><td>34.</td><td>Diterima di Kelas</td><td>:</td><td>${s.f_kelas_masuk||'-'}</td></tr></table>`;
 
             let postHtml = "</body></html>";
-            let fullHtml = preHtml + style + kopSurat + topSection + konten + postHtml;
+            let fullHtml = preHtml + style + kopSurat + topSection + kontenLengkap + postHtml;
 
-            let blob = new Blob(['\ufeff', fullHtml], { type: 'application/msword' });
-            let url = URL.createObjectURL(blob);
             let link = document.createElement('a');
-            link.href = url;
-            
-            let namaFile = (s.f_nama || 'Siswa').replace(/\s+/g, '_');
-            link.download = 'Buku_Induk_' + namaFile + '.doc';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            link.href = URL.createObjectURL(new Blob(['\ufeff', fullHtml], { type: 'application/msword' }));
+            link.download = 'Buku_Induk_' + (s.f_nama || 'Siswa').replace(/\s+/g, '_') + '.doc';
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
+
+        function initTheme() {
+            const b = localStorage.getItem('theme_bg_sekolah') || '#f1f5f9', p = localStorage.getItem('theme_primary_sekolah') || '#0ea5e9';
+            document.documentElement.style.setProperty('--bg-color', b); document.documentElement.style.setProperty('--primary', p);
+            document.getElementById('color-bg').value = b; document.getElementById('color-primary').value = p;
+        }
+        function changeTheme() {
+            const b = document.getElementById('color-bg').value, p = document.getElementById('color-primary').value;
+            document.documentElement.style.setProperty('--bg-color', b); document.documentElement.style.setProperty('--primary', p);
+            localStorage.setItem('theme_bg_sekolah', b); localStorage.setItem('theme_primary_sekolah', p);
+        }
+        function resetTheme() { document.getElementById('color-bg').value = '#f1f5f9'; document.getElementById('color-primary').value = '#0ea5e9'; changeTheme(); }
     </script>
 </body>
 </html>

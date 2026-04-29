@@ -209,8 +209,20 @@
         <!-- VIEW 2: HOME / DATA SISWA (ADMIN)  -->
         <!-- ================================== -->
         <div id="home-view" class="view-section card">
-            <div style="display:flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap:10px;">
-                <input type="text" id="search-input" class="form-control" style="width: 350px;" placeholder="🔍 Cari Nama / NISN / Kelas..." onkeyup="renderTable()">
+            
+            <!-- PERBAIKAN: Penambahan Keterangan Jumlah Data & Optimalisasi Search Box -->
+            <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap:10px;">
+                <div style="flex: 1; min-width: 250px;">
+                    <input type="text" id="search-input" class="form-control" style="width: 100%; max-width: 400px;" 
+                           placeholder="🔍 Cari Nama / NISN / Kelas / Jenis Kelamin..." 
+                           oninput="renderTable()" autocomplete="off" spellcheck="false">
+                    
+                    <!-- TEKS TOTAL SISWA -->
+                    <div id="student-count" style="margin-top: 8px; font-weight: bold; color: var(--primary); font-size: 0.95rem;">
+                        Total Data: 0 Siswa
+                    </div>
+                </div>
+                
                 <div style="display:flex; gap:10px; flex-wrap: wrap;">
                     <button id="btn-import-data" class="btn btn-success" style="background:#059669; display: none;" onclick="showView('import-view')">📥 Panduan Import Dapodik</button>
                     <button id="btn-tambah-data" class="btn btn-primary" style="display: none;" onclick="bukaFormBaru()">+ Tambah Data Siswa Baru</button>
@@ -515,7 +527,7 @@
 
     <!-- FOOTER CREDIT -->
     <div class="no-print credit-footer">
-        Dikembangkan pertama kali oleh <strong>Arifin Arif</strong>
+        Dikembangkan oleh <strong>Arifin Arif</strong>
     </div>
 
     <script>
@@ -605,12 +617,12 @@
                 if (pass === PENGAWAS_PIN) {
                     isAdmin = false; isPengawas = true;
                     document.getElementById('main-navbar').style.display = 'flex';
-                    document.getElementById('btn-settings').style.display = 'none'; // Pengawas tidak bisa ubah kop
-                    document.getElementById('btn-excel').style.display = 'inline-flex'; // Pengawas bisa download rekap
+                    document.getElementById('btn-settings').style.display = 'none'; 
+                    document.getElementById('btn-excel').style.display = 'inline-flex'; 
                     document.getElementById('menu-theme').style.display = 'none';
                     
-                    document.getElementById('btn-tambah-data').style.display = 'none'; // Sembunyikan tambah data
-                    document.getElementById('btn-import-data').style.display = 'none'; // Sembunyikan panduan import
+                    document.getElementById('btn-tambah-data').style.display = 'none'; 
+                    document.getElementById('btn-import-data').style.display = 'none'; 
                     
                     showView('home-view');
                     renderTable();
@@ -710,18 +722,35 @@
             reader.readAsDataURL(file);
         }
 
+        // --- FUNGSI RENDER TABEL & PENCARIAN CERDAS ---
         function renderTable() {
             const tbody = document.querySelector('#student-table tbody');
-            const search = document.getElementById('search-input').value.toLowerCase();
-            tbody.innerHTML = '';
-            let filtered = students.filter(s => (s.f_nama || '').toLowerCase().includes(search) || (String(s.f_nisn) || '').includes(search));
+            const searchRaw = document.getElementById('search-input').value.toLowerCase();
             
-            if(filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Belum ada data murid atau sedang loading...</td></tr>'; return; }
+            // Pisahkan kata kunci berdasarkan spasi agar bisa mencari kombinasi (misal: "kelas 5 laki")
+            const searchTerms = searchRaw.split(' ').filter(t => t.trim() !== '');
+            
+            tbody.innerHTML = '';
+            
+            let filtered = students.filter(s => {
+                // Gabungkan teks data yang ingin dijadikan target pencarian
+                const textData = `${s.f_nama} ${s.f_nisn} ${s.f_kelas} ${s.f_jk}`.toLowerCase();
+                
+                // Pastikan SEMUA kata kunci yang diketik ada di dalam teks data siswa tersebut
+                return searchTerms.every(term => textData.includes(term));
+            });
+            
+            // Update teks jumlah siswa
+            document.getElementById('student-count').innerText = `Total Data: ${filtered.length} Siswa`;
+            
+            if(filtered.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Data tidak ditemukan...</td></tr>'; 
+                return; 
+            }
 
             filtered.forEach((s, i) => {
                 let actionBtns = `<button class="btn btn-sm btn-success" onclick="viewStudent('${s.id}')">👁️ Lihat Buku Induk</button>`;
                 
-                // Jika Admin, tambahkan tombol Edit dan Hapus
                 if (isAdmin) {
                     actionBtns += `
                         <button class="btn btn-sm btn-primary" onclick="editStudent('${s.id}')">✏️ Edit</button>

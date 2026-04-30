@@ -522,7 +522,7 @@
 
     <!-- FOOTER CREDIT -->
     <div class="no-print credit-footer">
-        Pengembang <strong>Arifin Arif</strong>
+        Dikembangkan oleh <strong>Arifin Arif</strong>
     </div>
 
     <script>
@@ -530,7 +530,7 @@
         let GAS_URL = localStorage.getItem('gas_url_sekolah') || '';
         
         let students = [];
-        let filteredStudents = []; // Memori baru khusus menyimpan data saringan
+        let filteredStudents = []; 
         let isAdmin = false;
         let isPengawas = false;
 
@@ -546,7 +546,18 @@
         window.onload = () => { 
             initTheme(); 
             loadSettings();
-            if(GAS_URL) { fetchData(); } 
+            if(GAS_URL) { 
+                fetchData(); 
+                
+                // FITUR AUTO-LOGIN (Anti Keluar Saat Refresh)
+                const savedRole = localStorage.getItem('app_role');
+                const savedPass = localStorage.getItem('app_pass');
+                if(savedRole && savedPass) {
+                    document.getElementById('login-role').value = savedRole;
+                    document.getElementById('login-password').value = savedPass;
+                    prosesLogin();
+                }
+            } 
         };
 
         // --- SISTEM PENGATURAN SERVER ---
@@ -595,6 +606,9 @@
             if (role === 'admin') {
                 if (pass === ADMIN_PIN) {
                     isAdmin = true; isPengawas = false;
+                    localStorage.setItem('app_role', role); // Simpan sesi
+                    localStorage.setItem('app_pass', pass); // Simpan sesi
+                    
                     document.getElementById('main-navbar').style.display = 'flex';
                     document.getElementById('btn-settings').style.display = 'inline-flex';
                     document.getElementById('btn-excel').style.display = 'inline-flex';
@@ -612,6 +626,9 @@
             else if (role === 'pengawas') {
                 if (pass === PENGAWAS_PIN) {
                     isAdmin = false; isPengawas = true;
+                    localStorage.setItem('app_role', role); // Simpan sesi
+                    localStorage.setItem('app_pass', pass); // Simpan sesi
+                    
                     document.getElementById('main-navbar').style.display = 'flex';
                     document.getElementById('btn-settings').style.display = 'none'; 
                     document.getElementById('btn-excel').style.display = 'inline-flex'; 
@@ -627,6 +644,9 @@
             else {
                 if (pass === ORTU_PIN) {
                     isAdmin = false; isPengawas = false;
+                    localStorage.setItem('app_role', role); // Simpan sesi
+                    localStorage.setItem('app_pass', pass); // Simpan sesi
+                    
                     document.getElementById('main-navbar').style.display = 'flex';
                     document.getElementById('btn-settings').style.display = 'none';
                     document.getElementById('btn-excel').style.display = 'none';
@@ -642,6 +662,9 @@
             if(confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
                 isAdmin = false;
                 isPengawas = false;
+                localStorage.removeItem('app_role'); // Hapus sesi
+                localStorage.removeItem('app_pass'); // Hapus sesi
+                
                 document.getElementById('main-navbar').style.display = 'none';
                 document.getElementById('login-password').value = '';
                 document.getElementById('f_kunci_akses').value = '';
@@ -680,7 +703,7 @@
             try {
                 const response = await fetch(GAS_URL);
                 students = await response.json();
-                filteredStudents = [...students]; // Salin ke memori saringan awal
+                filteredStudents = [...students]; 
                 if(isAdmin || isPengawas) renderTable(); 
             } catch (error) { console.error('Gagal memuat data:', error); }
         }
@@ -738,7 +761,6 @@
             
             tbody.innerHTML = '';
             
-            // PERBAIKAN PENTING: Gunakan filteredStudents agar tersimpan untuk fitur Download Excel
             filteredStudents = students.filter(s => {
                 let nama = (s.f_nama || '').toLowerCase();
                 let nisn = (String(s.f_nisn) || '').toLowerCase();
@@ -773,7 +795,6 @@
                 return; 
             }
 
-            // PERBAIKAN PENTING: Me-render dari memori saringan
             filteredStudents.forEach((s, i) => {
                 let actionBtns = `<button class="btn btn-sm btn-success" onclick="viewStudent('${s.id}')">👁️ Lihat Buku Induk</button>`;
                 
@@ -876,21 +897,20 @@
             const b64 = canvas.toDataURL('image/jpeg', 0.6); document.getElementById('photo-data').value = b64; document.getElementById('photo-preview-img').src = b64;
         }
 
-        // --- PERBAIKAN PENTING: FITUR DOWNLOAD EXCEL MENGIKUTI HASIL SARINGAN ---
+        // --- FITUR DOWNLOAD EXCEL ---
         function exportExcel() {
             if (!filteredStudents || filteredStudents.length === 0) {
                 return alert("⚠️ Tidak ada data untuk di-download saat ini.");
             }
             
             let csv = "NISN,Nama Lengkap,Kelas Saat Ini,Jenis Kelamin,Tempat Lahir,Tgl Lahir,Agama\n";
-            // Melakukan looping (putaran) pada 'filteredStudents', bukan pada master 'students'
             filteredStudents.forEach(s => { 
                 csv += `"${s.f_nisn}","${s.f_nama}","${s.f_kelas || '-'}","${s.f_jk}","${s.f_tempat_lahir}","${s.f_tgl_lahir}","${s.f_agama}"\n`; 
             });
             
             const a = document.createElement('a'); 
             a.href = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); 
-            a.download = 'Rekap_Siswa_Tersaring.csv'; // Nama file otomatis saya bedakan
+            a.download = 'Rekap_Siswa_Tersaring.csv'; 
             a.click();
         }
 

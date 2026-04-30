@@ -212,7 +212,6 @@
             
             <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap:10px;">
                 <div style="flex: 1; min-width: 250px;">
-                    <!-- PERBAIKAN: Placeholder diperbarui untuk mencontohkan fitur multi-saring -->
                     <input type="text" id="search-input" class="form-control" style="width: 100%; max-width: 400px;" 
                            placeholder="🔍 Cari misal: Kelas 1, Kelas 1 A Putra, Kelas 5..." 
                            oninput="debounceSearch()" autocomplete="off" spellcheck="false">
@@ -523,7 +522,7 @@
 
     <!-- FOOTER CREDIT -->
     <div class="no-print credit-footer">
-        Dikembangkan oleh <strong>Arifin Arif</strong>
+        Pengembang <strong>Arifin Arif</strong>
     </div>
 
     <script>
@@ -531,6 +530,7 @@
         let GAS_URL = localStorage.getItem('gas_url_sekolah') || '';
         
         let students = [];
+        let filteredStudents = []; // Memori baru khusus menyimpan data saringan
         let isAdmin = false;
         let isPengawas = false;
 
@@ -680,6 +680,7 @@
             try {
                 const response = await fetch(GAS_URL);
                 students = await response.json();
+                filteredStudents = [...students]; // Salin ke memori saringan awal
                 if(isAdmin || isPengawas) renderTable(); 
             } catch (error) { console.error('Gagal memuat data:', error); }
         }
@@ -730,60 +731,50 @@
         function renderTable() {
             const tbody = document.querySelector('#student-table tbody');
             
-            // 1. Ambil inputan dari kotak pencarian
             let searchRaw = document.getElementById('search-input').value.toLowerCase();
-            
-            // NORMALISASI: Kalau ada tulisan tanpa spasi (misal "1A"), kita pisahkan jadi "1 A"
             searchRaw = searchRaw.replace(/(\d)([a-z])/g, '$1 $2').replace(/([a-z])(\d)/g, '$1 $2');
             
-            // Pecah kata yang diketik menjadi array
             const searchTerms = searchRaw.split(' ').filter(t => t.trim() !== '');
             
             tbody.innerHTML = '';
             
-            let filtered = students.filter(s => {
+            // PERBAIKAN PENTING: Gunakan filteredStudents agar tersimpan untuk fitur Download Excel
+            filteredStudents = students.filter(s => {
                 let nama = (s.f_nama || '').toLowerCase();
                 let nisn = (String(s.f_nisn) || '').toLowerCase();
                 
-                // Normalisasi kelas (misal dari Dapodik masuknya "Kelas 1A Putra" -> jadi "kelas 1 a putra")
                 let kelas = (s.f_kelas || '').toLowerCase();
                 kelas = kelas.replace(/(\d)([a-z])/g, '$1 $2').replace(/([a-z])(\d)/g, '$1 $2');
                 
-                // Gabungkan semua data ini untuk dicari
                 let textData = `${nama} ${nisn} ${kelas}`.toLowerCase();
                 
-                // 2. Injeksi Kata Sinonim Jenis Kelamin
-                // Agar kalau ngetik "putra" tetap muncul yang gender Laki-laki walau nama kelasnya tidak pakai kata Putra
                 let jk = (s.f_jk || '').toLowerCase();
                 if (jk === 'l' || jk.includes('laki')) textData += ' putra pria cowok';
                 if (jk === 'p' || jk.includes('perempuan')) textData += ' putri wanita cewek';
                 
-                // 3. Pengecekan Presisi
                 return searchTerms.every(term => {
-                    // Jika kata kunci hanya 1 atau 2 huruf (misal: "1", "A", "VI", "B")
                     if (term.length <= 2) {
                         try {
-                            // \b artinya batas kata. Agar angka "1" murni hanya mencari kata "1", bukan "00123"
                             let regex = new RegExp(`\\b${term}\\b`);
                             return regex.test(textData);
                         } catch(e) {
                             return textData.includes(term);
                         }
                     } else {
-                        // Jika lebih dari 2 huruf (misal: "kelas", "putra", "budi")
                         return textData.includes(term);
                     }
                 });
             });
             
-            document.getElementById('student-count').innerText = `Total Data: ${filtered.length} Siswa`;
+            document.getElementById('student-count').innerText = `Total Data: ${filteredStudents.length} Siswa`;
             
-            if(filtered.length === 0) { 
+            if(filteredStudents.length === 0) { 
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Data tidak ditemukan...</td></tr>'; 
                 return; 
             }
 
-            filtered.forEach((s, i) => {
+            // PERBAIKAN PENTING: Me-render dari memori saringan
+            filteredStudents.forEach((s, i) => {
                 let actionBtns = `<button class="btn btn-sm btn-success" onclick="viewStudent('${s.id}')">👁️ Lihat Buku Induk</button>`;
                 
                 if (isAdmin) {
@@ -885,11 +876,22 @@
             const b64 = canvas.toDataURL('image/jpeg', 0.6); document.getElementById('photo-data').value = b64; document.getElementById('photo-preview-img').src = b64;
         }
 
-        // --- FITUR DOWNLOAD EXCEL ---
+        // --- PERBAIKAN PENTING: FITUR DOWNLOAD EXCEL MENGIKUTI HASIL SARINGAN ---
         function exportExcel() {
+            if (!filteredStudents || filteredStudents.length === 0) {
+                return alert("⚠️ Tidak ada data untuk di-download saat ini.");
+            }
+            
             let csv = "NISN,Nama Lengkap,Kelas Saat Ini,Jenis Kelamin,Tempat Lahir,Tgl Lahir,Agama\n";
-            students.forEach(s => { csv += `"${s.f_nisn}","${s.f_nama}","${s.f_kelas || '-'}","${s.f_jk}","${s.f_tempat_lahir}","${s.f_tgl_lahir}","${s.f_agama}"\n`; });
-            const a = document.createElement('a'); a.href = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'Rekap_Siswa.csv'; a.click();
+            // Melakukan looping (putaran) pada 'filteredStudents', bukan pada master 'students'
+            filteredStudents.forEach(s => { 
+                csv += `"${s.f_nisn}","${s.f_nama}","${s.f_kelas || '-'}","${s.f_jk}","${s.f_tempat_lahir}","${s.f_tgl_lahir}","${s.f_agama}"\n`; 
+            });
+            
+            const a = document.createElement('a'); 
+            a.href = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); 
+            a.download = 'Rekap_Siswa_Tersaring.csv'; // Nama file otomatis saya bedakan
+            a.click();
         }
 
         // --- TEMA ---

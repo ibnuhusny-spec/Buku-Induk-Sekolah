@@ -549,7 +549,7 @@
             if(GAS_URL) { 
                 fetchData(); 
                 
-                // FITUR AUTO-LOGIN (Anti Keluar Saat Refresh)
+                // FITUR AUTO-LOGIN
                 const savedRole = localStorage.getItem('app_role');
                 const savedPass = localStorage.getItem('app_pass');
                 if(savedRole && savedPass) {
@@ -560,7 +560,6 @@
             } 
         };
 
-        // --- SISTEM PENGATURAN SERVER ---
         function bukaPengaturanServer() {
             document.getElementById('input-gas-url').value = GAS_URL;
             showView('server-settings-view');
@@ -579,7 +578,6 @@
             }
         }
 
-        // --- SISTEM LOGIN ---
         function toggleLoginType() {
             const role = document.getElementById('login-role').value;
             const label = document.getElementById('login-label');
@@ -606,8 +604,8 @@
             if (role === 'admin') {
                 if (pass === ADMIN_PIN) {
                     isAdmin = true; isPengawas = false;
-                    localStorage.setItem('app_role', role); // Simpan sesi
-                    localStorage.setItem('app_pass', pass); // Simpan sesi
+                    localStorage.setItem('app_role', role); 
+                    localStorage.setItem('app_pass', pass); 
                     
                     document.getElementById('main-navbar').style.display = 'flex';
                     document.getElementById('btn-settings').style.display = 'inline-flex';
@@ -626,8 +624,8 @@
             else if (role === 'pengawas') {
                 if (pass === PENGAWAS_PIN) {
                     isAdmin = false; isPengawas = true;
-                    localStorage.setItem('app_role', role); // Simpan sesi
-                    localStorage.setItem('app_pass', pass); // Simpan sesi
+                    localStorage.setItem('app_role', role); 
+                    localStorage.setItem('app_pass', pass); 
                     
                     document.getElementById('main-navbar').style.display = 'flex';
                     document.getElementById('btn-settings').style.display = 'none'; 
@@ -644,8 +642,8 @@
             else {
                 if (pass === ORTU_PIN) {
                     isAdmin = false; isPengawas = false;
-                    localStorage.setItem('app_role', role); // Simpan sesi
-                    localStorage.setItem('app_pass', pass); // Simpan sesi
+                    localStorage.setItem('app_role', role); 
+                    localStorage.setItem('app_pass', pass); 
                     
                     document.getElementById('main-navbar').style.display = 'flex';
                     document.getElementById('btn-settings').style.display = 'none';
@@ -662,8 +660,8 @@
             if(confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
                 isAdmin = false;
                 isPengawas = false;
-                localStorage.removeItem('app_role'); // Hapus sesi
-                localStorage.removeItem('app_pass'); // Hapus sesi
+                localStorage.removeItem('app_role'); 
+                localStorage.removeItem('app_pass'); 
                 
                 document.getElementById('main-navbar').style.display = 'none';
                 document.getElementById('login-password').value = '';
@@ -673,7 +671,6 @@
             }
         }
 
-        // --- SISTEM VIEW ---
         function showView(id) {
             document.querySelectorAll('.view-section').forEach(v => {
                 v.classList.remove('active');
@@ -697,7 +694,6 @@
             showView('form-view');
         }
 
-        // --- MANAJEMEN DATABASE ---
         async function fetchData() {
             if(!GAS_URL) return;
             try {
@@ -742,7 +738,6 @@
             reader.readAsDataURL(file);
         }
 
-        // --- FITUR DEBOUNCE & ALGORITMA PENYARINGAN KELAS JENIUS ---
         let searchTimeout;
         function debounceSearch() {
             clearTimeout(searchTimeout);
@@ -837,12 +832,26 @@
                     alert("❌ " + result.message);
                 } else if(result.status === "success") {
                     alert("✅ Data Siswa Berhasil Disimpan!");
-                    fetchData(); 
-                    if(isAdmin) { showView('home-view'); } 
+                    
+                    // PERBAIKAN PENTING: Update memori lokal secara instan agar tabel langsung berubah
+                    let existingIndex = students.findIndex(x => x.id == data.id);
+                    if (existingIndex >= 0) {
+                        students[existingIndex] = { ...students[existingIndex], ...data };
+                    } else {
+                        students.push(data);
+                    }
+
+                    if(isAdmin) { 
+                        renderTable(); // Update tampilan tabel seketika
+                        showView('home-view'); 
+                    } 
                     else { 
                         if(confirm('Data sukses dikirim. Ingin mendaftarkan siswa/anak lainnya?')) { bukaFormBaru(); } 
                         else { logout(); }
                     }
+                    
+                    // Lanjutkan sinkronisasi background dengan server
+                    fetchData(); 
                 }
             } catch (error) { alert("❌ Terjadi kesalahan jaringan."); } finally { btnSubmit.innerHTML = originalText; btnSubmit.disabled = false; }
         }

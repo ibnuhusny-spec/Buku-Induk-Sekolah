@@ -157,21 +157,41 @@
 <body>
 
     <!-- NAVBAR -->
-    <div id="main-navbar" class="navbar no-print" style="display: none;">
-        <h1>BUKU INDUK SEKOLAH DASAR</h1>
-        <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; justify-content: center;">
-            <div class="theme-controls" id="menu-theme" style="display: none;">
-                <label style="cursor:pointer;" title="Ganti Warna Latar">Latar: <input type="color" id="color-bg" onchange="changeTheme()"></label>
-                <label style="cursor:pointer;" title="Ganti Warna Header">Header: <input type="color" id="color-primary" onchange="changeTheme()"></label>
-                <button class="btn btn-sm btn-secondary" onclick="resetTheme()" title="Reset" style="font-size: 0.75rem; padding: 2px 6px;">Reset</button>
+    <div id="main-navbar" class="navbar no-print" style="display: none; flex-direction: column; align-items: stretch; padding: 0;">
+        <div style="padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <h1>BUKU INDUK DIGITAL</h1>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button class="btn btn-danger" onclick="logout()">🚪 Keluar</button>
             </div>
-            <button class="btn btn-warning" id="btn-settings" onclick="showView('settings-view')" style="display: none;">⚙️ Kop Surat</button>
-            <button class="btn btn-success" id="btn-excel" style="background:#10b981; display: none;" onclick="exportExcel()">⬇ Rekap Excel</button>
-            <button class="btn btn-danger" onclick="logout()">🚪 Keluar</button>
+        </div>
+        
+        <!-- MENU TAB (BARU) -->
+        <div id="nav-menu-tabs" style="background: rgba(0,0,0,0.1); padding: 0 20px; display: flex; gap: 5px; overflow-x: auto;">
+            <button class="btn nav-tab" onclick="showView('dashboard-view')" style="border-radius: 4px 4px 0 0; padding: 10px 15px; background: var(--card-bg); color: var(--text-color);">📊 Dashboard & Grafik</button>
+            <button class="btn nav-tab" onclick="showView('home-view')" style="border-radius: 4px 4px 0 0; padding: 10px 15px; background: transparent; color: white;">👥 Profil Siswa</button>
+            <button class="btn nav-tab" onclick="showView('rapor-view')" style="border-radius: 4px 4px 0 0; padding: 10px 15px; background: transparent; color: white;">📝 Input Rapor</button>
+            <button class="btn nav-tab" id="btn-settings" onclick="showView('settings-view')" style="border-radius: 4px 4px 0 0; padding: 10px 15px; background: transparent; color: white; display: none;">⚙️ Pengaturan</button>
         </div>
     </div>
 
     <div class="container">
+
+        <!-- ================================== -->
+        <!-- VIEW: DASHBOARD & GRAFIK (BARU)    -->
+        <!-- ================================== -->
+        <div id="dashboard-view" class="view-section card active">
+            <h2 style="margin-bottom: 20px; color: var(--primary);">📊 Dashboard Statistik Sekolah</h2>
+            
+            <div class="form-grid">
+                <!-- Tempatkan Elemen Canvas / Grafik Chart.js di sini -->
+                <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; height: 300px; display: flex; align-items: center; justify-content: center;">
+                    <p style="color: #64748b;">[ Area Grafik Jumlah Siswa Per Kelas ]</p>
+                </div>
+                <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; height: 300px; display: flex; align-items: center; justify-content: center;">
+                    <p style="color: #64748b;">[ Area Grafik Jenis Kelamin ]</p>
+                </div>
+            </div>
+        </div>
         
         <!-- ================================== -->
         <!-- VIEW 1: LAYAR LOGIN ELEGAN         -->
@@ -435,6 +455,54 @@
         </div>
 
         <!-- ================================== -->
+        <!-- VIEW: INPUT NILAI RAPOR (BARU)     -->
+        <!-- ================================== -->
+        <div id="rapor-view" class="view-section card no-print">
+            <h2 style="margin-bottom: 20px; color: var(--success); border-bottom: 2px solid var(--border); padding-bottom: 10px;">📝 Rekam Jejak Nilai Rapor Siswa</h2>
+            
+            <div style="display:flex; gap:10px; margin-bottom: 20px;">
+                <input type="text" id="search-rapor" class="form-control" placeholder="🔍 Cari Nama Siswa untuk diinput nilainya..." style="flex: 1;">
+            </div>
+
+            <!-- Tabel Siswa Khusus Rapor -->
+            <div style="overflow-x: auto; margin-bottom: 20px;">
+                <table id="rapor-table">
+                    <thead>
+                        <tr>
+                            <th>NISN</th>
+                            <th>Nama Siswa</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rapor-tbody">
+                        <!-- Baris siswa akan di-render di sini dengan tombol "Input Nilai" -->
+                        <tr><td colspan="3" style="text-align:center;">Silakan gunakan kolom pencarian...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Area Form Input (Awalnya Disembunyikan) -->
+            <div id="form-rapor-area" style="display: none; background:#f8fafc; padding:20px; border:1px solid #e2e8f0; border-radius:6px;">
+                <h4 id="nama-siswa-rapor" style="margin-bottom: 15px; color: #334155;">Input Nilai: [Nama Siswa]</h4>
+                <form id="form-input-rapor">
+                    <input type="hidden" id="r_student_id">
+                    <div class="form-grid-3">
+                        <div class="form-group"><label>Kelas 1</label><textarea id="r_kelas_1" class="form-control" rows="4"></textarea></div>
+                        <div class="form-group"><label>Kelas 2</label><textarea id="r_kelas_2" class="form-control" rows="4"></textarea></div>
+                        <div class="form-group"><label>Kelas 3</label><textarea id="r_kelas_3" class="form-control" rows="4"></textarea></div>
+                        <div class="form-group"><label>Kelas 4</label><textarea id="r_kelas_4" class="form-control" rows="4"></textarea></div>
+                        <div class="form-group"><label>Kelas 5</label><textarea id="r_kelas_5" class="form-control" rows="4"></textarea></div>
+                        <div class="form-group"><label>Kelas 6</label><textarea id="r_kelas_6" class="form-control" rows="4"></textarea></div>
+                    </div>
+                    <div style="margin-top:15px; text-align:right;">
+                        <button type="button" class="btn btn-secondary" onclick="tutupFormRapor()">Batal</button>
+                        <button type="submit" class="btn btn-success" style="margin-left: 10px;">💾 Simpan Rapor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ================================== -->
         <!-- VIEW 5: DETAIL CETAK BUKU INDUK    -->
         <!-- ================================== -->
         <div id="detail-view" class="view-section card">
@@ -633,7 +701,7 @@
                     document.getElementById('btn-import-data').style.display = 'inline-flex'; 
                     
                     document.getElementById('f_kunci_akses').value = ADMIN_PIN; 
-                    showView('home-view');
+                    showView('dashboard-view');
                     document.getElementById('btn-cancel-form').style.display = 'inline-flex'; 
                     renderTable();
                 } else { alert("❌ Password Administrator Salah!"); }

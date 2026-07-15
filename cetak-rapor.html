@@ -193,7 +193,19 @@
             tbody.innerHTML = '';
             if(n) {
                 n.forEach((item, i) => {
-                    tbody.innerHTML += `<tr><td class="text-center">${i+1}</td><td class="font-bold">${item.mata_pelajaran}</td><td class="text-center font-bold text-lg">${item.nilai}</td><td class="text-justify text-[8pt] leading-tight">${item.deskripsi || '-'}</td></tr>`;
+                    // 1. Ubah null menjadi strip
+                    let nilaiTampil = (item.nilai !== null && item.nilai !== undefined) ? item.nilai : '-';
+
+                    // 2. Ubah pemisah paragraf (Enter) menjadi garis tipis horizontal
+                    let deskripsiTampil = item.deskripsi ? item.deskripsi.replace(/\n\n/g, '<hr style="border-top: 1px solid #9ca3af; margin: 4px 0;">') : '-';
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="text-center">${i+1}</td>
+                            <td class="font-bold">${item.mata_pelajaran}</td>
+                            <td class="text-center font-bold text-lg">${nilaiTampil}</td>
+                            <td class="text-justify text-[8pt] leading-tight">${deskripsiTampil}</td>
+                        </tr>`;
                 });
             }
             

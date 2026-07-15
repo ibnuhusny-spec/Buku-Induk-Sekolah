@@ -116,33 +116,33 @@
                         <div class="lg:col-span-1 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
                             <h3 class="text-md font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2"><span>➕</span> Input Nilai Baru</h3>
                             <form id="formTambahNilai" class="space-y-4">
-    <div class="grid grid-cols-2 gap-2">
-        <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kelas</label>
-            <input type="text" id="in_nilai_kelas" required placeholder="Cth: Kelas 1 A Putra" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm font-bold text-slate-700">
-        </div>
-        <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Semester</label>
-            <select id="in_nilai_semester" required class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm">
-                <option value="">-- Pilih --</option>
-                <option value="Ganjil">Ganjil</option>
-                <option value="Genap">Genap</option>
-            </select>
-        </div>
-    </div>
-    
-    <div>
-        <label class="block text-xs font-bold text-blue-600 uppercase mb-1 flex justify-between items-center">
-            <span>Tabel Nilai & Deskripsi Rapor</span>
-            <span class="text-[10px] text-slate-400 font-normal normal-case">Copy-Paste dari Excel</span>
-        </label>
-        <textarea id="in_nilai_gabungan" required rows="6" placeholder="Paste data (Mata Pelajaran, Nilai, Deskripsi) dari tabel Excel Anda ke kotak ini..." class="w-full border p-2.5 rounded-lg bg-blue-50 outline-none text-sm font-mono whitespace-pre-wrap"></textarea>
-    </div>
-    
-    <button type="submit" id="btnSimpanNilai" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md mt-2">
-        Simpan Data Rapor
-    </button>
-</form>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kelas</label>
+                                        <input type="text" id="in_nilai_kelas" required placeholder="Cth: Kelas 1 A Putra" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm font-bold text-slate-700">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Semester</label>
+                                        <select id="in_nilai_semester" required class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm">
+                                            <option value="">-- Pilih --</option>
+                                            <option value="Ganjil">Ganjil</option>
+                                            <option value="Genap">Genap</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-xs font-bold text-blue-600 uppercase mb-1 flex justify-between items-center">
+                                        <span>Tabel Nilai & Deskripsi Rapor</span>
+                                        <span class="text-[10px] text-slate-400 font-normal normal-case">Copy-Paste dari Excel</span>
+                                    </label>
+                                    <textarea id="in_nilai_gabungan" required rows="6" placeholder="Paste data (Mata Pelajaran, Nilai Akhir, Capaian Kompetensi) dari tabel Excel Anda ke kotak ini..." class="w-full border p-2.5 rounded-lg bg-blue-50 outline-none text-sm font-mono whitespace-pre-wrap"></textarea>
+                                </div>
+                                
+                                <button type="submit" id="btnSimpanNilai" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md mt-2">
+                                    Simpan Data Rapor
+                                </button>
+                            </form>
                         </div>
 
                         <div class="lg:col-span-1 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm h-fit mt-6 lg:mt-0">
@@ -184,12 +184,12 @@
                                     <thead>
                                         <tr class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
                                             <th class="p-3 md:p-4 font-bold border-b whitespace-nowrap w-1/5">Kelas/Smt</th>
-<th class="p-3 md:p-4 font-bold border-b w-3/5">Rekapitulasi Data Rapor</th>
-<th class="p-3 md:p-4 font-bold border-b text-center w-1/5">Aksi</th>
+                                            <th class="p-3 md:p-4 font-bold border-b w-3/5">Rekapitulasi Data Rapor</th>
+                                            <th class="p-3 md:p-4 font-bold border-b text-center w-1/5">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tabelNilai" class="divide-y divide-slate-100 text-sm">
-                                        <tr><td colspan="4" class="text-center p-6 text-slate-500">Memuat data nilai...</td></tr>
+                                        <tr><td colspan="3" class="text-center p-6 text-slate-500">Memuat data nilai...</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -329,9 +329,8 @@
             document.getElementById('in_wali_kerja').value = s.pekerjaan_wali || '';
             document.getElementById('in_wali_alamat').value = s.alamat_wali || '';
 
-            // 🌟 LOGIKA AUTO-FILL KELAS 🌟
             document.getElementById('in_nilai_kelas').value = s.rombel || '';
-            document.getElementById('in_hadir_kelas').value = s.rombel || ''; // Menambahkan kelas ke form kehadiran
+            document.getElementById('in_hadir_kelas').value = s.rombel || '';
         }
 
         document.getElementById('formUpdateData').addEventListener('submit', async (e) => {
@@ -385,7 +384,7 @@
         // ==========================================
         async function muatNilai() {
             const tbody = document.getElementById('tabelNilai');
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center p-6 text-slate-500">Memuat data nilai...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center p-6 text-slate-500">Memuat data nilai...</td></tr>';
 
             const { data: nilai, error } = await supabase
                 .from('nilai_akademik')
@@ -395,12 +394,12 @@
                 .order('semester', { ascending: true });
 
             if (error) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center p-6 text-red-500">Gagal memuat: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center p-6 text-red-500">Gagal memuat: ${error.message}</td></tr>`;
                 return;
             }
 
             if (nilai.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center p-8 text-slate-400 bg-slate-50">Belum ada nilai yang diinputkan untuk siswa ini.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3" class="text-center p-8 text-slate-400 bg-slate-50">Belum ada nilai yang diinputkan untuk siswa ini.</td></tr>';
                 return;
             }
 
@@ -482,10 +481,9 @@
 
             // 🌟 2. MENGGABUNGKAN BARIS YANG TERPISAH KARENA MERGE CELL EXCEL 🌟
             const payloadArray = [];
-            let lastPayload = null; // Mengingat mapel sebelumnya
+            let lastPayload = null; 
 
             for (let cols of rows) {
-                // Bersihkan tanda kutip jika terbawa dari Excel
                 cols = cols.map(c => c.replace(/^"|"$/g, '').trim());
 
                 let mapel = "", nilaiStr = "", deskripsi = "";
@@ -506,20 +504,17 @@
                     continue;
                 }
 
-                // Abaikan jika yang ter-copy adalah judul tabel (Header)
                 if (mapel.toLowerCase().includes('muatan pelajaran') || mapel.toLowerCase().includes('mata pelajaran') || mapel.toLowerCase() === 'no') {
                     continue;
                 }
 
-                // LOGIKA PINTAR: Jika Mapel kosong, berarti ini sambungan deskripsi dari Mapel sebelumnya!
                 if (mapel === "" && (nilaiStr === "" || nilaiStr === "-")) {
                     if (lastPayload && deskripsi !== "") {
-                        lastPayload.deskripsi += "\n\n" + deskripsi; // Gabungkan dengan enter
+                        lastPayload.deskripsi += "\n\n" + deskripsi; 
                     }
                 } else {
-                    // Ini adalah Mapel Baru
                     let nilaiAngka = parseInt(nilaiStr);
-                    if (isNaN(nilaiAngka)) nilaiAngka = null; // Jika nilainya strip (-) jadikan null agar tidak 0
+                    if (isNaN(nilaiAngka)) nilaiAngka = null; 
 
                     lastPayload = {
                         siswa_id: idSiswa,
@@ -539,7 +534,6 @@
                 return;
             }
 
-            // 🌟 3. SIMPAN KE DATABASE 🌟
             const { error } = await supabase.from('nilai_akademik').insert(payloadArray);
 
             if (error) { 
@@ -695,7 +689,7 @@
 
 
         // ==========================================
-        // 5. 🌟 MESIN KEHADIRAN & KEPUTUSAN (YANG BARU DIPERBAIKI) 🌟
+        // 5. 🌟 MESIN KEHADIRAN & KEPUTUSAN
         // ==========================================
         const selectSemester = document.getElementById('in_hadir_semester');
         const boxKeputusan = document.getElementById('areaKeputusan');
@@ -728,13 +722,11 @@
                 keputusan: document.getElementById('in_keputusan').value || '-'
             };
 
-            // Hapus data lama di kelas & semester yang sama agar tidak dobel
             await supabase.from('rekap_kehadiran').delete()
                 .eq('siswa_id', idSiswa)
                 .eq('kelas', payload.kelas)
                 .eq('semester', payload.semester);
 
-            // Masukkan data baru
             const { error } = await supabase.from('rekap_kehadiran').insert([payload]);
 
             if (error) alert("Gagal menyimpan kehadiran: " + error.message);

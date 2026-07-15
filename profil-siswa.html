@@ -410,6 +410,9 @@
                 tr.className = "hover:bg-blue-50 transition-colors";
                 
                 const htmlDeskripsi = n.deskripsi ? `<div class="text-sm text-slate-700 mt-2 p-3 bg-white border border-slate-200 rounded-lg whitespace-pre-wrap font-mono overflow-x-auto shadow-inner">${n.deskripsi}</div>` : '';
+                
+                // Variabel baru untuk mengecek jika nilai kosong/strip, maka jangan tampilkan null
+                const nilaiTampil = (n.nilai !== null) ? n.nilai : '-';
 
                 tr.innerHTML = `
                     <td class="p-3 md:p-4 text-slate-700 align-top w-1/5">
@@ -421,7 +424,8 @@
                         ${htmlDeskripsi}
                     </td>
                     <td class="p-3 md:p-4 text-center align-top w-1/5">
-                        <button onclick="hapusNilai('${n.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl border border-red-200 transition-colors shadow-sm" title="Hapus Nilai">🗑️ Hapus Data</button>
+                        <div class="mb-2"><span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-lg font-bold text-lg">${nilaiTampil}</span></div>
+                        <button onclick="hapusNilai('${n.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl border border-red-200 transition-colors shadow-sm text-xs" title="Hapus Nilai">🗑️ Hapus</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -443,8 +447,7 @@
             const kelasVal = document.getElementById('in_nilai_kelas').value;
             const semesterVal = document.getElementById('in_nilai_semester').value;
 
-            // 🌟 1. MESIN PINTAR PEMBACA FORMAT EXCEL (TSV Parser) 🌟
-            // Ini akan memecah data yang di-paste tanpa merusak baris baru (Alt+Enter) di dalam sel Excel
+            // 🌟 1. MESIN PEMBACA FORMAT EXCEL 🌟
             let rows = [];
             let currentRow = [];
             let currentCell = '';
@@ -456,7 +459,7 @@
 
                 if (char === '"') {
                     if (insideQuotes && nextChar === '"') {
-                        currentCell += '"'; i++; // Mengabaikan kutipan ganda bawaan Excel
+                        currentCell += '"'; i++; 
                     } else {
                         insideQuotes = !insideQuotes;
                     }
@@ -477,37 +480,57 @@
                 if (currentRow.join('') !== '') rows.push(currentRow);
             }
 
-            // 🌟 2. MENGUBAH BARIS EXCEL MENJADI DATA DATABASE 🌟
+            // 🌟 2. MENGGABUNGKAN BARIS YANG TERPISAH KARENA MERGE CELL EXCEL 🌟
             const payloadArray = [];
-            for (let cols of rows) {
-                let mapel = "", nilai = 0, deskripsi = "";
+            let lastPayload = null; // Mengingat mapel sebelumnya
 
-                // Deteksi cerdas: Apakah guru meng-copy mulai dari kolom "No" (4 kolom) atau "Muatan Pelajaran" (3 kolom)
+            for (let cols of rows) {
+                // Bersihkan tanda kutip jika terbawa dari Excel
+                cols = cols.map(c => c.replace(/^"|"$/g, '').trim());
+
+                let mapel = "", nilaiStr = "", deskripsi = "";
+
                 if (cols.length >= 4) {
                     mapel = cols[1];
-                    nilai = parseInt(cols[2]) || 0;
-                    deskripsi = cols[3];
+                    nilaiStr = cols[2];
+                    deskripsi = cols.slice(3).join(' '); 
                 } else if (cols.length === 3) {
                     mapel = cols[0];
-                    nilai = parseInt(cols[1]) || 0;
+                    nilaiStr = cols[1];
                     deskripsi = cols[2];
+                } else if (cols.length === 2) {
+                    mapel = ""; nilaiStr = ""; deskripsi = cols[1] || cols[0];
+                } else if (cols.length === 1) {
+                    mapel = ""; nilaiStr = ""; deskripsi = cols[0];
                 } else {
-                    continue; // Lewati jika barisnya berantakan
-                }
-
-                // Abaikan baris Judul Tabel (Header) jika ikut ter-copy
-                if (mapel.toLowerCase().includes('muatan pelajaran') || mapel.toLowerCase().includes('mata pelajaran')) {
                     continue;
                 }
 
-                payloadArray.push({
-                    siswa_id: idSiswa,
-                    kelas: kelasVal,
-                    semester: semesterVal,
-                    mata_pelajaran: mapel,
-                    nilai: nilai,
-                    deskripsi: deskripsi
-                });
+                // Abaikan jika yang ter-copy adalah judul tabel (Header)
+                if (mapel.toLowerCase().includes('muatan pelajaran') || mapel.toLowerCase().includes('mata pelajaran') || mapel.toLowerCase() === 'no') {
+                    continue;
+                }
+
+                // LOGIKA PINTAR: Jika Mapel kosong, berarti ini sambungan deskripsi dari Mapel sebelumnya!
+                if (mapel === "" && (nilaiStr === "" || nilaiStr === "-")) {
+                    if (lastPayload && deskripsi !== "") {
+                        lastPayload.deskripsi += "\n\n" + deskripsi; // Gabungkan dengan enter
+                    }
+                } else {
+                    // Ini adalah Mapel Baru
+                    let nilaiAngka = parseInt(nilaiStr);
+                    if (isNaN(nilaiAngka)) nilaiAngka = null; // Jika nilainya strip (-) jadikan null agar tidak 0
+
+                    lastPayload = {
+                        siswa_id: idSiswa,
+                        kelas: kelasVal,
+                        semester: semesterVal,
+                        mata_pelajaran: mapel,
+                        nilai: nilaiAngka,
+                        deskripsi: deskripsi
+                    };
+                    payloadArray.push(lastPayload);
+                }
             }
 
             if (payloadArray.length === 0) {
@@ -516,16 +539,16 @@
                 return;
             }
 
-            // 🌟 3. SIMPAN BANYAK BARIS SEKALIGUS (BULK INSERT) 🌟
+            // 🌟 3. SIMPAN KE DATABASE 🌟
             const { error } = await supabase.from('nilai_akademik').insert(payloadArray);
 
             if (error) { 
                 alert("Gagal menyimpan nilai: " + error.message); 
             } else {
-                alert(`✅ Alhamdulillah! ${payloadArray.length} Mata Pelajaran berhasil di-input otomatis dari Excel.`);
+                alert(`✅ Alhamdulillah! ${payloadArray.length} Mata Pelajaran berhasil di-input otomatis.`);
                 document.getElementById('in_nilai_gabungan').value = '';
                 document.getElementById('in_nilai_gabungan').focus();
-                muatNilai(); // Tampilkan langsung ke tabel riwayat di bawah
+                muatNilai(); 
             }
             btn.innerHTML = "Simpan Data Rapor"; btn.disabled = false;
         });

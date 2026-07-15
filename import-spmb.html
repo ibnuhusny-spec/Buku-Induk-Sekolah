@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Data SPMB - IndukKu Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+    
+    <nav class="bg-emerald-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">📥</span>
+                <div>
+                    <h1 class="text-xl font-bold leading-tight">Import Excel SPMB</h1>
+                    <p class="text-xs text-emerald-200">Masukkan Data Siswa Baru (PPDB) Sekaligus</p>
+                </div>
+            </div>
+            <a href="index.html" class="bg-emerald-800 hover:bg-emerald-900 px-4 py-2 rounded-lg text-sm font-bold transition-all border border-emerald-500">
+                ⬅ Kembali
+            </a>
+        </div>
+    </nav>
+
+    <main class="max-w-xl mx-auto mt-10 px-4">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
+            <div class="mb-6">
+                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
+                    📄
+                </div>
+                <h2 class="text-xl font-bold text-slate-800">Upload Rekapan Excel PPDB</h2>
+                <p class="text-sm text-slate-500 mt-2">Pastikan judul kolom di Excel sudah sesuai dengan format sistem (nama_lengkap, nisn, rombel, dll).</p>
+            </div>
+
+            <div class="border-2 border-dashed border-emerald-300 bg-emerald-50 rounded-xl p-8 mb-6 relative hover:bg-emerald-100 transition-colors">
+                <input type="file" id="fileExcel" accept=".xlsx, .xls" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                <div class="text-emerald-700 font-bold">
+                    <span class="text-2xl block mb-2">📁</span>
+                    Klik di sini atau Seret File Excel ke sini
+                </div>
+                <div id="namaFile" class="mt-2 text-sm text-emerald-600 font-medium hidden"></div>
+            </div>
+
+            <button id="btnProses" disabled class="w-full bg-slate-300 text-slate-500 px-6 py-3 rounded-xl font-bold shadow-sm transition-all flex items-center justify-center gap-2">
+                <span>🚀</span> Mulai Import Data
+            </button>
+        </div>
+    </main>
+
+    <script type="module">
+        import { supabase } from './js/supabaseConfig.js';
+
+        const fileInput = document.getElementById('fileExcel');
+        const namaFileDiv = document.getElementById('namaFile');
+        const btnProses = document.getElementById('btnProses');
+        let dataExcelJson = null;
+
+        // Saat file dipilih, baca isinya
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            namaFileDiv.innerText = `Terpilih: ${file.name}`;
+            namaFileDiv.classList.remove('hidden');
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                // Ambil sheet pertama
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                // Ubah ke JSON
+                dataExcelJson = XLSX.utils.sheet_to_json(worksheet);
+                
+                if(dataExcelJson.length > 0) {
+                    btnProses.disabled = false;
+                    btnProses.className = "w-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold shadow-md transition-all flex items-center justify-center gap-2";
+                } else {
+                    alert("⚠️ File Excel kosong!");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // Saat tombol proses diklik
+        btnProses.addEventListener('click', async () => {
+            const konfirmasi = confirm(`Apakah Anda yakin ingin memasukkan ${dataExcelJson.length} siswa baru ke dalam sistem?`);
+            if(!konfirmasi) return;
+
+            const teksAsli = btnProses.innerHTML;
+            btnProses.innerHTML = `⏳ Memproses... Jangan tutup halaman!`;
+            btnProses.disabled = true;
+
+            try {
+                // Modifikasi data sebelum dimasukkan
+                const dataSiapMasuk = dataExcelJson.map(row => {
+                    // Paksakan semua siswa ini statusnya 'Aktif' dan tahunnya 2026
+                    return {
+                        ...row,
+                        nama_lengkap: row.nama_lengkap ? row.nama_lengkap.toString().toUpperCase() : '-',
+                        status: 'Aktif',
+                        tahun_masuk: new Date().getFullYear() // 2026
+                    };
+                });
+
+                // Tembakkan ke Supabase (Menggunakan UPSERT agar aman jika ada NISN ganda)
+                const { error } = await supabase
+                    .from('buku_induk')
+                    .upsert(dataSiapMasuk, { onConflict: 'nisn' });
+
+                if (error) throw error;
+
+                alert(`✅ ALHAMDULILLAH! Berhasil meng-import ${dataSiapMasuk.length} Siswa Baru!`);
+                window.location.href = 'index.html'; // Kembali ke menu utama
+
+            } catch (error) {
+                console.error("Error Import:", error);
+                alert("❌ TERJADI KESALAHAN:\n" + error.message);
+                btnProses.innerHTML = teksAsli;
+                btnProses.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

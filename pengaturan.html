@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Sekolah - IndukKu Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 font-sans h-screen flex flex-col">
+
+    <header class="bg-white shadow-sm border-b px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-bold transition-colors">
+                &larr; Kembali
+            </a>
+            <h1 class="text-xl font-bold text-slate-800">⚙️ Pengaturan Identitas Sekolah</h1>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto p-6 w-full mt-10 mb-20">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span>🏫</span> Informasi Utama Sekolah
+            </h2>
+            
+            <form id="formPengaturan" class="space-y-6">
+                <div class="space-y-4 p-5 bg-slate-50 rounded-xl border border-slate-100">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 mb-1">Nama Sekolah</label>
+                        <input type="text" id="set_nama" placeholder="Cth: SDIT QURRATU A'YUN AL-ISLAMI" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-blue-500 font-bold uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 mb-1">Alamat Sekolah (Bisa Panjang Lengkap)</label>
+                        <input type="text" id="set_alamat" placeholder="Cth: Jl. Poros Makassar - Maros Km. 26 Maccopa, Kab. Maros" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-blue-50 rounded-xl border border-blue-100">
+                    <div>
+                        <label class="block text-sm font-bold text-blue-800 mb-1">Nama Kepala Sekolah</label>
+                        <input type="text" id="set_kepsek" placeholder="Nama Lengkap & Gelar" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-blue-800 mb-1">NIP Kepala Sekolah</label>
+                        <input type="text" id="set_nip" placeholder="Kosongkan jika tidak ada" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-emerald-50 rounded-xl border border-emerald-100">
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-800 mb-1">Nama Wali Kelas</label>
+                        <input type="text" id="set_walikelas" placeholder="Nama Lengkap & Gelar" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-800 mb-1">NIP Wali Kelas</label>
+                        <input type="text" id="set_nip_walikelas" placeholder="Kosongkan jika tidak ada" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-amber-50 rounded-xl border border-amber-100">
+                    <div>
+                        <label class="block text-sm font-bold text-amber-800 mb-1">Kota/Tempat Tanggal Cetak</label>
+                        <input type="text" id="set_kota_tanggal" placeholder="Cth: Maros" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-amber-500 font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-amber-800 mb-1">Tanggal Cetak Rapor (Opsional)</label>
+                        <input type="date" id="set_tanggal_cetak" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div class="md:col-span-2">
+                        <p class="text-xs text-amber-700">Jika tanggal dikosongkan, rapor akan otomatis menggunakan tanggal hari ini saat dicetak.</p>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all text-lg">
+                        ✅ Simpan Semua Pengaturan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const config = JSON.parse(localStorage.getItem('config_sekolah') || '{}');
+        document.getElementById('set_nama').value = config.nama || '';
+        document.getElementById('set_alamat').value = config.alamat || '';
+        
+        document.getElementById('set_kepsek').value = config.kepsek || '';
+        document.getElementById('set_nip').value = config.nip || '';
+        
+        document.getElementById('set_walikelas').value = config.walikelas || '';
+        document.getElementById('set_nip_walikelas').value = config.nip_walikelas || '';
+        
+        document.getElementById('set_kota_tanggal').value = config.kota_tanggal || 'Maros';
+        document.getElementById('set_tanggal_cetak').value = config.tanggal_cetak || '';
+
+        document.getElementById('formPengaturan').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const dataBaru = {
+                nama: document.getElementById('set_nama').value,
+                alamat: document.getElementById('set_alamat').value,
+                kepsek: document.getElementById('set_kepsek').value,
+                nip: document.getElementById('set_nip').value,
+                walikelas: document.getElementById('set_walikelas').value,
+                nip_walikelas: document.getElementById('set_nip_walikelas').value,
+                kota_tanggal: document.getElementById('set_kota_tanggal').value,
+                tanggal_cetak: document.getElementById('set_tanggal_cetak').value
+            };
+            localStorage.setItem('config_sekolah', JSON.stringify(dataBaru));
+            alert("Alhamdulillah! Semua pengaturan (Identitas, Tempat, & Tanggal) berhasil disimpan.");
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cetak Biodata Siswa - IndukKu Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @page { size: A4 portrait; margin: 0; }
+        @media print {
+            body { background: white; }
+            .no-print { display: none !important; }
+            .kertas-a4 { box-shadow: none !important; margin: 0 !important; width: 100% !important; }
+        }
+        .kertas-a4 {
+            width: 210mm; 
+            height: 297mm;
+            margin: 2rem auto; 
+            background: white;
+            padding: 2cm 2.5cm; /* Margin standar rapor */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            font-family: 'Times New Roman', Times, serif; /* Font resmi dokumen */
+            font-size: 11pt; 
+            color: black;
+            position: relative;
+        }
+        .tabel-biodata { width: 100%; border-collapse: collapse; margin-top: 20px; line-height: 1.6; }
+        .tabel-biodata td { padding: 4px 8px; vertical-align: top; border: none; }
+        .nomor { width: 30px; text-align: center; }
+        .label-bio { width: 200px; }
+        .titik-dua { width: 15px; text-align: center; }
+        
+        /* Kotak Pas Foto 3x4 */
+        .kotak-foto {
+            width: 3cm;
+            height: 4cm;
+            border: 2px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="bg-gray-200">
+
+    <div class="no-print fixed bottom-8 right-8 flex gap-4 z-50">
+        <button onclick="window.close()" class="bg-slate-600 text-white px-6 py-3 rounded-full shadow-lg font-bold">⬅️ Kembali</button>
+        <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-lg font-bold">🖨️ Cetak Biodata</button>
+    </div>
+
+    <div class="kertas-a4">
+        
+        <h2 class="text-center font-bold text-xl mb-8 underline">KETERANGAN TENTANG DIRI PESERTA DIDIK</h2>
+
+        <table class="tabel-biodata">
+            <tr><td class="nomor">1.</td><td class="label-bio">Nama Peserta Didik (Lengkap)</td><td class="titik-dua">:</td><td class="font-bold uppercase" id="b_nama">-</td></tr>
+            <tr><td class="nomor">2.</td><td class="label-bio">Nomor Induk Siswa Nasional</td><td class="titik-dua">:</td><td id="b_nisn">-</td></tr>
+            <tr><td class="nomor">3.</td><td class="label-bio">Tempat, Tanggal Lahir</td><td class="titik-dua">:</td><td id="b_ttl">-</td></tr>
+            <tr><td class="nomor">4.</td><td class="label-bio">Jenis Kelamin</td><td class="titik-dua">:</td><td id="b_jk">-</td></tr>
+            <tr><td class="nomor">5.</td><td class="label-bio">Agama</td><td class="titik-dua">:</td><td id="b_agama">-</td></tr>
+            <tr><td class="nomor">6.</td><td class="label-bio">Kewarganegaraan</td><td class="titik-dua">:</td><td id="b_wn">-</td></tr>
+            <tr><td class="nomor">7.</td><td class="label-bio">Anak ke</td><td class="titik-dua">:</td><td id="b_anak_ke">-</td></tr>
+            <tr><td class="nomor">8.</td><td class="label-bio">Jumlah Saudara</td><td class="titik-dua">:</td><td id="b_jml_sdr">-</td></tr>
+            <tr><td class="nomor">9.</td><td class="label-bio">Alamat Peserta Didik</td><td class="titik-dua">:</td><td id="b_alamat_siswa">-</td></tr>
+            
+            <tr><td colspan="4">&nbsp;</td></tr>
+
+            <tr><td class="nomor">10.</td><td colspan="3" class="font-bold">Orang Tua</td></tr>
+            <tr><td></td><td class="label-bio">a. Nama Ayah</td><td class="titik-dua">:</td><td id="b_ayah_nama">-</td></tr>
+            <tr><td></td><td class="label-bio">b. Nama Ibu</td><td class="titik-dua">:</td><td id="b_ibu_nama">-</td></tr>
+            <tr><td></td><td class="label-bio">c. Pekerjaan Ayah</td><td class="titik-dua">:</td><td id="b_ayah_kerja">-</td></tr>
+            <tr><td></td><td class="label-bio">d. Pekerjaan Ibu</td><td class="titik-dua">:</td><td id="b_ibu_kerja">-</td></tr>
+            <tr><td></td><td class="label-bio">e. Alamat Orang Tua</td><td class="titik-dua">:</td><td id="b_alamat_ortu">-</td></tr>
+            
+            <tr><td colspan="4">&nbsp;</td></tr>
+
+            <tr><td class="nomor">11.</td><td colspan="3" class="font-bold">Wali Peserta Didik</td></tr>
+            <tr><td></td><td class="label-bio">a. Nama Wali</td><td class="titik-dua">:</td><td id="b_wali_nama">-</td></tr>
+            <tr><td></td><td class="label-bio">b. Hubungan Keluarga</td><td class="titik-dua">:</td><td id="b_wali_hub">-</td></tr>
+            <tr><td></td><td class="label-bio">c. Pekerjaan Wali</td><td class="titik-dua">:</td><td id="b_wali_kerja">-</td></tr>
+            <tr><td></td><td class="label-bio">d. Alamat Wali</td><td class="titik-dua">:</td><td id="b_alamat_wali">-</td></tr>
+        </table>
+
+        <div class="mt-16 flex justify-between items-end">
+            <div class="kotak-foto" id="wadah_foto">
+                <div class="text-[9pt] text-gray-400 text-center leading-tight">Pas Foto<br>3 x 4</div>
+            </div>
+
+            <div class="w-[45%] flex flex-col text-center">
+                <div>
+                    <p id="tgl_skrg">Maros, .....................</p>
+                    <p>Kepala Sekolah,</p>
+                </div>
+                <div class="mt-20 inline-block text-left mx-auto" id="ttd_kepsek">
+                    <div class="font-bold underline">( ................................... )</div>
+                    <div class="text-[10pt] font-normal mt-0.5">NIP. -</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { supabase } from './js/supabaseConfig.js';
+        const urlP = new URLSearchParams(window.location.search);
+        const idSiswa = urlP.get('id');
+        
+        // Ambil Data Global (Sama dengan Cetak Rapor)
+        const configSekolah = JSON.parse(localStorage.getItem('config_sekolah') || '{}');
+        const namaKepsek = configSekolah.kepsek || "Radiant Fadli, S.Pd";
+        const nipKepsek = configSekolah.nip || "-"; 
+        const kotaTanggal = configSekolah.kota_tanggal || "Maros";
+        const tanggalCetakGlobal = configSekolah.tanggal_cetak || null;
+
+        // Fungsi mengubah format tanggal (YYYY-MM-DD menjadi 17 Agustus 1945)
+        function formatTanggal(tglString) {
+            if (!tglString) return "-";
+            const blnList = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            const d = new Date(tglString);
+            return `${d.getDate()} ${blnList[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        async function ambilData() {
+            const { data: s } = await supabase.from('buku_induk').select('*').eq('id', idSiswa).single();
+            if(s) {
+                // Isi Biodata
+                document.getElementById('b_nama').innerText = s.nama_lengkap || '-';
+                document.getElementById('b_nisn').innerText = s.nisn || '-';
+                
+                const tmptLahir = s.tempat_lahir || '-';
+                const tglLahir = formatTanggal(s.tanggal_lahir);
+                document.getElementById('b_ttl').innerText = `${tmptLahir}, ${tglLahir}`;
+                
+                document.getElementById('b_jk').innerText = s.jenis_kelamin || '-';
+                document.getElementById('b_agama').innerText = s.agama || '-';
+                document.getElementById('b_wn').innerText = s.kewarganegaraan || 'Indonesia';
+                
+                document.getElementById('b_anak_ke').innerText = s.anak_ke ? `${s.anak_ke} ( ${s.anak_ke} )` : '-';
+                document.getElementById('b_jml_sdr').innerText = s.jumlah_saudara ? `${s.jumlah_saudara} ( ${s.jumlah_saudara} )` : '-';
+                document.getElementById('b_alamat_siswa').innerText = s.alamat_siswa || '-';
+
+                // Data Ortu
+                document.getElementById('b_ayah_nama').innerText = s.nama_ayah || '-';
+                document.getElementById('b_ibu_nama').innerText = s.nama_ibu || '-';
+                document.getElementById('b_ayah_kerja').innerText = s.pekerjaan_ayah || '-';
+                document.getElementById('b_ibu_kerja').innerText = s.pekerjaan_ibu || '-';
+                // Jika alamat ayah dan ibu sama, satukan saja
+                const alamatOrtu = s.alamat_ayah || s.alamat_ibu || '-';
+                document.getElementById('b_alamat_ortu').innerText = alamatOrtu;
+
+                // Data Wali
+                document.getElementById('b_wali_nama').innerText = s.nama_wali || '-';
+                document.getElementById('b_wali_hub').innerText = s.hubungan_wali || '-';
+                document.getElementById('b_wali_kerja').innerText = s.pekerjaan_wali || '-';
+                document.getElementById('b_alamat_wali').innerText = s.alamat_wali || '-';
+
+                // 🌟 LOGIKA MENAMPILKAN FOTO DI KOTAK 3x4 🌟
+                const wadahFoto = document.getElementById('wadah_foto');
+                if (s.foto) {
+                    wadahFoto.innerHTML = `<img src="${s.foto}" class="w-full h-full object-cover">`;
+                }
+
+                // Tanda Tangan Kepsek Rata Kiri
+                const nipK = nipKepsek ? nipKepsek : "-";
+                document.getElementById('ttd_kepsek').innerHTML = `
+                    <div class="font-bold underline">${namaKepsek}</div>
+                    <div class="text-[10pt] font-normal mt-0.5">NIP. ${nipK}</div>`;
+            }
+
+            // Atur Tanggal Cetak
+            let d;
+            if (tanggalCetakGlobal) { d = new Date(tanggalCetakGlobal); } else { d = new Date(); }
+            const blnList = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            
+            document.getElementById('tgl_skrg').innerText = `${kotaTanggal}, ${d.getDate()} ${blnList[d.getMonth()]} ${d.getFullYear()}`;
+        }
+        
+        ambilData();
+    </script>
+</body>
+</html>

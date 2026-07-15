@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - IndukKu Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 flex items-center justify-center h-screen">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm border border-slate-200">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl mb-2">📚</h1>
+            <h2 class="text-2xl font-bold text-slate-800">IndukKu Pro</h2>
+            <p class="text-slate-500 text-sm mt-1">Silakan masuk untuk melanjutkan</p>
+        </div>
+        
+        <form id="loginForm" class="space-y-5">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Email</label>
+                <input type="email" id="email" required class="w-full border border-slate-300 p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Password</label>
+                <input type="password" id="password" required class="w-full border border-slate-300 p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                
+                <!-- Fitur Tampilkan Password -->
+                <div class="flex items-center mt-3 mb-1">
+                    <input type="checkbox" id="cekTampilPassword" class="mr-2 w-4 h-4 cursor-pointer accent-blue-600">
+                    <label for="cekTampilPassword" class="text-sm text-slate-600 font-medium cursor-pointer select-none">Tampilkan Password</label>
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-colors mt-2">
+                Masuk ke Sistem
+            </button>
+        </form>
+    </div>
+
+    <!-- Script Autentikasi yang Lebih Pintar -->
+    <script type="module">
+        import { supabase } from './js/supabaseConfig.js';
+
+        const loginForm = document.getElementById('loginForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const submitButton = loginForm.querySelector('button');
+        const cekTampilPassword = document.getElementById('cekTampilPassword');
+
+        // Logika Tampilkan Password
+        cekTampilPassword.addEventListener('change', function() {
+            if (this.checked) {
+                passwordInput.type = 'text';
+            } else {
+                passwordInput.type = 'password';
+            }
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            
+            const originalText = submitButton.innerText;
+            submitButton.innerText = "Memeriksa data...";
+            submitButton.disabled = true;
+
+            try {
+                // 1. Proses login ke Supabase
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: emailInput.value,
+                    password: passwordInput.value,
+                });
+
+                if (error) throw error;
+                
+                // 2. DETEKTOR KARCIS: Jika Supabase menolak kasih Karcis
+                if (!data.session) {
+                    alert("⚠️ LOGIN DITOLAK OLEH SUPABASE: Password Anda benar, tapi sistem gagal membuatkan Sesi Karcis. Silakan beritahu pesan ini ke AI Anda.");
+                    submitButton.innerText = originalText;
+                    submitButton.disabled = false;
+                    return; // Hentikan script, jangan pindah halaman
+                }
+
+                // 3. Jika berhasil
+                submitButton.innerText = "Karcis Diterima! Masuk sistem...";
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+
+            } catch (error) {
+                console.error("Error Message:", error.message);
+                alert("Login gagal! " + error.message);
+                submitButton.innerText = originalText;
+                submitButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

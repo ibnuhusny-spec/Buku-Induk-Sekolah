@@ -3,1023 +3,436 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi Buku Induk Sekolah Dasar</title>
-    <style>
-        /* CSS Variables */
-        :root {
-            --primary: #0ea5e9; 
-            --bg-color: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-color: #1e293b;
-            --border: #cbd5e1;
-            --success: #10b981;
-            --danger: #ef4444;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        
-        body { background-color: var(--bg-color); color: var(--text-color); line-height: 1.5; font-size: 14px; transition: background-color 0.3s ease; display: flex; flex-direction: column; min-height: 100vh;}
-        
-        .navbar { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; transition: background-color 0.3s ease;}
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; flex: 1; width: 100%;}
-        
-        .card { background: var(--card-bg); border-radius: 8px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        
-        .view-section { display: none; }
-        .view-section.active { animation: fadeIn 0.3s; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .btn { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; color: white; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; justify-content: center;}
-        .btn:hover { opacity: 0.9; }
-        .btn-primary { background: var(--primary); } .btn-success { background: var(--success); }
-        .btn-danger { background: var(--danger); } .btn-secondary { background: #64748b; } .btn-warning { background: #f59e0b; color: white; }
-        
-        /* Form Styling */
-        .form-section-title { background: #334155; color: white; padding: 8px 15px; margin: 20px 0 15px 0; border-radius: 4px; font-weight: bold; grid-column: 1 / -1; text-transform: uppercase; letter-spacing: 0.5px;}
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; grid-column: 1 / -1;}
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 0.85rem; color: #475569;}
-        .form-control { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; background: #fff;}
-        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2); }
-        .full-width { grid-column: 1 / -1; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
-        th, td { border: 1px solid var(--border); padding: 10px; text-align: left; }
-        th { background: #f8fafc; font-weight: 600; color: #334155;}
-
-        /* Photo Area */
-        .photo-area { text-align: center; border: 2px dashed var(--border); padding: 20px; border-radius: 8px; background: #f8fafc; }
-        .photo-preview { width: 120px; height: 160px; object-fit: cover; border: 1px solid #ccc; background: #e2e8f0; margin: 10px auto; display: block; border-radius: 4px;}
-        .logo-preview { width: 100px; height: 100px; object-fit: contain; border: 1px solid #ccc; background: transparent; margin: 10px 0; display: block; border-radius: 4px;}
-
-        /* Alat Ganti Tema */
-        .theme-controls { display: flex; gap: 15px; align-items: center; font-size: 0.85rem; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px;}
-        .theme-controls input[type="color"] { border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; padding: 0; background: transparent;}
-
-        /* --- LAYAR LOGIN ELEGAN (SPLASH SCREEN) --- */
-        .login-wrapper { justify-content: center; align-items: center; min-height: 80vh; padding: 20px; }
-        .login-card { 
-            background: var(--card-bg); border-radius: 12px; padding: 40px 30px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); width: 100%; max-width: 420px; 
-            text-align: center; border-top: 6px solid var(--primary);
-        }
-        .login-logo { width: 90px; height: auto; margin-bottom: 15px; object-fit: contain; }
-        .login-title { color: var(--text-color); margin-bottom: 5px; font-size: 1.6rem; font-weight: 800; letter-spacing: 0.5px; }
-        .login-subtitle { color: #64748b; margin-bottom: 25px; font-size: 0.95rem; }
-        
-        .btn-3d { 
-            background: var(--primary); color: white; border: none; padding: 12px; 
-            border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; 
-            width: 100%; transition: all 0.1s; box-shadow: 0 5px 0 #0284c7; 
-            margin-top: 10px;
-        }
-        .btn-3d:active { transform: translateY(5px); box-shadow: 0 0 0 #0284c7; }
-        
-        .btn-text-link {
-            background: transparent; color: #94a3b8; border: none; cursor: pointer; 
-            font-size: 0.85rem; margin-top: 25px; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px;
-        }
-        .btn-text-link:hover { color: var(--primary); text-decoration: underline; }
-
-        /* TAMPILAN CETAK A4 */
-        @media print {
-            @page { size: A4; margin: 1.5cm; }
-            body { background: white !important; color: black !important; display: block;}
-            body * { visibility: hidden; }
-            #detail-view, #detail-view * { visibility: visible; }
-            #detail-view { position: absolute; left: 0; top: 0; width: 100%; padding: 0; margin: 0; background: white !important; box-shadow: none;}
-            .no-print { display: none !important; }
-            .card { box-shadow: none; border: none; padding: 0; background: white !important;}
-            .print-container { font-family: 'Times New Roman', Times, serif; font-size: 10.5pt; line-height: 1.3; color: black; }
-            
-            .kop-surat { position: relative; display: flex; align-items: center; padding-bottom: 10px; margin-bottom: 15px; }
-            .kop-surat::after { content: ""; position: absolute; bottom: 3px; left: 0; width: 100%; border-bottom: 4px solid black; }
-            .kop-surat::before { content: ""; position: absolute; bottom: -2px; left: 0; width: 100%; border-bottom: 1px solid black; }
-            .kop-surat img { width: 2.8cm; height: 2.8cm; object-fit: contain; flex-shrink: 0; }
-            .kop-text { flex-grow: 1; text-align: center; padding-right: 2.8cm; }
-            .kop-text h4 { margin: 0; font-size: 12pt; font-weight: normal; text-transform: uppercase; }
-            .kop-text h3 { margin: 0; font-size: 14pt; font-weight: bold; text-transform: uppercase; }
-            .kop-text h2 { margin: 0; font-size: 16pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-            .kop-text p { margin: 3px 0 0 0; font-size: 10pt; font-style: normal; }
-
-            .print-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: bold; }
-            .buku-induk-table { width: 100%; border-collapse: collapse; border: none; margin-bottom: 10px;}
-            .buku-induk-table td { border: none; padding: 2px 4px; vertical-align: top; font-size: 10.5pt;}
-            .col-num { width: 3%; text-align: right; padding-right: 8px; }
-            .col-label { width: 35%; }
-            .col-separator { width: 2%; text-align: center; }
-            .col-value { width: 60%; border-bottom: 1px dotted #666 !important; }
-            .section-header { font-weight: bold; margin-top: 10px; margin-bottom: 3px; text-transform: uppercase; font-size: 10.5pt;}
-            .ortu-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 10.5pt; page-break-inside: avoid; }
-            .ortu-table th, .ortu-table td { border: 1px solid black; padding: 3px 5px; vertical-align: top;}
-            .ortu-table th { text-align: center; font-weight: bold; background: transparent;}
-            
-            .print-photo-box { position: absolute; right: 20px; top: 125px; width: 3cm; height: 4cm; border: 1px solid black; display: flex; justify-content: center; align-items: center; text-align: center; font-size: 9pt;}
-            .print-photo-box img { width: 100%; height: 100%; object-fit: cover; }
-            .page-break { page-break-before: always; }
-        }
-
-        @media (max-width: 768px) {
-            .navbar { flex-direction: column; gap: 10px; text-align: center; }
-            .navbar h1 { font-size: 1.2rem; line-height: 1.3; }
-            .theme-controls { flex-wrap: wrap; justify-content: center; }
-            .navbar button { width: 100%; }
-            .form-grid, .form-grid-3 { grid-template-columns: 1fr; gap: 10px; }
-            #search-input { width: 100% !important; margin-bottom: 10px; }
-            .view-section.card > div:first-child { flex-direction: column; }
-            .view-section.card > div:first-child button { width: 100%; }
-            #student-table th:nth-child(4), #student-table td:nth-child(4) { display: none; }
-            #student-table td:last-child { display: flex; flex-direction: column; gap: 5px; }
-        }
-        
-        .credit-footer { text-align: center; padding: 20px; font-size: 0.85rem; color: #64748b; margin-top: auto; }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    // URL dan Kunci ini HARUS SAMA dengan yang ada di Portal Terpadu
-    const supabaseUrl = 'https://gquohpkbygzkuybgblmp.supabase.co';
-    const supabaseKey = 'sb_publishable_xcOviXGQvu-Ua3U3sRY_wg_AHlCMYMt'; 
-    
-    const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-    // Langsung periksa apakah pengunjung membawa tiket dari Portal
-    _supabase.auth.getSession().then(({ data }) => {
-      if (!data.session) {
-        // Jika tidak ada tiket, langsung tendang kembali ke Portal!
-        window.location.replace("https://portal-terpadu.vercel.app/");
-      }
-      // Jika ada tiket, Supabase otomatis membersihkan URL dan membiarkan mereka masuk
-    });
-  </script>
+    <title>Dashboard - IndukKu Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="bg-slate-50 font-sans flex h-screen overflow-hidden">
 
-    <!-- NAVBAR -->
-    <div id="main-navbar" class="navbar no-print" style="display: none; flex-direction: column; align-items: stretch; padding: 0;">
-        <div style="padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
-            <h1>BUKU INDUK DIGITAL</h1>
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <button class="btn btn-danger" onclick="logout()">🚪 Keluar</button>
-            </div>
+    <aside class="w-64 bg-slate-900 text-white flex flex-col hidden md:flex shadow-xl z-20">
+        <div class="h-16 flex items-center justify-center border-b border-slate-800 font-black text-2xl tracking-wider text-blue-400">
+            📚 IndukKu <span class="text-white ml-1">Pro</span>
         </div>
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <a href="index.html" class="block px-4 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/30">👥 Beranda & Data</a>
+            <a href="pengaturan.html" class="block px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors font-bold">🏫 Pengaturan Sekolah</a>
+            
+            <button id="btnLogout" class="w-full text-left px-4 py-3 mt-10 rounded-xl text-red-400 hover:bg-red-500 hover:text-white transition-colors font-bold">🚪 Keluar (Logout)</button>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen relative">
         
-        <!-- MENU TAB (BARU) -->
-        <div id="nav-menu-tabs" style="background: rgba(0,0,0,0.1); padding: 0 20px; display: flex; gap: 5px; overflow-x: auto;">
-            <button class="btn nav-tab" onclick="showView('dashboard-view')" style="border-radius: 4px 4px 0 0; padding: 10px 15px; background: var(--card-bg); color: var(--text-color);">📊 Dashboard & Grafik</button>
-            <button class="btn nav-tab" onclick="showView('home-view')" style="border-radius: 4px 4px 0 0; padding: 10px 15px; background: transparent; color: white;">👥 Profil Siswa</button>
-            <button class="btn nav-tab" onclick="showView('rapor-view')" style="border-radius: 4px 4px 0 0; padding: 10px 15px; background: transparent; color: white;">📝 Input Rapor</button>
-            <button class="btn nav-tab" id="btn-settings" onclick="showView('settings-view')" style="border-radius: 4px 4px 0 0; padding: 10px 15px; background: transparent; color: white; display: none;">⚙️ Pengaturan</button>
-        </div>
-    </div>
+        <header class="h-20 bg-white shadow-sm flex flex-col md:flex-row items-center justify-between px-8 py-4 gap-4 z-10">
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Master Data Siswa</h1>
+            <div class="relative w-full md:w-[400px]">
+                <input type="text" id="inputCari" placeholder="Ketik Nama, NISN, NIPD, atau Kelas..." class="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-100 border-none focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner font-medium text-slate-700">
+                <span class="absolute left-4 top-3 text-xl">🔍</span>
+            </div>
+        </header>
 
-    <div class="container">
-
-        <!-- ================================== -->
-        <!-- VIEW: DASHBOARD & GRAFIK (BARU)    -->
-        <!-- ================================== -->
-        <div id="dashboard-view" class="view-section card active">
-            <h2 style="margin-bottom: 20px; color: var(--primary);">📊 Dashboard Statistik Sekolah</h2>
+        <div class="flex-1 p-6 md:p-8 overflow-auto">
             
-            <div class="form-grid">
-                <!-- Tempatkan Elemen Canvas / Grafik Chart.js di sini -->
-                <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; height: 300px; display: flex; align-items: center; justify-content: center;">
-                    <p style="color: #64748b;">[ Area Grafik Jumlah Siswa Per Kelas ]</p>
-                </div>
-                <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; height: 300px; display: flex; align-items: center; justify-content: center;">
-                    <p style="color: #64748b;">[ Area Grafik Jenis Kelamin ]</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ================================== -->
-        <!-- VIEW 1: LAYAR LOGIN ELEGAN         -->
-        <!-- ================================== -->
-        <div id="login-view" class="view-section login-wrapper active" style="display: flex;">
-            <div class="login-card">
-                <img src="maros.png" alt="Logo Wilayah" class="login-logo" onerror="this.style.display='none'">
-                
-                <h2 class="login-title">Buku Induk Digital</h2>
-                <p class="login-subtitle">Aplikasi Pengelolaan Data Sekolah Dasar</p>
-                
-                <div style="text-align: left; margin-bottom: 15px;">
-                    <label style="font-weight: 600; display: block; margin-bottom: 5px; color: #475569;">Masuk Sebagai:</label>
-                    <select id="login-role" class="form-control" onchange="toggleLoginType()">
-                        <option value="ortu">Orang Tua / Wali Murid</option>
-                        <option value="pengawas">Pengawas Sekolah / Tamu</option>
-                        <option value="admin">Administrator Sekolah</option>
-                    </select>
-                </div>
-                
-                <div style="text-align: left; margin-bottom: 25px;">
-                    <label id="login-label" style="font-weight: 600; display: block; margin-bottom: 5px; color: #475569;">Kunci Akses Pendaftaran:</label>
-                    <input type="password" id="login-password" class="form-control" placeholder="Masukkan Kunci Rahasia..." onkeypress="handleEnter(event)">
-                </div>
-                
-                <button class="btn-3d" onclick="prosesLogin()">MASUK APLIKASI ➔</button>
-
-                <button class="btn-text-link" onclick="bukaPengaturanServer()">⚙️ Pengaturan Server Database</button>
-            </div>
-        </div>
-
-        <!-- ================================== -->
-        <!-- VIEW 1.B: LAYAR PENGATURAN SERVER  -->
-        <!-- ================================== -->
-        <div id="server-settings-view" class="view-section login-wrapper">
-            <div class="login-card">
-                <h2 class="login-title" style="font-size: 1.4rem;">⚙️ Pengaturan Server</h2>
-                <p class="login-subtitle">Tautkan aplikasi ke Google Sheets Anda</p>
-                
-                <div style="text-align: left; margin-bottom: 25px; background: #fffbeb; padding: 15px; border-left: 4px solid #f59e0b; border-radius: 4px;">
-                    <label style="font-weight: 600; display: block; margin-bottom: 5px; color: #475569;">URL Google Apps Script (Web App):</label>
-                    <input type="text" id="input-gas-url" class="form-control" placeholder="https://script.google.com/macros/s/.../exec">
-                    <small style="display: block; margin-top: 8px; color: #64748b;">* Pastikan URL diakhiri dengan <strong>/exec</strong></small>
-                </div>
-                
-                <button class="btn-3d" style="background: var(--success); box-shadow: 0 5px 0 #059669;" onclick="simpanURLServer()">💾 SIMPAN SERVER</button>
-                <button class="btn btn-secondary" style="width: 100%; margin-top: 15px; padding: 10px;" onclick="showView('login-view')">Batal / Kembali</button>
-            </div>
-        </div>
-
-        <!-- ================================== -->
-        <!-- VIEW 2: HOME / DATA SISWA (ADMIN)  -->
-        <!-- ================================== -->
-        <div id="home-view" class="view-section card">
-            
-            <div style="display:flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap:10px;">
-                <div style="flex: 1; min-width: 250px;">
-                    <input type="text" id="search-input" class="form-control" style="width: 100%; max-width: 400px;" 
-                           placeholder="🔍 Cari misal: Kelas 1, Kelas 1 A Putra, Kelas 5..." 
-                           oninput="debounceSearch()" autocomplete="off" spellcheck="false">
-                    
-                    <div id="student-count" style="margin-top: 8px; font-weight: bold; color: var(--primary); font-size: 0.95rem;">
-                        Total Data: 0 Siswa
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-3xl">👥</div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Total Siswa</p>
+                        <h3 class="text-3xl font-black text-slate-800" id="dashTotal">0</h3>
                     </div>
                 </div>
-                
-                <div style="display:flex; gap:10px; flex-wrap: wrap;">
-                    <button id="btn-import-data" class="btn btn-success" style="background:#059669; display: none;" onclick="showView('import-view')">📥 Panduan Import Dapodik</button>
-                    <button id="btn-tambah-data" class="btn btn-primary" style="display: none;" onclick="bukaFormBaru()">+ Tambah Data Siswa Baru</button>
-                </div>
-            </div>
-            
-            <div id="table-container" style="overflow-x: auto;">
-                <table id="student-table">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>NISN</th>
-                            <th>Nama Lengkap</th>
-                            <th>Kelas Saat Ini</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ================================== -->
-        <!-- VIEW 2.B: PANDUAN IMPORT DAPODIK   -->
-        <!-- ================================== -->
-        <div id="import-view" class="view-section card no-print">
-            <h2 style="margin-bottom: 15px; color: var(--success); border-bottom: 2px solid var(--border); padding-bottom: 10px;">📥 Panduan Import Data dari Dapodik / Excel</h2>
-            
-            <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; line-height: 1.6;">
-                <p>Kabar baik! Karena aplikasi Buku Induk ini berbasis <strong>Google Sheets</strong>, Anda tidak perlu mengunggah file yang rawan *error*. Cara tercepat dan teraman untuk memasukkan ratusan data siswa dari Dapodik adalah dengan melakukan <strong>Copy-Paste langsung</strong> ke database.</p>
-                <br>
-                <h4 style="margin-bottom: 10px; color: #334155;">Langkah-langkah Import:</h4>
-                <ol style="margin-left: 20px; color: #475569;">
-                    <li style="margin-bottom: 8px;">Buka file Excel unduhan Dapodik Anda di laptop.</li>
-                    <li style="margin-bottom: 8px;">Buka file <strong>Google Sheets</strong> (database aplikasi ini) di tab browser baru.</li>
-                    <li style="margin-bottom: 8px;">Buka *sheet* bernama <strong>DB_Induk</strong>.</li>
-                    <li style="margin-bottom: 8px;">Cukup <strong>Copy (Salin)</strong> kolom data dari Excel (misal: kolom Nama, NISN, Tempat Lahir), lalu <strong>Paste (Tempel)</strong> ke baris dan kolom yang sesuai di Google Sheets tersebut, mulai dari Baris ke-2.</li>
-                    <li style="margin-bottom: 8px;">Jangan lupa salin seluruh data NISN atau NIPD siswa ke <strong>Kolom A (id)</strong> agar tombol Cetak dapat bekerja.</li>
-                    <li style="margin-bottom: 8px;">Data yang Anda masukkan akan langsung otomatis terbaca di aplikasi Buku Induk ini saat halaman di-<i>refresh</i>.</li>
-                </ol>
-            </div>
-            
-            <div style="margin-top:20px; text-align:right;">
-                <button type="button" class="btn btn-secondary" onclick="showView('home-view')">⬅ Kembali ke Beranda</button>
-            </div>
-        </div>
-
-        <!-- ================================== -->
-        <!-- VIEW 3: PENGATURAN KOP SURAT       -->
-        <!-- ================================== -->
-        <div id="settings-view" class="view-section card no-print">
-            <h2 style="margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--border); padding-bottom: 10px;">⚙️ Pengaturan Kop Surat & Identitas Sekolah</h2>
-            
-            <form id="settings-form" onsubmit="saveSettings(event)">
-                <div class="form-grid">
-                    <div class="form-group full-width"><label>Pemerintah Daerah</label><input type="text" id="set_pemda" class="form-control" required></div>
-                    <div class="form-group full-width"><label>Dinas</label><input type="text" id="set_dinas" class="form-control" required></div>
-                    <div class="form-group full-width"><label>Sekolah</label><input type="text" id="set_sekolah" class="form-control" required></div>
-                    <div class="form-group full-width"><label>Alamat Lengkap</label><input type="text" id="set_alamat" class="form-control" required></div>
-                    <div class="form-group full-width photo-area" style="text-align: left;">
-                        <label>Logo Sekolah</label>
-                        <img id="logo-preview-img" class="logo-preview" src="">
-                        <input type="hidden" id="set_logo">
-                        <input type="file" id="upload-logo" accept="image/*" style="display:none" onchange="handleLogoUpload(event)">
-                        <button type="button" class="btn btn-secondary" onclick="document.getElementById('upload-logo').click()">📁 Pilih File Logo</button>
-                        <small style="display:block; margin-top:5px; color:#64748b;">* Disarankan format PNG. Maksimal 500 KB.</small>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl">🟢</div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Siswa Aktif</p>
+                        <h3 class="text-3xl font-black text-slate-800" id="dashAktif">0</h3>
                     </div>
                 </div>
-                <div style="margin-top:20px; text-align:right;">
-                    <button type="button" class="btn btn-secondary" onclick="showView('home-view')">⬅ Kembali</button>
-                    <button type="submit" class="btn btn-success" style="margin-left:10px;">💾 Simpan Pengaturan</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- ================================== -->
-        <!-- VIEW 4: FORMULIR ISIAN SISWA       -->
-        <!-- ================================== -->
-        <div id="form-view" class="view-section card no-print">
-            <h2 id="form-title" style="text-align: center; margin-bottom: 20px; color: var(--primary);">Formulir Isian Buku Induk Siswa</h2>
-            <form id="student-form" onsubmit="saveStudent(event)">
-                <input type="hidden" id="student-id">
-                <input type="hidden" id="f_kunci_akses">
-
-                <div class="form-grid">
-                    <div class="form-grid-3">
-                        <div class="form-group"><label>NISN <span style="color:var(--danger)">*</span></label><input type="text" id="f_nisn" class="form-control" required></div>
-                        <div class="form-group"><label>Kelas Saat Ini <span style="color:var(--danger)">*</span></label><input type="text" id="f_kelas" class="form-control" required></div>
-                        <div class="form-group"><label>No. Seri Rapor</label><input type="text" id="f_no_rapor" class="form-control"></div>
-                    </div>
-
-                    <div class="form-section-title">A. Keterangan Pribadi</div>
-                    <div class="form-group"><label>1. a. Nama Lengkap <span style="color:var(--danger)">*</span></label><input type="text" id="f_nama" class="form-control" required></div>
-                    <div class="form-group"><label>1. b. Nama Panggilan</label><input type="text" id="f_panggilan" class="form-control"></div>
-                    <div class="form-group"><label>2. Jenis Kelamin</label><select id="f_jk" class="form-control"><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div>
-                    <div class="form-group"><label>3. Tempat & Tanggal Lahir</label><div style="display:flex; gap:5px;"><input type="text" id="f_tempat_lahir" class="form-control" placeholder="Tempat"><input type="date" id="f_tgl_lahir" class="form-control"></div></div>
-                    <div class="form-group"><label>4. Agama</label><input type="text" id="f_agama" class="form-control" value="Islam"></div>
-                    <div class="form-group"><label>5. Kewarganegaraan</label><input type="text" id="f_wn" class="form-control" value="Indonesia"></div>
-                    
-                    <div class="form-group">
-                        <label>6. Anak Keberapa <span style="color:var(--danger)">*</span></label>
-                        <input type="number" id="f_anak_ke" class="form-control" required min="1" placeholder="Contoh: 1">
-                    </div>
-                    
-                    <div class="form-grid-3">
-                        <div class="form-group">
-                            <label>7. Sdr. Kandung <span style="color:var(--danger)">*</span></label>
-                            <input type="number" id="f_sdr_kandung" class="form-control" required min="0" placeholder="Isi 0 jika tdk ada">
-                        </div>
-                        <div class="form-group">
-                            <label>8. Sdr. Tiri <span style="color:var(--danger)">*</span></label>
-                            <input type="number" id="f_sdr_tiri" class="form-control" required min="0" placeholder="Isi 0 jika tdk ada">
-                        </div>
-                        <div class="form-group">
-                            <label>9. Sdr. Angkat <span style="color:var(--danger)">*</span></label>
-                            <input type="number" id="f_sdr_angkat" class="form-control" required min="0" placeholder="Isi 0 jika tdk ada">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group"><label>10. Status Yatim</label><select id="f_yatim" class="form-control"><option value="-">Tidak / Lengkap</option><option value="Yatim">Yatim</option><option value="Piatu">Piatu</option><option value="Yatim Piatu">Yatim Piatu</option></select></div>
-                    <div class="form-group"><label>11. Bahasa Sehari-hari</label><input type="text" id="f_bahasa" class="form-control" value="Indonesia / Daerah"></div>
-
-                    <div class="form-section-title">B. Keterangan Tempat Tinggal</div>
-                    <div class="form-group full-width"><label>12. Alamat Lengkap</label><input type="text" id="f_alamat" class="form-control"></div>
-                    <div class="form-group"><label>13. No Telepon / HP</label><input type="text" id="f_telp" class="form-control"></div>
-                    <div class="form-group"><label>14. Tinggal Bersama</label><select id="f_tinggal" class="form-control"><option value="Orang Tua">Orang Tua</option><option value="Menumpang">Menumpang</option><option value="Asrama">Asrama</option></select></div>
-                    <div class="form-group"><label>15. Jarak ke Sekolah (Km)</label><input type="text" id="f_jarak" class="form-control"></div>
-                    <div class="form-group"><label>16. Ke Sekolah Dengan</label><select id="f_transport" class="form-control"><option value="Jalan Kaki">Jalan Kaki</option><option value="Kendaraan Pribadi">Kendaraan Pribadi</option><option value="Kendaraan Umum">Kendaraan Umum</option></select></div>
-
-                    <div class="form-section-title">C. Kesehatan & D. Pendidikan</div>
-                    <div class="form-group"><label>Berat (Kg) / Tinggi (Cm)</label><div style="display:flex; gap:5px;"><input type="text" id="f_bb" class="form-control" placeholder="Berat"><input type="text" id="f_tb" class="form-control" placeholder="Tinggi"></div></div>
-                    <div class="form-group"><label>Golongan Darah</label><input type="text" id="f_goldar" class="form-control"></div>
-                    <div class="form-group"><label>Kelainan Jasmani</label><input type="text" id="f_kelainan" class="form-control"></div>
-                    <div class="form-group"><label>Penyakit yg Pernah Diderita</label><input type="text" id="f_penyakit" class="form-control"></div>
-                    <div class="form-group full-width"><label>Asal Sekolah (TK/PAUD) & No Ijazah</label><div style="display:flex; gap:5px;"><input type="text" id="f_asal_sekolah" class="form-control" placeholder="Nama TK/PAUD"><input type="text" id="f_ijazah_asal" class="form-control" placeholder="No Ijazah"></div></div>
-                    <div class="form-group full-width"><label>Pindahan (Tanggal Diterima & Alasan Pindah)</label><input type="text" id="f_pindahan" class="form-control" placeholder="Kosongkan jika bukan pindahan"></div>
-
-                    <div class="form-section-title">E. Keterangan Orang Tua Kandung</div>
-                    <div style="background:#f8fafc; padding:15px; border:1px solid #e2e8f0; border-radius:6px;">
-                        <h4 style="margin-bottom:10px; color:#0284c7;">Data Ayah</h4>
-                        <div class="form-group"><label>Nama Ayah</label><input type="text" id="f_ayah_nama" class="form-control"></div>
-                        <div class="form-group"><label>TTL Ayah</label><input type="text" id="f_ayah_ttl" class="form-control"></div>
-                        <div class="form-group"><label>Agama</label><input type="text" id="f_ayah_agama" class="form-control"></div>
-                        <div class="form-group"><label>Ijazah Tertinggi</label><input type="text" id="f_ayah_pend" class="form-control"></div>
-                        <div class="form-group"><label>Pekerjaan</label><input type="text" id="f_ayah_kerja" class="form-control"></div>
-                        <div class="form-group"><label>Penghasilan / Bln</label><input type="text" id="f_ayah_gaji" class="form-control"></div>
-                        <div class="form-group"><label>Masih Hidup/Meninggal</label><input type="text" id="f_ayah_status" class="form-control" value="Masih Hidup"></div>
-                    </div>
-                    <div style="background:#f8fafc; padding:15px; border:1px solid #e2e8f0; border-radius:6px;">
-                        <h4 style="margin-bottom:10px; color:#0284c7;">Data Ibu</h4>
-                        <div class="form-group"><label>Nama Ibu</label><input type="text" id="f_ibu_nama" class="form-control"></div>
-                        <div class="form-group"><label>TTL Ibu</label><input type="text" id="f_ibu_ttl" class="form-control"></div>
-                        <div class="form-group"><label>Agama</label><input type="text" id="f_ibu_agama" class="form-control"></div>
-                        <div class="form-group"><label>Ijazah Tertinggi</label><input type="text" id="f_ibu_pend" class="form-control"></div>
-                        <div class="form-group"><label>Pekerjaan</label><input type="text" id="f_ibu_kerja" class="form-control"></div>
-                        <div class="form-group"><label>Penghasilan / Bln</label><input type="text" id="f_ibu_gaji" class="form-control"></div>
-                        <div class="form-group"><label>Masih Hidup/Meninggal</label><input type="text" id="f_ibu_status" class="form-control" value="Masih Hidup"></div>
-                    </div>
-
-                    <div class="form-section-title">F. Wali & G. Perkembangan</div>
-                    <div class="form-group"><label>Nama Wali</label><input type="text" id="f_wali_nama" class="form-control"></div>
-                    <div class="form-group"><label>Hubungan & Pekerjaan Wali</label><div style="display:flex; gap:5px;"><input type="text" id="f_wali_hub" class="form-control" placeholder="Hubungan"><input type="text" id="f_wali_kerja" class="form-control" placeholder="Pekerjaan"></div></div>
-                    <div class="form-group full-width"><label>Alamat Wali</label><input type="text" id="f_wali_alamat" class="form-control"></div>
-                    <div class="form-group"><label>Bakat / Prestasi</label><input type="text" id="f_bakat" class="form-control"></div>
-                    <div class="form-group"><label>Diterima di Kelas (Awal)</label><input type="text" id="f_kelas_masuk" class="form-control" placeholder="Contoh: Kelas 1"></div>
-
-                    <div class="form-group full-width photo-area">
-                        <label style="text-align: left; font-size: 1rem;">Pas Foto Siswa (3x4) <span style="color:var(--danger)">*</span></label>
-                        <img id="photo-preview-img" class="photo-preview" src="">
-                        <input type="hidden" id="photo-data">
-                        
-                        <!-- UI KAMERA -->
-                        <div id="camera-container" style="display: none; margin: 10px auto; max-width: 300px;">
-                            <video id="camera-video" autoplay playsinline style="width: 100%; border-radius: 8px; border: 2px solid var(--primary); transform: scaleX(-1);"></video>
-                            <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center;">
-                                <button type="button" class="btn btn-success" onclick="capturePhoto()">📸 Jepret Foto</button>
-                                <button type="button" class="btn btn-danger" onclick="stopCamera()">✖ Batal</button>
-                            </div>
-                        </div>
-
-                        <!-- TOMBOL PILIHAN FOTO -->
-                        <div id="photo-buttons" style="display:flex; gap:10px; justify-content:center; margin-top: 10px; flex-wrap: wrap;">
-                            <input type="file" id="upload-photo" accept="image/*" style="display:none" onchange="handleFileUpload(event)">
-                            <button type="button" class="btn btn-primary" onclick="document.getElementById('upload-photo').click()">📁 Dari Galeri/File</button>
-                            <button type="button" class="btn btn-warning" onclick="startCamera()">📷 Buka Kamera</button>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-3xl">🚻</div>
+                    <div class="w-full">
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Laki-laki / Pr</p>
+                        <div class="flex items-baseline gap-1">
+                            <h3 class="text-2xl font-black text-blue-600" id="dashL">0</h3>
+                            <span class="text-slate-300 font-bold text-lg">/</span>
+                            <h3 class="text-2xl font-black text-pink-500" id="dashP">0</h3>
                         </div>
                     </div>
                 </div>
-
-                <div style="margin-top:20px; text-align:right; border-top: 1px solid var(--border); padding-top: 15px;">
-                    <button type="button" id="btn-cancel-form" class="btn btn-secondary" onclick="showView('home-view')" style="display: none;">⬅ Batal / Kembali</button>
-                    <button type="submit" class="btn btn-success" style="padding: 10px 20px; font-size: 1rem; margin-left:10px;">💾 Simpan Data Siswa</button>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div class="w-14 h-14 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-3xl">🎓</div>
+                    <div class="w-full">
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Lulus / Pindah</p>
+                        <div class="flex items-baseline gap-1">
+                            <h3 class="text-2xl font-black text-purple-600" id="dashAlumni">0</h3>
+                            <span class="text-slate-300 font-bold text-lg">/</span>
+                            <h3 class="text-2xl font-black text-red-500" id="dashPindah">0</h3>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">📊 <span class="uppercase tracking-wider text-sm">Distribusi Siswa per Kelas</span></h3>
+                    <div class="relative h-64 w-full">
+                        <canvas id="chartKelas"></canvas>
+                    </div>
+                </div>
+                <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">🚻 <span class="uppercase tracking-wider text-sm">Rasio Jenis Kelamin</span></h3>
+                    <div class="relative h-64 w-full">
+                        <canvas id="chartGender"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                
+                <div class="p-6 border-b border-slate-100 bg-slate-50 flex flex-wrap justify-center items-center gap-4">
+                    <button id="btnExport" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                        <span class="text-lg">📤</span> Export Excel
+                    </button>
+                    <a href="import-dapodik.html" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                        <span class="text-lg">📥</span> Import Dapodik
+                    </a>
+                    <a href="import-spmb.html" class="bg-gradient-to-r from-teal-400 to-emerald-500 hover:from-teal-500 hover:to-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                        <span class="text-lg">📥</span> Import SPMB
+                    </a>
+                    <a href="ppdb.html" class="bg-gradient-to-r from-fuchsia-500 to-purple-600 hover:from-fuchsia-600 hover:to-purple-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                        <span class="text-lg">🎓</span> PPDB Kilat
+                    </a>
+                    <button id="btnNaikKelas" class="bg-gradient-to-r from-orange-400 to-rose-500 hover:from-orange-500 hover:to-rose-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                        <span class="text-lg">🚀</span> Kenaikan Kelas
+                    </button>
+                    <button id="btnTambah" class="bg-slate-800 hover:bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                        <span class="text-lg">+</span> Siswa Manual
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-white text-slate-400 text-xs uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-4 md:p-5 font-bold">NISN / NIPD</th>
+                                <th class="p-4 md:p-5 font-bold">Nama Lengkap & Kelas</th>
+                                <th class="p-4 md:p-5 font-bold">Status</th>
+                                <th class="p-4 md:p-5 font-bold text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="text-sm text-slate-700 divide-y divide-slate-50">
+                            <tr>
+                                <td colspan="4" class="p-10 text-center text-slate-400 font-bold animate-pulse">⏳ Memuat data siswa...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
-        <!-- ================================== -->
-        <!-- VIEW: INPUT NILAI RAPOR (BARU)     -->
-        <!-- ================================== -->
-        <div id="rapor-view" class="view-section card no-print">
-            <h2 style="margin-bottom: 20px; color: var(--success); border-bottom: 2px solid var(--border); padding-bottom: 10px;">📝 Rekam Jejak Nilai Rapor Siswa</h2>
-            
-            <div style="display:flex; gap:10px; margin-bottom: 20px;">
-                <input type="text" id="search-rapor" class="form-control" placeholder="🔍 Cari Nama Siswa untuk diinput nilainya..." style="flex: 1;">
-            </div>
-
-            <!-- Tabel Siswa Khusus Rapor -->
-            <div style="overflow-x: auto; margin-bottom: 20px;">
-                <table id="rapor-table">
-                    <thead>
-                        <tr>
-                            <th>NISN</th>
-                            <th>Nama Siswa</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="rapor-tbody">
-                        <!-- Baris siswa akan di-render di sini dengan tombol "Input Nilai" -->
-                        <tr><td colspan="3" style="text-align:center;">Silakan gunakan kolom pencarian...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Area Form Input (Awalnya Disembunyikan) -->
-            <div id="form-rapor-area" style="display: none; background:#f8fafc; padding:20px; border:1px solid #e2e8f0; border-radius:6px;">
-                <h4 id="nama-siswa-rapor" style="margin-bottom: 15px; color: #334155;">Input Nilai: [Nama Siswa]</h4>
-                <form id="form-input-rapor">
-                    <input type="hidden" id="r_student_id">
-                    <div class="form-grid-3">
-                        <div class="form-group"><label>Kelas 1</label><textarea id="r_kelas_1" class="form-control" rows="4"></textarea></div>
-                        <div class="form-group"><label>Kelas 2</label><textarea id="r_kelas_2" class="form-control" rows="4"></textarea></div>
-                        <div class="form-group"><label>Kelas 3</label><textarea id="r_kelas_3" class="form-control" rows="4"></textarea></div>
-                        <div class="form-group"><label>Kelas 4</label><textarea id="r_kelas_4" class="form-control" rows="4"></textarea></div>
-                        <div class="form-group"><label>Kelas 5</label><textarea id="r_kelas_5" class="form-control" rows="4"></textarea></div>
-                        <div class="form-group"><label>Kelas 6</label><textarea id="r_kelas_6" class="form-control" rows="4"></textarea></div>
+        <div id="modalTambah" class="hidden absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 transition-all">
+            <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl mx-4 border border-slate-100 transform scale-100">
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
+                    <h2 class="text-xl font-black text-slate-800">Tambah Siswa Baru</h2>
+                    <button id="btnTutupModal" class="text-slate-400 hover:text-red-500 text-2xl font-bold transition-colors">&times;</button>
+                </div>
+                <form id="formTambah" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">NISN Siswa</label>
+                        <input type="text" id="inputNisn" required class="w-full border-2 border-slate-200 p-3 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none transition-colors font-mono">
                     </div>
-                    <div style="margin-top:15px; text-align:right;">
-                        <button type="button" class="btn btn-secondary" onclick="tutupFormRapor()">Batal</button>
-                        <button type="submit" class="btn btn-success" style="margin-left: 10px;">💾 Simpan Rapor</button>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Lengkap</label>
+                        <input type="text" id="inputNama" required class="w-full border-2 border-slate-200 p-3 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none transition-colors font-bold text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tahun Masuk</label>
+                        <input type="number" id="inputTahun" value="2026" required class="w-full border-2 border-slate-200 p-3 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none transition-colors font-bold text-slate-800">
+                    </div>
+                    <div class="flex gap-3 pt-6">
+                        <button type="button" id="btnBatal" class="w-1/3 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold transition-all">Batal</button>
+                        <button type="submit" id="btnSimpan" class="w-2/3 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all">Simpan Data</button>
                     </div>
                 </form>
             </div>
         </div>
+    </main>
 
-        <!-- ================================== -->
-        <!-- VIEW 5: DETAIL CETAK BUKU INDUK    -->
-        <!-- ================================== -->
-        <div id="detail-view" class="view-section card">
-            <div class="no-print" style="margin-bottom:20px; background:#e2e8f0; padding:15px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <button class="btn btn-secondary" onclick="showView('home-view')">⬅ Kembali</button>
-                    <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Langsung Buku Induk</button>
-                </div>
-            </div>
-            
-            <div class="print-container">
-                <div class="kop-surat">
-                    <img id="print_logo" src="" alt="Logo" style="display:none;">
-                    <div class="kop-text">
-                        <h4 id="print_pemda"></h4>
-                        <h3 id="print_dinas"></h3>
-                        <h2 id="print_sekolah"></h2>
-                        <p id="print_alamat"></p>
-                    </div>
-                </div>
+    <script type="module">
+        import { supabase } from './js/supabaseConfig.js';
 
-                <div class="print-header">
-                    <div>
-                        <table style="border:none; border-collapse:collapse; font-size:11pt;">
-                            <tr><td style="border:none; padding:2px;">Nama Lengkap Murid</td><td style="border:none; padding:2px;">:</td><td style="border:none; padding:2px; font-weight:bold; border-bottom:1px solid black;" id="p_nama"></td></tr>
-                            <tr><td style="border:none; padding:2px;">Nomor Induk Siswa Nasional</td><td style="border:none; padding:2px;">:</td><td style="border:none; padding:2px; border-bottom:1px solid black;" id="p_nisn"></td></tr>
-                            <tr><td style="border:none; padding:2px;">Kelas Saat Ini</td><td style="border:none; padding:2px;">:</td><td style="border:none; padding:2px; border-bottom:1px solid black;" id="p_kelas"></td></tr>
-                            <tr><td style="border:none; padding:2px;">No. Seri Buku Rapor</td><td style="border:none; padding:2px;">:</td><td style="border:none; padding:2px; border-bottom:1px solid black;" id="p_no_rapor"></td></tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="print-photo-box"><img id="p_photo" src="" alt="Pas Foto"></div>
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { window.location.href = 'login.html'; }
 
-                <div class="section-header">A. KETERANGAN PRIBADI</div>
-                <table class="buku-induk-table">
-                    <tr><td class="col-num">1.</td><td class="col-label">Nama Murid</td><td class="col-separator">:</td><td class="col-value"></td></tr>
-                    <tr><td></td><td class="col-label" style="padding-left:15px;">a. Nama Lengkap</td><td class="col-separator">:</td><td class="col-value" id="d_nama"></td></tr>
-                    <tr><td></td><td class="col-label" style="padding-left:15px;">b. Nama Panggilan</td><td class="col-separator">:</td><td class="col-value" id="d_panggilan"></td></tr>
-                    <tr><td class="col-num">2.</td><td class="col-label">Jenis Kelamin</td><td class="col-separator">:</td><td class="col-value" id="d_jk"></td></tr>
-                    <tr><td class="col-num">3.</td><td class="col-label">Tempat dan Tanggal Lahir</td><td class="col-separator">:</td><td class="col-value" id="d_ttl"></td></tr>
-                    <tr><td class="col-num">4.</td><td class="col-label">Agama</td><td class="col-separator">:</td><td class="col-value" id="d_agama"></td></tr>
-                    <tr><td class="col-num">5.</td><td class="col-label">Kewarganegaraan</td><td class="col-separator">:</td><td class="col-value" id="d_wn"></td></tr>
-                    <tr><td class="col-num">6.</td><td class="col-label">Anak Keberapa</td><td class="col-separator">:</td><td class="col-value" id="d_anak_ke"></td></tr>
-                    <tr><td class="col-num">7.</td><td class="col-label">Jumlah Saudara Kandung</td><td class="col-separator">:</td><td class="col-value" id="d_sdr_kandung"></td></tr>
-                    <tr><td class="col-num">8.</td><td class="col-label">Jumlah Saudara Tiri</td><td class="col-separator">:</td><td class="col-value" id="d_sdr_tiri"></td></tr>
-                    <tr><td class="col-num">9.</td><td class="col-label">Jumlah Saudara Angkat</td><td class="col-separator">:</td><td class="col-value" id="d_sdr_angkat"></td></tr>
-                    <tr><td class="col-num">10.</td><td class="col-label">Anak Yatim / Piatu / Yatim Piatu</td><td class="col-separator">:</td><td class="col-value" id="d_yatim"></td></tr>
-                    <tr><td class="col-num">11.</td><td class="col-label">Bahasa sehari-hari di rumah</td><td class="col-separator">:</td><td class="col-value" id="d_bahasa"></td></tr>
-                </table>
+        document.getElementById('btnLogout').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            window.location.href = 'login.html';
+        });
 
-                <div class="section-header">B. KETERANGAN TEMPAT TINGGAL</div>
-                <table class="buku-induk-table">
-                    <tr><td class="col-num">12.</td><td class="col-label">Alamat Lengkap</td><td class="col-separator">:</td><td class="col-value" id="d_alamat"></td></tr>
-                    <tr><td class="col-num">13.</td><td class="col-label">Nomor Telepon / HP</td><td class="col-separator">:</td><td class="col-value" id="d_telp"></td></tr>
-                    <tr><td class="col-num">14.</td><td class="col-label">Alamat tersebut</td><td class="col-separator">:</td><td class="col-value" id="d_tinggal"></td></tr>
-                    <tr><td class="col-num">15.</td><td class="col-label">Jarak dari tempat tinggal ke sekolah</td><td class="col-separator">:</td><td class="col-value" id="d_jarak"></td></tr>
-                    <tr><td class="col-num">16.</td><td class="col-label">Ke sekolah dengan</td><td class="col-separator">:</td><td class="col-value" id="d_transport"></td></tr>
-                </table>
+        let dataSiswaGlobal = []; 
+        let chartKelasInstance = null;
+        let chartGenderInstance = null;
 
-                <div class="section-header">C. KESEHATAN / JASMANI & D. PENDIDIKAN SEBELUMNYA</div>
-                <table class="buku-induk-table">
-                    <tr><td class="col-num">17.</td><td class="col-label">Berat Badan / Tinggi Badan</td><td class="col-separator">:</td><td class="col-value"><span id="d_bb"></span> Kg / <span id="d_tb"></span> Cm</td></tr>
-                    <tr><td class="col-num">18.</td><td class="col-label">Golongan Darah</td><td class="col-separator">:</td><td class="col-value" id="d_goldar"></td></tr>
-                    <tr><td class="col-num">19.</td><td class="col-label">Penyakit yang pernah diderita</td><td class="col-separator">:</td><td class="col-value" id="d_penyakit"></td></tr>
-                    <tr><td class="col-num">20.</td><td class="col-label">Kelainan Jasmani</td><td class="col-separator">:</td><td class="col-value" id="d_kelainan"></td></tr>
-                    <tr><td class="col-num">21.</td><td class="col-label">Asal Sekolah (TK/PAUD)</td><td class="col-separator">:</td><td class="col-value" id="d_asal_sekolah"></td></tr>
-                    <tr><td class="col-num">22.</td><td class="col-label">Tgl & No Ijazah</td><td class="col-separator">:</td><td class="col-value" id="d_ijazah_asal"></td></tr>
-                    <tr><td class="col-num">23.</td><td class="col-label">Pindahan / Alasan</td><td class="col-separator">:</td><td class="col-value" id="d_pindahan"></td></tr>
-                </table>
+        async function muatData() {
+            const tableBody = document.getElementById('tableBody');
 
-                <div class="page-break"></div>
-                <div style="height: 20px;"></div>
+            const { data, error } = await supabase
+                .from('buku_induk')
+                .select('*')
+                .order('nama_lengkap', { ascending: true });
 
-                <div class="section-header">E. KETERANGAN TENTANG ORANG TUA KANDUNG</div>
-                <table class="ortu-table">
-                    <thead>
-                        <tr><th width="5%">No</th><th width="35%">Orang Tua Kandung</th><th width="30%">Ayah</th><th width="30%">Ibu</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td align="center">24.</td><td>Nama</td><td id="d_ayah_nama"></td><td id="d_ibu_nama"></td></tr>
-                        <tr><td align="center">25.</td><td>Tempat dan Tanggal Lahir</td><td id="d_ayah_ttl"></td><td id="d_ibu_ttl"></td></tr>
-                        <tr><td align="center">26.</td><td>Agama</td><td id="d_ayah_agama"></td><td id="d_ibu_agama"></td></tr>
-                        <tr><td align="center">27.</td><td>Ijazah Tertinggi</td><td id="d_ayah_pend"></td><td id="d_ibu_pend"></td></tr>
-                        <tr><td align="center">28.</td><td>Pekerjaan</td><td id="d_ayah_kerja"></td><td id="d_ibu_kerja"></td></tr>
-                        <tr><td align="center">29.</td><td>Penghasilan per Bulan</td><td id="d_ayah_gaji"></td><td id="d_ibu_gaji"></td></tr>
-                        <tr><td align="center">30.</td><td>Masih Hidup / Meninggal Dunia</td><td id="d_ayah_status"></td><td id="d_ibu_status"></td></tr>
-                    </tbody>
-                </table>
-
-                <div class="section-header">F. KETERANGAN TENTANG WALI & G. KEGEMARAN</div>
-                <table class="buku-induk-table">
-                    <tr><td class="col-num">31.</td><td class="col-label">Nama Wali</td><td class="col-separator">:</td><td class="col-value" id="d_wali_nama"></td></tr>
-                    <tr><td class="col-num">32.</td><td class="col-label">Hubungan / Pekerjaan Wali</td><td class="col-separator">:</td><td class="col-value"><span id="d_wali_hub"></span> / <span id="d_wali_kerja"></span></td></tr>
-                    <tr><td class="col-num">33.</td><td class="col-label">Alamat Rumah Wali</td><td class="col-separator">:</td><td class="col-value" id="d_wali_alamat"></td></tr>
-                    <tr><td class="col-num">34.</td><td class="col-label">Bakat Khusus / Prestasi</td><td class="col-separator">:</td><td class="col-value" id="d_bakat"></td></tr>
-                    <tr><td class="col-num">35.</td><td class="col-label">Diterima di Kelas</td><td class="col-separator">:</td><td class="col-value" id="d_kelas_masuk"></td></tr>
-                </table>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- FOOTER CREDIT -->
-    <div class="no-print credit-footer">
-        Dikembangkan oleh <strong>Arifin Arif</strong>
-    </div>
-
-    <script>
-        // --- PENGATURAN URL SERVER DINAMIS ---
-        let GAS_URL = localStorage.getItem('gas_url_sekolah') || '';
-        
-        let students = [];
-        let filteredStudents = []; 
-        let isAdmin = false;
-        let isPengawas = false;
-
-        const ADMIN_PIN = "@dm1nKu77";
-        const ORTU_PIN = "m4r0s77";
-        const PENGAWAS_PIN = "p3ngaw4s"; 
-        
-        let appSettings = JSON.parse(localStorage.getItem('settings_sekolah')) || {
-            pemda: "PEMERINTAH DAERAH", dinas: "DINAS PENDIDIKAN",
-            sekolah: "NAMA SEKOLAH DASAR", alamat: "Alamat Lengkap Sekolah", logo: ""
-        };
-
-        window.onload = () => { 
-            initTheme(); 
-            loadSettings();
-            if(GAS_URL) { 
-                fetchData(); 
-                
-                // FITUR AUTO-LOGIN
-                const savedRole = localStorage.getItem('app_role');
-                const savedPass = localStorage.getItem('app_pass');
-                if(savedRole && savedPass) {
-                    document.getElementById('login-role').value = savedRole;
-                    document.getElementById('login-password').value = savedPass;
-                    prosesLogin();
-                }
-            } 
-        };
-
-        function bukaPengaturanServer() {
-            document.getElementById('input-gas-url').value = GAS_URL;
-            showView('server-settings-view');
-        }
-
-        function simpanURLServer() {
-            const urlBaru = document.getElementById('input-gas-url').value.trim();
-            if(urlBaru && urlBaru.includes('script.google.com/macros/s/')) {
-                GAS_URL = urlBaru;
-                localStorage.setItem('gas_url_sekolah', urlBaru);
-                alert("✅ URL Server Berhasil Disimpan!\nAplikasi siap digunakan.");
-                showView('login-view');
-                fetchData(); 
-            } else {
-                alert("❌ URL tidak valid!\nPastikan Anda menyalin link 'Web App' yang benar dari Google Apps Script (berakhiran /exec).");
-            }
-        }
-
-        function toggleLoginType() {
-            const role = document.getElementById('login-role').value;
-            const label = document.getElementById('login-label');
-            if (role === 'admin') { label.innerText = 'Password Administrator:'; } 
-            else if (role === 'pengawas') { label.innerText = 'Kunci Akses Pengawas:'; }
-            else { label.innerText = 'Kunci Akses Pendaftaran:'; }
-            document.getElementById('login-password').value = '';
-            document.getElementById('login-password').focus();
-        }
-
-        function handleEnter(e) {
-            if (e.key === 'Enter') prosesLogin();
-        }
-
-        function prosesLogin() {
-            if(!GAS_URL) {
-                alert("⚠️ Sistem belum terhubung ke Database!\nSilakan klik 'Pengaturan Server Database' terlebih dahulu.");
+            if (error) {
+                tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-red-500 font-bold bg-red-50 rounded-xl">❌ Gagal mengambil data dari server!</td></tr>';
                 return;
             }
 
-            const role = document.getElementById('login-role').value;
-            const pass = document.getElementById('login-password').value;
+            dataSiswaGlobal = data;
+            renderTabel(dataSiswaGlobal);
+        }
 
-            if (role === 'admin') {
-                if (pass === ADMIN_PIN) {
-                    isAdmin = true; isPengawas = false;
-                    localStorage.setItem('app_role', role); 
-                    localStorage.setItem('app_pass', pass); 
-                    
-                    document.getElementById('main-navbar').style.display = 'flex';
-                    document.getElementById('btn-settings').style.display = 'inline-flex';
-                    document.getElementById('btn-excel').style.display = 'inline-flex';
-                    document.getElementById('menu-theme').style.display = 'flex';
-                    
-                    document.getElementById('btn-tambah-data').style.display = 'inline-flex'; 
-                    document.getElementById('btn-import-data').style.display = 'inline-flex'; 
-                    
-                    document.getElementById('f_kunci_akses').value = ADMIN_PIN; 
-                    showView('dashboard-view');
-                    document.getElementById('btn-cancel-form').style.display = 'inline-flex'; 
-                    renderTable();
-                } else { alert("❌ Password Administrator Salah!"); }
-            } 
-            else if (role === 'pengawas') {
-                if (pass === PENGAWAS_PIN) {
-                    isAdmin = false; isPengawas = true;
-                    localStorage.setItem('app_role', role); 
-                    localStorage.setItem('app_pass', pass); 
-                    
-                    document.getElementById('main-navbar').style.display = 'flex';
-                    document.getElementById('btn-settings').style.display = 'none'; 
-                    document.getElementById('btn-excel').style.display = 'inline-flex'; 
-                    document.getElementById('menu-theme').style.display = 'none';
-                    
-                    document.getElementById('btn-tambah-data').style.display = 'none'; 
-                    document.getElementById('btn-import-data').style.display = 'none'; 
-                    
-                    showView('home-view');
-                    renderTable();
-                } else { alert("❌ Kunci Akses Pengawas Salah!"); }
+        // 🌟 FUNGSI MENGGAMBAR GRAFIK (CHART.JS) 🌟
+        function renderGrafik(data) {
+            // 1. Hitung Data Gender
+            const jmlLaki = data.filter(s => s.jenis_kelamin === 'Laki-laki').length;
+            const jmlPr = data.filter(s => s.jenis_kelamin === 'Perempuan').length;
+
+            // 2. Hitung Data Kelas (Kelompokkan siswa berdasarkan Rombel)
+            const countKelas = {};
+            data.forEach(s => {
+                if(s.status === 'Aktif' || !s.status) {
+                    const kelas = s.rombel || 'Belum Ada Kelas';
+                    countKelas[kelas] = (countKelas[kelas] || 0) + 1;
+                }
+            });
+            // Urutkan nama kelas sesuai abjad
+            const labelKelas = Object.keys(countKelas).sort();
+            const dataKelas = labelKelas.map(k => countKelas[k]);
+
+            // ================= GAMBAR GRAFIK GENDER (DONAT) =================
+            const ctxGender = document.getElementById('chartGender').getContext('2d');
+            if (chartGenderInstance) chartGenderInstance.destroy(); // Hapus grafik lama jika ada
+            
+            chartGenderInstance = new Chart(ctxGender, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Laki-laki', 'Perempuan'],
+                    datasets: [{
+                        data: [jmlLaki, jmlPr],
+                        backgroundColor: ['#3b82f6', '#ec4899'], // Biru dan Pink
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    cutout: '70%' // Ukuran lubang di tengah
+                }
+            });
+
+            // ================= GAMBAR GRAFIK KELAS (BATANG) =================
+            const ctxKelas = document.getElementById('chartKelas').getContext('2d');
+            if (chartKelasInstance) chartKelasInstance.destroy();
+            
+            chartKelasInstance = new Chart(ctxKelas, {
+                type: 'bar',
+                data: {
+                    labels: labelKelas,
+                    datasets: [{
+                        label: 'Jumlah Siswa Aktif',
+                        data: dataKelas,
+                        backgroundColor: '#6366f1', // Indigo
+                        borderRadius: 6, // Ujung batang membulat
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }, // Sembunyikan legenda
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Fungsi menggambar tabel dan statistik
+        function renderTabel(data) {
+            const tableBody = document.getElementById('tableBody');
+            
+            // Hitung Statistik
+            const total = data.length;
+            const jmlAktif = data.filter(s => !s.status || s.status === 'Aktif').length;
+            const jmlAlumni = data.filter(s => s.status === 'Alumni').length;
+            const jmlPindah = data.filter(s => s.status === 'Pindah').length;
+            const jmlLaki = data.filter(s => s.jenis_kelamin === 'Laki-laki').length;
+            const jmlPr = data.filter(s => s.jenis_kelamin === 'Perempuan').length;
+
+            document.getElementById('dashTotal').innerText = total;
+            document.getElementById('dashAktif').innerText = jmlAktif;
+            document.getElementById('dashAlumni').innerText = jmlAlumni;
+            document.getElementById('dashPindah').innerText = jmlPindah;
+            document.getElementById('dashL').innerText = jmlLaki;
+            document.getElementById('dashP').innerText = jmlPr;
+
+            // Panggil mesin pembuat grafik!
+            renderGrafik(data);
+
+            tableBody.innerHTML = ''; 
+            if (data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" class="p-12 text-center text-slate-400 font-bold text-lg">📭 Tidak ada data yang ditemukan.</td></tr>';
+                return;
             }
+
+            data.forEach(siswa => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors group cursor-default";
+                
+                let badgeStatus = `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-bold border border-emerald-200 uppercase tracking-widest">Aktif</span>`;
+                if(siswa.status === 'Alumni') badgeStatus = `<span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-[10px] font-bold border border-purple-200 uppercase tracking-widest">Alumni</span>`;
+                if(siswa.status === 'Pindah') badgeStatus = `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-[10px] font-bold border border-red-200 uppercase tracking-widest">Pindah</span>`;
+
+                tr.innerHTML = `
+                    <td class="p-4 md:p-5 whitespace-nowrap">
+                        <div class="font-mono text-slate-700 font-bold text-sm">${siswa.nisn || '-'}</div>
+                        <div class="text-[10px] text-slate-400 font-medium tracking-widest uppercase mt-1">NIPD: ${siswa.nipd || '-'}</div>
+                    </td>
+                    <td class="p-4 md:p-5">
+                        <div class="font-bold text-slate-800 text-base mb-1">${siswa.nama_lengkap}</div>
+                        <div class="text-[11px] text-slate-500 font-medium bg-slate-100 inline-block px-2.5 py-1 rounded-md border border-slate-200">🏫 ${siswa.rombel || 'Belum masuk kelas'}</div>
+                    </td>
+                    <td class="p-4 md:p-5">${badgeStatus}</td>
+                    <td class="p-4 md:p-5">
+                        <div class="flex items-center justify-center gap-2">
+                            <a href="profil-siswa.html?id=${siswa.id}" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-3 py-2 rounded-xl font-bold transition-colors flex items-center gap-2 shadow-sm" title="Buka Profil Lengkap">
+                                <span class="text-base">👁️</span> <span class="hidden xl:inline text-xs uppercase tracking-wider">Profil</span>
+                            </a>
+                            <button onclick="hapusSiswa('${siswa.id}', '${siswa.nama_lengkap}')" class="bg-red-50 text-red-500 hover:bg-red-600 hover:text-white p-2 rounded-xl font-bold transition-colors shadow-sm opacity-0 group-hover:opacity-100" title="Hapus Permanen">
+                                <span class="text-base">🗑️</span>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('inputCari').addEventListener('input', (e) => {
+            const kataKunci = e.target.value.toLowerCase();
+            const dataFilter = dataSiswaGlobal.filter(siswa => {
+                const nama = (siswa.nama_lengkap || '').toLowerCase();
+                const nisn = (siswa.nisn || '').toLowerCase();
+                const nipd = (siswa.nipd || '').toString().toLowerCase(); 
+                const rombel = (siswa.rombel || '').toLowerCase();
+                return nama.includes(kataKunci) || nisn.includes(kataKunci) || nipd.includes(kataKunci) || rombel.includes(kataKunci);
+            });
+            renderTabel(dataFilter); 
+        });
+
+        muatData();
+
+        window.hapusSiswa = async function(idSiswa, namaSiswa) {
+            const yakin = confirm(`Peringatan Keras!\nApakah Anda yakin ingin menghapus permanen data siswa bernama ${namaSiswa}?`);
+            if (yakin) {
+                const { error } = await supabase.from('buku_induk').delete().eq('id', idSiswa);
+                if (error) alert("Gagal menghapus data: " + error.message);
+                else muatData();
+            }
+        };
+
+        document.getElementById('btnExport').addEventListener('click', async () => {
+            const btn = document.getElementById('btnExport');
+            const teksAsli = btn.innerHTML;
+            btn.innerHTML = `<span class="text-lg">⏳</span> Memproses...`;
+            btn.disabled = true;
+
+            try {
+                const { data, error } = await supabase.from('buku_induk').select('*').order('nama_lengkap', { ascending: true });
+                if (error) throw error;
+                if (!data || data.length === 0) { alert("Belum ada data untuk diexport!"); return; }
+
+                const worksheet = XLSX.utils.json_to_sheet(data);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Buku_Induk");
+
+                const tanggal = new Date().toISOString().split('T')[0];
+                XLSX.writeFile(workbook, `Backup_IndukKu_${tanggal}.xlsx`);
+            } catch (err) { alert("Gagal export: " + err.message); } 
+            finally { btn.innerHTML = teksAsli; btn.disabled = false; }
+        });
+
+        const modal = document.getElementById('modalTambah');
+        const formTambah = document.getElementById('formTambah');
+
+        document.getElementById('btnTambah').addEventListener('click', () => modal.classList.remove('hidden'));
+        document.getElementById('btnTutupModal').addEventListener('click', () => modal.classList.add('hidden'));
+        document.getElementById('btnBatal').addEventListener('click', () => {
+            modal.classList.add('hidden');
+            formTambah.reset();
+        });
+
+        formTambah.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpan');
+            btn.innerText = "⏳ Menyimpan..."; btn.disabled = true;
+
+            const { error } = await supabase.from('buku_induk').insert([{
+                nisn: document.getElementById('inputNisn').value,
+                nama_lengkap: document.getElementById('inputNama').value,
+                tahun_masuk: parseInt(document.getElementById('inputTahun').value),
+                status: 'Aktif'
+            }]);
+
+            if (error) alert("Gagal: " + error.message);
             else {
-                if (pass === ORTU_PIN) {
-                    isAdmin = false; isPengawas = false;
-                    localStorage.setItem('app_role', role); 
-                    localStorage.setItem('app_pass', pass); 
-                    
-                    document.getElementById('main-navbar').style.display = 'flex';
-                    document.getElementById('btn-settings').style.display = 'none';
-                    document.getElementById('btn-excel').style.display = 'none';
-                    document.getElementById('menu-theme').style.display = 'none';
-                    document.getElementById('f_kunci_akses').value = ORTU_PIN; 
-                    bukaFormBaru(); 
-                    document.getElementById('btn-cancel-form').style.display = 'none'; 
-                } else { alert("❌ Kunci Akses Pendaftaran Salah!"); }
+                modal.classList.add('hidden');
+                formTambah.reset();
+                muatData();
             }
-        }
+            btn.innerText = "Simpan Data"; btn.disabled = false;
+        });
 
-        function logout() {
-            if(confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                isAdmin = false;
-                isPengawas = false;
-                localStorage.removeItem('app_role'); 
-                localStorage.removeItem('app_pass'); 
-                
-                document.getElementById('main-navbar').style.display = 'none';
-                document.getElementById('login-password').value = '';
-                document.getElementById('f_kunci_akses').value = '';
-                clearForm(true);
-                showView('login-view');
-            }
-        }
+        document.getElementById('btnNaikKelas').addEventListener('click', async () => {
+            const sandi = prompt("⚠️ PERINGATAN!\nFitur ini akan meluluskan Kelas 6 dan menaikkan kelas 1-5.\n\nMasukkan password rahasia (BISMILLAH):");
+            if (sandi !== "BISMILLAH") { if (sandi !== null) alert("❌ Password salah!"); return; }
 
-        function showView(id) {
-            document.querySelectorAll('.view-section').forEach(v => {
-                v.classList.remove('active');
-                v.style.display = 'none'; 
-            });
-            
-            const activeView = document.getElementById(id);
-            activeView.classList.add('active');
-            
-            if (id === 'login-view' || id === 'server-settings-view') {
-                activeView.style.display = 'flex';
-            } else {
-                activeView.style.display = 'block'; 
-            }
-        }
+            const yakin = confirm("Apakah Anda YAKIN ingin memproses kenaikan kelas sekarang?");
+            if (!yakin) return;
 
-        function bukaFormBaru() {
-            let tempKey = document.getElementById('f_kunci_akses').value;
-            clearForm();
-            document.getElementById('f_kunci_akses').value = tempKey;
-            showView('form-view');
-        }
-
-        async function fetchData() {
-            if(!GAS_URL) return;
-            try {
-                const response = await fetch(GAS_URL);
-                students = await response.json();
-                filteredStudents = [...students]; 
-                if(isAdmin || isPengawas) renderTable(); 
-            } catch (error) { console.error('Gagal memuat data:', error); }
-        }
-
-        function loadSettings() {
-            document.getElementById('set_pemda').value = appSettings.pemda; document.getElementById('set_dinas').value = appSettings.dinas;
-            document.getElementById('set_sekolah').value = appSettings.sekolah; document.getElementById('set_alamat').value = appSettings.alamat;
-            document.getElementById('logo-preview-img').src = appSettings.logo || ""; document.getElementById('set_logo').value = appSettings.logo || "";
-
-            document.getElementById('print_pemda').innerText = appSettings.pemda; document.getElementById('print_dinas').innerText = appSettings.dinas;
-            document.getElementById('print_sekolah').innerText = appSettings.sekolah; document.getElementById('print_alamat').innerText = appSettings.alamat;
-            
-            const logoPrint = document.getElementById('print_logo');
-            if(appSettings.logo) { logoPrint.src = appSettings.logo; logoPrint.style.display = "block"; } else { logoPrint.style.display = "none"; }
-        }
-
-        function saveSettings(e) {
-            e.preventDefault();
-            appSettings = {
-                pemda: document.getElementById('set_pemda').value, dinas: document.getElementById('set_dinas').value,
-                sekolah: document.getElementById('set_sekolah').value, alamat: document.getElementById('set_alamat').value,
-                logo: document.getElementById('set_logo').value
-            };
-            localStorage.setItem('settings_sekolah', JSON.stringify(appSettings));
-            loadSettings(); alert("✅ Pengaturan Kop Surat Berhasil Disimpan!"); showView('home-view');
-        }
-
-        function handleLogoUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (file.size > 500 * 1024) { alert("⚠️ UKURAN LOGO TERLALU BESAR (Maks: 500 KB)."); e.target.value = ""; return; }
-            const reader = new FileReader();
-            reader.onload = (event) => { 
-                document.getElementById('set_logo').value = event.target.result; document.getElementById('logo-preview-img').src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        let searchTimeout;
-        function debounceSearch() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                renderTable();
-            }, 400); 
-        }
-
-        function renderTable() {
-            const tbody = document.querySelector('#student-table tbody');
-            
-            let searchRaw = document.getElementById('search-input').value.toLowerCase();
-            searchRaw = searchRaw.replace(/(\d)([a-z])/g, '$1 $2').replace(/([a-z])(\d)/g, '$1 $2');
-            
-            const searchTerms = searchRaw.split(' ').filter(t => t.trim() !== '');
-            
-            tbody.innerHTML = '';
-            
-            filteredStudents = students.filter(s => {
-                let nama = (s.f_nama || '').toLowerCase();
-                let nisn = (String(s.f_nisn) || '').toLowerCase();
-                
-                let kelas = (s.f_kelas || '').toLowerCase();
-                kelas = kelas.replace(/(\d)([a-z])/g, '$1 $2').replace(/([a-z])(\d)/g, '$1 $2');
-                
-                let textData = `${nama} ${nisn} ${kelas}`.toLowerCase();
-                
-                let jk = (s.f_jk || '').toLowerCase();
-                if (jk === 'l' || jk.includes('laki')) textData += ' putra pria cowok';
-                if (jk === 'p' || jk.includes('perempuan')) textData += ' putri wanita cewek';
-                
-                return searchTerms.every(term => {
-                    if (term.length <= 2) {
-                        try {
-                            let regex = new RegExp(`\\b${term}\\b`);
-                            return regex.test(textData);
-                        } catch(e) {
-                            return textData.includes(term);
-                        }
-                    } else {
-                        return textData.includes(term);
-                    }
-                });
-            });
-            
-            document.getElementById('student-count').innerText = `Total Data: ${filteredStudents.length} Siswa`;
-            
-            if(filteredStudents.length === 0) { 
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Data tidak ditemukan...</td></tr>'; 
-                return; 
-            }
-
-            filteredStudents.forEach((s, i) => {
-                let actionBtns = `<button class="btn btn-sm btn-success" onclick="viewStudent('${s.id}')">👁️ Lihat Buku Induk</button>`;
-                
-                if (isAdmin) {
-                    actionBtns += `
-                        <button class="btn btn-sm btn-primary" onclick="editStudent('${s.id}')">✏️ Edit</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}')">🗑️ Hapus</button>
-                    `;
-                }
-
-                tbody.innerHTML += `<tr><td style="text-align:center;">${i+1}</td><td><strong>${s.f_nisn}</strong></td><td>${s.f_nama}</td><td>${s.f_kelas || '-'}</td>
-                    <td><div style="display:flex; gap:5px; flex-wrap:wrap;">${actionBtns}</div></td></tr>`;
-            });
-        }
-
-        function deleteStudent(id) { 
-            if(confirm('Apakah Anda yakin menyembunyikan data murid ini dari tabel?\n\n(Catatan: Untuk menghapus permanen, Anda tetap harus menghapusnya langsung dari file Google Sheets Anda)')) { 
-                students = students.filter(s => s.id != id); 
-                renderTable(); 
-            } 
-        }
-
-        async function saveStudent(e) {
-            e.preventDefault();
-            if(!GAS_URL) { alert("⚠️ URL Server belum diatur!"); return; }
-
-            const btnSubmit = e.target.querySelector('button[type="submit"]');
-            const originalText = btnSubmit.innerHTML;
-            btnSubmit.innerHTML = "⏳ Menyimpan..."; btnSubmit.disabled = true; 
-            
-            const formInputs = document.querySelectorAll('#student-form input[id^="f_"], #student-form select[id^="f_"]');
-            let data = { id: document.getElementById('student-id').value || Date.now(), photo: document.getElementById('photo-data').value };
-            formInputs.forEach(input => { data[input.id] = input.value; });
+            const btn = document.getElementById('btnNaikKelas');
+            const teksAsli = btn.innerHTML;
+            btn.innerHTML = `<span class="text-lg">⏳</span> Memproses...`; btn.disabled = true;
 
             try {
-                const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(data) });
-                const result = await response.json();
-                
-                if(result.status === "error") {
-                    alert("❌ " + result.message);
-                } else if(result.status === "success") {
-                    alert("✅ Data Siswa Berhasil Disimpan!");
+                let jumlahBerubah = 0;
+                for (let siswa of dataSiswaGlobal) {
+                    if (siswa.status === 'Alumni' || siswa.status === 'Pindah') continue; 
                     
-                    // PERBAIKAN PENTING: Update memori lokal secara instan agar tabel langsung berubah
-                    let existingIndex = students.findIndex(x => x.id == data.id);
-                    if (existingIndex >= 0) {
-                        students[existingIndex] = { ...students[existingIndex], ...data };
-                    } else {
-                        students.push(data);
-                    }
+                    let rombelBaru = siswa.rombel || '';
+                    let statusBaru = siswa.status || 'Aktif';
 
-                    if(isAdmin) { 
-                        renderTable(); // Update tampilan tabel seketika
-                        showView('home-view'); 
-                    } 
-                    else { 
-                        if(confirm('Data sukses dikirim. Ingin mendaftarkan siswa/anak lainnya?')) { bukaFormBaru(); } 
-                        else { logout(); }
+                    if (rombelBaru.includes('Kelas 6')) {
+                        statusBaru = 'Alumni'; rombelBaru = `Alumni ${new Date().getFullYear()}`;
+                    } else if (rombelBaru.includes('Kelas 5')) { rombelBaru = rombelBaru.replace('Kelas 5', 'Kelas 6');
+                    } else if (rombelBaru.includes('Kelas 4')) { rombelBaru = rombelBaru.replace('Kelas 4', 'Kelas 5');
+                    } else if (rombelBaru.includes('Kelas 3')) { rombelBaru = rombelBaru.replace('Kelas 3', 'Kelas 4');
+                    } else if (rombelBaru.includes('Kelas 2')) { rombelBaru = rombelBaru.replace('Kelas 2', 'Kelas 3');
+                    } else if (rombelBaru.includes('Kelas 1')) { rombelBaru = rombelBaru.replace('Kelas 1', 'Kelas 2'); }
+
+                    if (rombelBaru !== siswa.rombel || statusBaru !== siswa.status) {
+                        await supabase.from('buku_induk').update({ rombel: rombelBaru, status: statusBaru }).eq('id', siswa.id);
+                        jumlahBerubah++;
                     }
-                    
-                    // Lanjutkan sinkronisasi background dengan server
-                    fetchData(); 
                 }
-            } catch (error) { alert("❌ Terjadi kesalahan jaringan."); } finally { btnSubmit.innerHTML = originalText; btnSubmit.disabled = false; }
-        }
-
-        function editStudent(id) {
-            const s = students.find(x => x.id == id);
-            document.getElementById('student-id').value = s.id;
-            for (let key in s) { if (key.startsWith('f_')) { let el = document.getElementById(key); if(el) el.value = s[key]; } }
-            document.getElementById('photo-data').value = s.photo || ""; document.getElementById('photo-preview-img').src = s.photo || "";
-            document.getElementById('f_kunci_akses').value = ADMIN_PIN; 
-            showView('form-view');
-        }
-
-        function clearForm(isLogout = false) {
-            document.getElementById('student-form').reset();
-            document.getElementById('student-id').value = "";
-            document.getElementById('photo-preview-img').src = "";
-            document.getElementById('photo-data').value = "";
-            if(isLogout) document.getElementById('f_kunci_akses').value = "";
-            stopCamera();
-        }
-
-        function viewStudent(id) {
-            const s = students.find(x => x.id == id);
-            document.getElementById('p_nama').innerText = s.f_nama; document.getElementById('p_nisn').innerText = s.f_nisn;
-            document.getElementById('p_kelas').innerText = s.f_kelas || '-'; document.getElementById('p_no_rapor').innerText = s.f_no_rapor || '-';
-            document.getElementById('p_photo').src = s.photo || '';
-            
-            let dataIds = ['nama','panggilan','jk','agama','wn','anak_ke','sdr_kandung','sdr_tiri','sdr_angkat','yatim','bahasa','alamat','telp','tinggal','jarak','transport','bb','tb','goldar','penyakit','kelainan','asal_sekolah','ijazah_asal','pindahan','ayah_nama','ayah_ttl','ayah_agama','ayah_pend','ayah_kerja','ayah_gaji','ayah_status','ibu_nama','ibu_ttl','ibu_agama','ibu_pend','ibu_kerja','ibu_gaji','ibu_status','wali_nama','wali_hub','wali_kerja','wali_alamat','bakat','kelas_masuk'];
-            dataIds.forEach(k => { let el = document.getElementById('d_'+k); if(el) el.innerText = s['f_'+k] || '-'; });
-            
-            document.getElementById('d_ttl').innerText = `${s.f_tempat_lahir || '-'}, ${s.f_tgl_lahir ? new Date(s.f_tgl_lahir).toLocaleDateString('id-ID') : '-'}`;
-            showView('detail-view');
-        }
-
-        // --- KAMERA ---
-        let cameraStream = null;
-        async function startCamera() { try { cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } }); document.getElementById('camera-video').srcObject = cameraStream; document.getElementById('camera-container').style.display = 'block'; document.getElementById('photo-buttons').style.display = 'none'; } catch (err) { alert("❌ Akses kamera ditolak."); } }
-        function stopCamera() { if (cameraStream) cameraStream.getTracks().forEach(track => track.stop()); document.getElementById('camera-container').style.display = 'none'; document.getElementById('photo-buttons').style.display = 'flex'; }
-        function capturePhoto() { const video = document.getElementById('camera-video'); processAndCompressImage(video, video.videoWidth, video.videoHeight, true); stopCamera(); }
-        function handleFileUpload(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { const img = new Image(); img.onload = () => processAndCompressImage(img, img.width, img.height, false); img.src = event.target.result; }; reader.readAsDataURL(file); }
-        
-        function processAndCompressImage(sourceElement, sourceWidth, sourceHeight, isCamera) {
-            const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-            const TARGET_WIDTH = 300, TARGET_HEIGHT = 400; canvas.width = TARGET_WIDTH; canvas.height = TARGET_HEIGHT;
-            const sourceRatio = sourceWidth / sourceHeight, targetRatio = TARGET_WIDTH / TARGET_HEIGHT;
-            let drawWidth = TARGET_WIDTH, drawHeight = TARGET_HEIGHT, offsetX = 0, offsetY = 0;
-            if (sourceRatio > targetRatio) { drawWidth = sourceHeight * targetRatio; offsetX = (sourceWidth - drawWidth) / 2; drawHeight = sourceHeight; } 
-            else { drawHeight = sourceWidth / targetRatio; offsetY = (sourceHeight - drawHeight) / 2; drawWidth = sourceWidth; }
-            if(isCamera) { ctx.translate(TARGET_WIDTH, 0); ctx.scale(-1, 1); }
-            ctx.drawImage(sourceElement, offsetX, offsetY, drawWidth, drawHeight, 0, 0, TARGET_WIDTH, TARGET_HEIGHT);
-            const b64 = canvas.toDataURL('image/jpeg', 0.6); document.getElementById('photo-data').value = b64; document.getElementById('photo-preview-img').src = b64;
-        }
-
-        // --- FITUR DOWNLOAD EXCEL ---
-        function exportExcel() {
-            if (!filteredStudents || filteredStudents.length === 0) {
-                return alert("⚠️ Tidak ada data untuk di-download saat ini.");
-            }
-            
-            let csv = "NISN,Nama Lengkap,Kelas Saat Ini,Jenis Kelamin,Tempat Lahir,Tgl Lahir,Agama\n";
-            filteredStudents.forEach(s => { 
-                csv += `"${s.f_nisn}","${s.f_nama}","${s.f_kelas || '-'}","${s.f_jk}","${s.f_tempat_lahir}","${s.f_tgl_lahir}","${s.f_agama}"\n`; 
-            });
-            
-            const a = document.createElement('a'); 
-            a.href = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); 
-            a.download = 'Rekap_Siswa_Tersaring.csv'; 
-            a.click();
-        }
-
-        // --- TEMA ---
-        function initTheme() {
-            const b = localStorage.getItem('theme_bg_sekolah') || '#f1f5f9', p = localStorage.getItem('theme_primary_sekolah') || '#0ea5e9';
-            document.documentElement.style.setProperty('--bg-color', b); document.documentElement.style.setProperty('--primary', p);
-            document.getElementById('color-bg').value = b; document.getElementById('color-primary').value = p;
-        }
-        function changeTheme() {
-            const b = document.getElementById('color-bg').value, p = document.getElementById('color-primary').value;
-            document.documentElement.style.setProperty('--bg-color', b); document.documentElement.style.setProperty('--primary', p);
-            localStorage.setItem('theme_bg_sekolah', b); localStorage.setItem('theme_primary_sekolah', p);
-        }
-        function resetTheme() { document.getElementById('color-bg').value = '#f1f5f9'; document.getElementById('color-primary').value = '#0ea5e9'; changeTheme(); }
+                alert(`✅ ALHAMDULILLAH!\n${jumlahBerubah} siswa telah dinaikkan kelasnya dan diluluskan.`);
+                location.reload(); 
+            } catch (error) { alert("❌ ERROR: " + error.message); } 
+            finally { btn.innerHTML = teksAsli; btn.disabled = false; }
+        });
     </script>
 </body>
 </html>

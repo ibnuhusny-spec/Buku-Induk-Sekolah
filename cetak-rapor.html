@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cetak Capaian Kompetensi - IndukKu Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @page { size: A4 portrait; margin: 0; }
+        @media print {
+            body { background: white; }
+            .no-print { display: none !important; }
+            .kertas-a4 { box-shadow: none !important; margin: 0 !important; width: 100% !important; }
+        }
+        .kertas-a4 {
+            width: 210mm; 
+            height: 297mm;
+            margin: 2rem auto; 
+            background: white;
+            padding: 1.5cm 1.5cm; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            font-family: 'Arial', sans-serif; 
+            font-size: 10pt; 
+            color: black;
+            position: relative;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid black; padding: 6px; vertical-align: top; }
+        th { background-color: #f2f2f2 !important; -webkit-print-color-adjust: exact; }
+
+        .footer-rapor {
+            position: absolute;
+            bottom: 1.5cm;
+            left: 1.5cm;
+            right: 1.5cm;
+            border-top: 1px solid black;
+            padding-top: 5px;
+            text-align: center;
+            font-size: 8pt;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="bg-gray-200">
+
+    <div class="no-print fixed bottom-8 right-8 flex gap-4 z-50">
+        <button onclick="window.close()" class="bg-slate-600 text-white px-6 py-3 rounded-full shadow-lg font-bold">⬅️ Kembali</button>
+        <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-3 rounded-full shadow-lg font-bold">🖨️ Cetak Rapor</button>
+    </div>
+
+    <div class="kertas-a4">
+        
+        <h2 class="text-center font-bold text-lg mb-6">CAPAIAN KOMPETENSI</h2>
+
+        <div class="grid grid-cols-2 gap-2 mb-4 text-[9pt]">
+            <table class="!border-none !m-0">
+                <tr class="!border-none"><td class="!border-none p-1 w-[80px] whitespace-nowrap">Nama Siswa</td><td class="!border-none p-1 w-[10px]">:</td><td class="!border-none p-1 font-bold" id="h_nama">-</td></tr>
+                <tr class="!border-none"><td class="!border-none p-1 w-[80px] whitespace-nowrap">NISN</td><td class="!border-none p-1 w-[10px]">:</td><td class="!border-none p-1" id="h_nisn">-</td></tr>
+                <tr class="!border-none"><td class="!border-none p-1 w-[80px] whitespace-nowrap">Sekolah</td><td class="!border-none p-1 w-[10px]">:</td><td class="!border-none p-1 font-bold uppercase leading-tight" id="h_sekolah">-</td></tr>
+                <tr class="!border-none"><td class="!border-none p-1 w-[80px] whitespace-nowrap">Alamat</td><td class="!border-none p-1 w-[10px]">:</td><td class="!border-none p-1 leading-tight" id="h_alamat">-</td></tr>
+            </table>
+            <table class="!border-none !m-0">
+                <tr class="!border-none"><td class="!border-none p-1 w-[100px] whitespace-nowrap">Kelas</td><td class="!border-none p-1 w-[10px]">:</td><td class="!border-none p-1" id="h_kelas">-</td></tr>
+                <tr class="!border-none"><td class="!border-none p-1 w-[100px] whitespace-nowrap">Fase</td><td class="!border-none p-1 w-[10px]">:</td><td class="!border-none p-1" id="h_fase">-</td></tr>
+                <tr class="!border-none"><td class="!border-none p-1 w-[100px] whitespace-nowrap">Semester</td><td class="!border-none p-1 w-[10px]">:</td><td class="!border-none p-1" id="h_semester">-</td></tr>
+                <tr class="!border-none"><td class="!border-none p-1 w-[100px] whitespace-nowrap">Tahun Pelajaran</td><td class="!border-none p-1 w-[10px]">:</td><td class="!border-none p-1" id="h_tp">-</td></tr>
+            </table>
+        </div>
+
+        <table>
+            <thead>
+                <tr class="text-center font-bold">
+                    <th class="w-10">No</th>
+                    <th class="w-48">Mata Pelajaran</th>
+                    <th class="w-20">Nilai Akhir</th>
+                    <th>Capaian Kompetensi</th>
+                </tr>
+            </thead>
+            <tbody id="isiRapor"></tbody>
+        </table>
+<div id="wadah_kehadiran" class="mt-6 flex flex-col items-start gap-4 text-[9pt]">
+            </div>
+            
+        <div class="mt-10 flex w-full text-[9pt]">
+            
+            <div class="w-[30%] flex flex-col justify-between h-[3.5cm] text-center">
+                <div>
+                    <p>Mengetahui,</p>
+                    <p>Orang Tua / Wali Siswa</p>
+                </div>
+                <div>
+                    <div class="inline-block text-center" id="ttd_ortu">
+                        </div>
+                </div>
+            </div>
+
+            <div class="w-[35%] flex flex-col justify-between h-[3.5cm] text-center">
+                <div>
+                    <p>&nbsp;</p> 
+                    <p>Wali Kelas,</p>
+                </div>
+                <div>
+                    <div class="inline-block text-left" id="ttd_walikelas">
+                        </div>
+                </div>
+            </div>
+
+            <div class="w-[35%] flex flex-col justify-between h-[3.5cm] text-center">
+                <div>
+                    <p id="tgl_skrg">Maros, .....................</p>
+                    <p>Kepala Sekolah,</p>
+                </div>
+                <div>
+                    <div class="inline-block text-left" id="ttd_kepsek">
+                        </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-rapor">
+            <div class="font-bold uppercase mb-0.5" id="f_nama_sekolah">-</div>
+            <div id="f_detail_siswa">-</div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { supabase } from './js/supabaseConfig.js';
+        const urlP = new URLSearchParams(window.location.search);
+        const idSiswa = urlP.get('id');
+        const klsOriginal = urlP.get('kelas') || '';
+        const smt = urlP.get('semester');
+        
+        const configSekolah = JSON.parse(localStorage.getItem('config_sekolah') || '{}');
+        const sekolah = configSekolah.nama || "SDIT QURRATU A'YUN AL-ISLAMI";
+        const alamatSekolah = configSekolah.alamat || "Maros, Sulawesi Selatan";
+        
+        const namaKepsek = configSekolah.kepsek || "Radiant Fadli, S.Pd";
+        const nipKepsek = configSekolah.nip || "-"; 
+        const namaWaliKelas = configSekolah.walikelas || "( ................................... )";
+        const nipWaliKelas = configSekolah.nip_walikelas || "-"; 
+        
+        const kotaTanggal = configSekolah.kota_tanggal || "Maros";
+        const tanggalCetakGlobal = configSekolah.tanggal_cetak || null;
+
+        const angkaKelas = klsOriginal.match(/\d+/);
+        const klsBersih = angkaKelas ? "Kelas " + angkaKelas[0] : klsOriginal;
+
+        async function ambilData() {
+            const { data: s } = await supabase.from('buku_induk').select('*').eq('id', idSiswa).single();
+            if(s) {
+                document.getElementById('h_nama').innerText = s.nama_lengkap;
+                document.getElementById('h_nisn').innerText = s.nisn;
+                document.getElementById('h_kelas').innerText = klsOriginal;
+                document.getElementById('h_semester').innerText = smt;
+                
+                const tp = s.tahun_masuk + "/" + (parseInt(s.tahun_masuk)+1);
+                document.getElementById('h_tp').innerText = tp;
+                
+                document.getElementById('h_sekolah').innerText = sekolah;
+                document.getElementById('h_alamat').innerText = alamatSekolah;
+                
+                document.getElementById('f_nama_sekolah').innerText = sekolah;
+                document.getElementById('f_detail_siswa').innerText = 
+                    `${s.nama_lengkap} | ${s.nisn || '-'} | ${klsBersih} | Semester ${smt} | ${tp}`;
+
+                // 🌟 TRIK NIP TAK TERLIHAT UNTUK ORANG TUA AGAR SEJAJAR 🌟
+                const namaOrtu = s.nama_ayah || s.nama_ibu || s.nama_wali || '...................................';
+                document.getElementById('ttd_ortu').innerHTML = `
+                    <div class="font-bold underline">( ${namaOrtu} )</div>
+                    <div class="text-[8pt] font-normal mt-0.5 invisible">NIP. Rahasia</div>
+                `;
+                
+                const nipK = nipKepsek ? nipKepsek : "-";
+                document.getElementById('ttd_kepsek').innerHTML = `
+                    <div class="font-bold underline">${namaKepsek}</div>
+                    <div class="text-[8pt] font-normal mt-0.5">NIP. ${nipK}</div>`;
+                
+                const nipW = nipWaliKelas ? nipWaliKelas : "-";
+                document.getElementById('ttd_walikelas').innerHTML = `
+                    <div class="font-bold underline">${namaWaliKelas}</div>
+                    <div class="text-[8pt] font-normal mt-0.5">NIP. ${nipW}</div>`;
+
+                let fase = "A";
+                if(klsOriginal.includes('3') || klsOriginal.includes('4')) fase = "B";
+                if(klsOriginal.includes('5') || klsOriginal.includes('6')) fase = "C";
+                document.getElementById('h_fase').innerText = fase;
+            }
+
+            const { data: n } = await supabase.from('nilai_akademik').select('*').eq('siswa_id', idSiswa).eq('kelas', klsOriginal).eq('semester', smt);
+            const tbody = document.getElementById('isiRapor');
+            tbody.innerHTML = '';
+            if(n) {
+                n.forEach((item, i) => {
+                    tbody.innerHTML += `<tr><td class="text-center">${i+1}</td><td class="font-bold">${item.mata_pelajaran}</td><td class="text-center font-bold text-lg">${item.nilai}</td><td class="text-justify text-[8pt] leading-tight">${item.deskripsi || '-'}</td></tr>`;
+                });
+            }
+            
+            let d;
+            if (tanggalCetakGlobal) {
+                d = new Date(tanggalCetakGlobal); 
+            } else {
+                d = new Date();
+            }
+            const bln = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+            
+            document.getElementById('tgl_skrg').innerText = `${kotaTanggal}, ${d.getDate()} ${bln[d.getMonth()]} ${d.getFullYear()}`;
+        }
+        ambilData();
+    </script>
+</body>
+</html>

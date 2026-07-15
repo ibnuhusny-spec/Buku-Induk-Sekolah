@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Dapodik - IndukKu Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+</head>
+<body class="bg-slate-50 font-sans h-screen flex flex-col">
+
+    <header class="bg-white shadow-sm border-b px-6 py-4 flex items-center gap-4 sticky top-0 z-10">
+        <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-bold transition-colors">
+            &larr; Kembali
+        </a>
+        <h1 class="text-xl font-bold text-slate-800">📥 Import Data dari Dapodik</h1>
+    </header>
+
+    <main class="max-w-3xl mx-auto p-6 w-full mt-10">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
+            
+            <div class="w-24 h-24 mx-auto bg-green-100 text-green-600 rounded-full flex items-center justify-center text-5xl mb-6">
+                📊
+            </div>
+            
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Upload File Excel Dapodik</h2>
+            <p class="text-slate-500 mb-8">Pilih file <span class="font-bold">Daftar Peserta Didik</span> yang baru Anda unduh dari web Dapodik (format .xlsx).</p>
+            
+            <label class="block w-full border-2 border-dashed border-slate-300 hover:border-green-500 hover:bg-green-50 transition-all rounded-2xl p-10 cursor-pointer">
+                <span class="text-4xl mb-3 block">📂</span>
+                <span class="font-bold text-slate-700 block text-lg">Klik untuk memilih file Excel</span>
+                <input type="file" id="fileDapodik" accept=".xlsx, .xls, .csv" class="hidden">
+            </label>
+
+            <div id="areaProses" class="hidden mt-8 text-left bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <h3 class="font-bold text-slate-800 mb-2">Status Proses:</h3>
+                <p id="teksStatus" class="text-slate-600">Menunggu file...</p>
+                
+                <div class="w-full bg-slate-200 rounded-full h-4 mt-4 overflow-hidden">
+                    <div id="barProgres" class="bg-green-500 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { supabase } from './js/supabaseConfig.js';
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) window.location.href = 'login.html';
+
+        document.getElementById('fileDapodik').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+
+            document.getElementById('areaProses').classList.remove('hidden');
+            const teksStatus = document.getElementById('teksStatus');
+            const barProgres = document.getElementById('barProgres');
+            
+            teksStatus.innerHTML = `Membaca file <b>${file.name}</b>...`;
+            barProgres.style.width = '20%';
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                teksStatus.innerText = "Mesin Radar sedang memetakan kolom Excel...";
+                barProgres.style.width = '40%';
+                
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                    
+                    // ==============================================================
+                    // 🧠 1. KECERDASAN BUATAN: CARI BARIS JUDUL (HEADER)
+                    // ==============================================================
+                    let indexJudul = -1;
+                    let headers = [];
+                    let headersGabungan = [];
+
+                    for(let i=0; i<15; i++) {
+                        if(!rows[i]) continue;
+                        const baris = rows[i].map(sel => String(sel || '').toLowerCase().trim());
+                        
+                        if(baris.includes('nisn') && (baris.includes('nama') || baris.includes('nama peserta didik'))) {
+                            indexJudul = i;
+                            headers = baris;
+                            
+                            const barisAtas = rows[i-1] || [];
+                            let kategoriAtas = '';
+                            for(let c=0; c<baris.length; c++) {
+                                let atas = String(barisAtas[c] || '').toLowerCase().trim();
+                                if(atas && atas.length > 2) kategoriAtas = atas; 
+                                headersGabungan[c] = kategoriAtas + " " + String(baris[c] || '').toLowerCase().trim();
+                            }
+                            break;
+                        }
+                    }
+
+                    if(indexJudul === -1) {
+                        throw new Error("Gagal menemukan baris judul. Pastikan ini format Excel Dapodik asli.");
+                    }
+
+                    // ==============================================================
+                    // 🗺️ 2. PEMETAAN POSISI KOTAK (RADAR JARAK)
+                    // ==============================================================
+                    const getKolom = (kataKunciArray) => {
+                        return headers.findIndex(judul => {
+                            if (!judul) return false; 
+                            return kataKunciArray.some(kunci => judul.includes(kunci));
+                        });
+                    };
+
+                    const cNama = getKolom(['nama', 'nama peserta didik']);
+                    const cNIPD = getKolom(['nipd']);
+                    const cNISN = getKolom(['nisn']);
+                    const cJK = getKolom(['l/p', 'jk', 'jenis kelamin']);
+                    const cTempatLahir = getKolom(['tempat lahir']);
+                    const cTanggalLahir = getKolom(['tanggal lahir']);
+                    const cAgama = getKolom(['agama', 'agama & kepercayaan']);
+                    const cJalan = getKolom(['jalan', 'alamat jalan', 'alamat']);
+                    const cKelurahan = getKolom(['kelurahan/desa', 'desa/kelurahan', 'kelurahan']);
+                    const cRombel = getKolom(['rombongan belajar', 'rombel', 'rombel saat ini']);
+                    const cAnakKe = getKolom(['anak ke-berapa', 'anak ke']);
+                    const cJmlSaudara = getKolom(['jumlah saudara kandung']);
+
+                    const cAyahBase = getKolom(['data ayah']);
+                    const cIbuBase = getKolom(['data ibu']);
+                    const cWaliBase = getKolom(['data wali']);
+
+                    // ==============================================================
+                    // 🚀 3. PROSES AMBIL DATA
+                    // ==============================================================
+                    const dataSiswaKotor = [];
+                    for(let i = indexJudul + 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        
+                        const cekNama = row[cNama] ? String(row[cNama]).trim() : '';
+                        if(!row || cNama === -1 || !cekNama || cekNama.toLowerCase() === 'nama') continue; 
+
+                        let tglLahir = null;
+                        if(cTanggalLahir !== -1 && row[cTanggalLahir]) {
+                            const cellTgl = row[cTanggalLahir];
+                            if(typeof cellTgl === 'number') {
+                                const dateObj = new Date(Math.round((cellTgl - 25569) * 86400 * 1000));
+                                tglLahir = dateObj.toISOString().split('T')[0];
+                            } else if(typeof cellTgl === 'string') {
+                                const teks = cellTgl.trim();
+                                if (/\d{4}/.test(teks)) tglLahir = teks.replace(/\//g, '-');
+                            }
+                        }
+
+                        const jalan = cJalan !== -1 ? (row[cJalan] || '') : '';
+                        const kelurahan = cKelurahan !== -1 ? (row[cKelurahan] || '') : '';
+                        const alamatLengkap = `${jalan} ${kelurahan ? 'Kel. '+kelurahan : ''}`.trim();
+
+                        let jenisKelamin = null;
+                        if(cJK !== -1 && row[cJK]) {
+                            const jk = String(row[cJK]).trim().toUpperCase();
+                            if(jk === 'L' || jk === 'LAKI-LAKI') jenisKelamin = 'Laki-laki';
+                            if(jk === 'P' || jk === 'PEREMPUAN') jenisKelamin = 'Perempuan';
+                        }
+
+                        // Bersihkan NISN: Jika hanya strip (-) atau nol, jadikan null agar tidak dianggap kembar
+                        let nisnSiswa = (cNISN !== -1 && row[cNISN]) ? String(row[cNISN]).trim() : null;
+                        if (nisnSiswa === '' || nisnSiswa === '-' || nisnSiswa === '0') nisnSiswa = null;
+                        
+                        const nipdSiswa = (cNIPD !== -1 && row[cNIPD]) ? String(row[cNIPD]).trim() : null;
+
+                        let tahunMasukSiswa = new Date().getFullYear();
+                        if (nipdSiswa && nipdSiswa.length >= 2) {
+                            const digitTahun = parseInt(nipdSiswa.substring(0, 2));
+                            if (!isNaN(digitTahun)) {
+                                tahunMasukSiswa = 2000 + digitTahun; 
+                            }
+                        }
+
+                        const payload = {
+                            nama_lengkap: cekNama,
+                            nipd: nipdSiswa,
+                            nisn: nisnSiswa,
+                            jenis_kelamin: jenisKelamin,
+                            tempat_lahir: cTempatLahir !== -1 ? (row[cTempatLahir] || null) : null,
+                            tanggal_lahir: tglLahir,
+                            agama: cAgama !== -1 ? (row[cAgama] || null) : null,
+                            alamat_siswa: alamatLengkap,
+                            anak_ke: cAnakKe !== -1 ? (parseInt(row[cAnakKe]) || null) : null,
+                            jumlah_saudara: cJmlSaudara !== -1 ? (parseInt(row[cJmlSaudara]) || null) : null,
+                            
+                            nama_ayah: cAyahBase !== -1 ? (row[cAyahBase] || null) : null,
+                            pekerjaan_ayah: cAyahBase !== -1 ? (row[cAyahBase + 3] || null) : null,
+                            
+                            nama_ibu: cIbuBase !== -1 ? (row[cIbuBase] || null) : null,
+                            pekerjaan_ibu: cIbuBase !== -1 ? (row[cIbuBase + 3] || null) : null,
+                            
+                            nama_wali: cWaliBase !== -1 ? (row[cWaliBase] || null) : null,
+                            pekerjaan_wali: cWaliBase !== -1 ? (row[cWaliBase + 3] || null) : null,
+
+                            rombel: cRombel !== -1 ? (row[cRombel] || null) : null,
+                            status: 'Aktif',
+                            tahun_masuk: tahunMasukSiswa
+                        };
+                        
+                        dataSiswaKotor.push(payload);
+                    }
+
+                    // ==============================================================
+                    // 🛡️ 3.5. SARINGAN ANTI-KEMBAR (DEDUPLIKASI)
+                    // ==============================================================
+                    const mapSiswaUnik = new Map();
+                    const dataBersih = [];
+
+                    dataSiswaKotor.forEach(siswa => {
+                        // Jika ada NISN, jadikan ia kunci gemboknya.
+                        // Jika tidak ada NISN, buatkan kunci acak sementara agar tidak ditolak karena "kembar kosong".
+                        const kunci = siswa.nisn ? siswa.nisn : `NO-NISN-${Math.random()}`;
+                        
+                        // Map otomatis menghancurkan duplikat (hanya mengambil data baris Excel yang paling bawah/terakhir)
+                        mapSiswaUnik.set(kunci, siswa);
+                    });
+
+                    // Pindahkan data yang sudah bersih ke dalam kotak pengiriman
+                    mapSiswaUnik.forEach(value => dataBersih.push(value));
+
+                    teksStatus.innerHTML = `Menyaring <b>${dataBersih.length}</b> siswa unik bebas duplikat. Menyimpan ke Database...`;
+                    barProgres.style.width = '70%';
+
+                    // ==============================================================
+                    // 4. TEMBAKKAN KE SUPABASE
+                    // ==============================================================
+                    const { error } = await supabase.from('buku_induk').upsert(dataBersih, { 
+                        onConflict: 'nisn', 
+                        ignoreDuplicates: false 
+                    });
+
+                    if(error) throw error;
+
+                    teksStatus.innerHTML = `<span class="text-green-700 font-bold">✅ Berhasil Mutlak! Data masuk tanpa ada error duplikat.</span>`;
+                    barProgres.style.width = '100%';
+                    
+                    setTimeout(() => { window.location.href = 'index.html'; }, 2500);
+
+                } catch (err) {
+                    console.error(err);
+                    teksStatus.innerHTML = `<span class="text-red-600 font-bold">Gagal memproses file: ${err.message}</span>`;
+                    barProgres.classList.replace('bg-green-500', 'bg-red-500');
+                }
+            };
+            
+            reader.readAsArrayBuffer(file);
+        });
+    </script>
+</body>
+</html>

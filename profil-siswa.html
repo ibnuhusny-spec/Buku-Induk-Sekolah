@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil 360 - IndukKu Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans h-screen overflow-auto">
+
+    <header class="bg-white shadow-sm border-b px-4 md:px-6 py-3 md:py-4 flex items-center justify-between sticky top-0 z-10">
+        <div class="flex items-center gap-3 md:gap-4">
+            <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg font-bold transition-colors flex items-center justify-center">
+                <span class="text-xl">&larr;</span> <span class="hidden md:inline ml-2">Kembali</span>
+            </a>
+            <h1 class="text-lg md:text-xl font-bold text-slate-800">Profil <span class="hidden md:inline">Siswa</span> 360°</h1>
+        </div>
+        <div id="statusBadge" class="bg-green-50 border border-green-200 text-green-700 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold whitespace-nowrap">
+            Memuat...
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6">
+        
+        <aside class="w-full lg:w-1/4 space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-center sticky top-24">
+                <div class="relative w-24 h-24 md:w-32 md:h-32 mx-auto mb-2 group">
+                    <img id="fotoProfilSiswa" src="https://ui-avatars.com/api/?name=Siswa&background=e2e8f0&color=475569&size=128" alt="Foto Profil" class="w-full h-full object-cover rounded-full shadow-md border-4 border-white">
+                    
+                    <label for="inputUploadFoto" class="absolute inset-0 bg-black bg-opacity-60 text-white rounded-full flex flex-col items-center justify-center opacity-0 hover:opacity-100 cursor-pointer transition-opacity duration-300">
+                        <span class="text-2xl">📷</span>
+                        <span class="text-[10px] font-bold mt-1">Ubah Foto</span>
+                    </label>
+                    <input type="file" id="inputUploadFoto" accept="image/*" class="hidden">
+                </div>
+                <p id="statusUpload" class="text-xs text-blue-600 font-bold mb-4 hidden animate-pulse">⏳ Mengunggah foto...</p>
+                <h2 id="namaCard" class="text-xl md:text-2xl font-bold text-slate-800 mb-1">Memuat...</h2>
+                <p id="nisnCard" class="text-sm md:text-base text-slate-500 font-mono mb-4">...</p>
+                
+                <button id="btnCetakRapor" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md border border-blue-700 hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 mt-4">
+                    <span class="text-xl">🖨️</span> <span class="hidden lg:inline">Cetak Biodata Rapor</span>
+                </button>
+
+                <button id="btnCetakNilai" class="w-full bg-orange-600 text-white font-bold py-3 rounded-xl shadow-md border border-orange-700 hover:bg-orange-700 transition-colors flex items-center justify-center gap-2 mt-3">
+                    <span class="text-xl">📊</span> <span class="hidden lg:inline">Cetak Nilai Rapor</span>
+                </button>
+            </div>
+        </aside>
+
+        <section class="w-full lg:w-3/4 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+            
+            <div class="flex border-b bg-slate-50">
+                <button onclick="bukaTab('biodata')" id="btn-biodata" class="flex-1 py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 bg-white transition-all flex items-center justify-center gap-2">
+                    <span class="text-2xl md:text-lg">📄</span><span class="hidden md:inline">Biodata Lengkap</span>
+                </button>
+                <button onclick="bukaTab('akademik')" id="btn-akademik" class="flex-1 py-4 text-center font-bold text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-all border-b-2 border-transparent flex items-center justify-center gap-2">
+                    <span class="text-2xl md:text-lg">📈</span><span class="hidden md:inline">Nilai Akademik</span>
+                </button>
+                <button onclick="bukaTab('dokumen')" id="btn-dokumen" class="flex-1 py-4 text-center font-bold text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-all border-b-2 border-transparent flex items-center justify-center gap-2">
+                    <span class="text-2xl md:text-lg">📂</span><span class="hidden md:inline">Dokumen Digital</span>
+                </button>
+            </div>
+
+            <div class="p-5 md:p-8 bg-slate-50 min-h-[500px]">
+                
+                <div id="tab-biodata" class="block animate-fade-in">
+                    <form id="formUpdateData" class="space-y-8">
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="text-lg font-bold text-slate-800 border-b pb-3 mb-5 flex items-center gap-2"><span>👤</span> Keterangan Tentang Siswa</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Lengkap</label><input type="text" id="in_nama" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500"></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">NISN</label><input type="text" id="in_nisn" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tahun Masuk</label><input type="number" id="in_tahun_masuk" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Jenis Kelamin</label><select id="in_jk" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"><option value="">-- Pilih --</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Agama</label><input type="text" id="in_agama" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tempat Lahir</label><input type="text" id="in_tmpt_lahir" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tanggal Lahir</label><input type="date" id="in_tgl_lahir" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Kewarganegaraan</label><input type="text" id="in_wn" value="Indonesia" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Status Siswa</label><select id="in_status" class="w-full border p-2.5 rounded-lg bg-emerald-50 outline-none font-bold text-emerald-700"><option value="Aktif">Aktif</option><option value="Alumni">Lulus / Alumni</option><option value="Pindah">Pindah / Tidak Aktif</option></select></div>
+                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Kelas Saat Ini</label><input type="text" id="in_rombel_biodata" class="w-full border p-2.5 rounded-lg bg-emerald-50 outline-none font-bold text-emerald-700"></div>
+                                <div class="flex gap-2"><div class="w-1/2"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Anak Ke</label><input type="number" id="in_anak_ke" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div><div class="w-1/2"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jml Saudara</label><input type="number" id="in_jml_sdr" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div></div>
+                                <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Alamat Lengkap</label><textarea id="in_alamat" rows="2" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></textarea></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm"><h3 class="text-md font-bold text-blue-800 border-b pb-2 mb-4 flex items-center gap-2"><span>👨🏽</span> Data Ayah Kandung</h3><div class="space-y-3"><div><label class="block text-xs text-slate-500 mb-1">Nama Ayah</label><input type="text" id="in_ayah_nama" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="flex gap-2"><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Tempat Lahir</label><input type="text" id="in_ayah_tmpt" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Tgl Lahir</label><input type="date" id="in_ayah_tgl" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div></div><div class="flex gap-2"><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Agama</label><input type="text" id="in_ayah_agama" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Ijazah</label><input type="text" id="in_ayah_ijazah" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div></div><div><label class="block text-xs text-slate-500 mb-1">Pekerjaan</label><input type="text" id="in_ayah_kerja" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div><label class="block text-xs text-slate-500 mb-1">Alamat Lengkap</label><textarea id="in_ayah_alamat" rows="2" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></textarea></div></div></div>
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm"><h3 class="text-md font-bold text-pink-800 border-b pb-2 mb-4 flex items-center gap-2"><span>👩🏽</span> Data Ibu Kandung</h3><div class="space-y-3"><div><label class="block text-xs text-slate-500 mb-1">Nama Ibu</label><input type="text" id="in_ibu_nama" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="flex gap-2"><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Tempat Lahir</label><input type="text" id="in_ibu_tmpt" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Tgl Lahir</label><input type="date" id="in_ibu_tgl" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div></div><div class="flex gap-2"><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Agama</label><input type="text" id="in_ibu_agama" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Ijazah</label><input type="text" id="in_ibu_ijazah" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div></div><div><label class="block text-xs text-slate-500 mb-1">Pekerjaan</label><input type="text" id="in_ibu_kerja" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div><label class="block text-xs text-slate-500 mb-1">Alamat Lengkap</label><textarea id="in_ibu_alamat" rows="2" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></textarea></div></div></div>
+                        </div>
+
+                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="text-lg font-bold text-slate-800 border-b pb-3 mb-5 flex items-center gap-2"><span>🛡️</span> Keterangan Tentang Wali</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div><label class="block text-xs text-slate-500 uppercase mb-1">Nama Wali</label><input type="text" id="in_wali_nama" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
+                                <div><label class="block text-xs text-slate-500 uppercase mb-1">Hubungan Keluarga</label><input type="text" id="in_wali_hub" placeholder="Cth: Paman" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
+                                <div><label class="block text-xs text-slate-500 uppercase mb-1">Pekerjaan Wali</label><input type="text" id="in_wali_kerja" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
+                                <div><label class="block text-xs text-slate-500 uppercase mb-1">Alamat Lengkap</label><textarea id="in_wali_alamat" rows="1" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></textarea></div>
+                            </div>
+                        </div>
+
+                        <div class="sticky bottom-4 z-20">
+                            <button type="submit" id="btnUpdate" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-xl transition-all border-2 border-white text-lg">
+                                💾 Simpan Semua Perubahan Biodata
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="tab-akademik" class="hidden animate-fade-in">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <div class="lg:col-span-1 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
+                            <h3 class="text-md font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2"><span>➕</span> Input Nilai Baru</h3>
+                            <form id="formTambahNilai" class="space-y-4">
+    <div class="grid grid-cols-2 gap-2">
+        <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kelas</label>
+            <input type="text" id="in_nilai_kelas" required placeholder="Cth: Kelas 1 A Putra" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm font-bold text-slate-700">
+        </div>
+        <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Semester</label>
+            <select id="in_nilai_semester" required class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm">
+                <option value="">-- Pilih --</option>
+                <option value="Ganjil">Ganjil</option>
+                <option value="Genap">Genap</option>
+            </select>
+        </div>
+    </div>
+    
+    <div>
+        <label class="block text-xs font-bold text-blue-600 uppercase mb-1 flex justify-between items-center">
+            <span>Tabel Nilai & Deskripsi Rapor</span>
+            <span class="text-[10px] text-slate-400 font-normal normal-case">Copy-Paste dari Excel</span>
+        </label>
+        <textarea id="in_nilai_gabungan" required rows="6" placeholder="Paste data (Mata Pelajaran, Nilai, Deskripsi) dari tabel Excel Anda ke kotak ini..." class="w-full border p-2.5 rounded-lg bg-blue-50 outline-none text-sm font-mono whitespace-pre-wrap"></textarea>
+    </div>
+    
+    <button type="submit" id="btnSimpanNilai" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md mt-2">
+        Simpan Data Rapor
+    </button>
+</form>
+                        </div>
+
+                        <div class="lg:col-span-1 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm h-fit mt-6 lg:mt-0">
+                            <h3 class="text-md font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2"><span>📅</span> Input Kehadiran & Keputusan</h3>
+                            <form id="formTambahKehadiran" class="space-y-4">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kelas</label>
+                                        <input type="text" id="in_hadir_kelas" required placeholder="Cth: Kelas 1" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm font-bold text-slate-700">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Semester</label>
+                                        <select id="in_hadir_semester" required class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm font-bold text-slate-700">
+                                            <option value="">-- Pilih --</option>
+                                            <option value="Ganjil">Ganjil</option>
+                                            <option value="Genap">Genap</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div><label class="block text-[10px] font-bold text-slate-500 uppercase text-center mb-1">Sakit</label><input type="number" id="in_sakit" class="w-full border p-2 rounded-lg text-center font-bold" placeholder="0"></div>
+                                    <div><label class="block text-[10px] font-bold text-slate-500 uppercase text-center mb-1">Izin</label><input type="number" id="in_izin" class="w-full border p-2 rounded-lg text-center font-bold" placeholder="0"></div>
+                                    <div><label class="block text-[10px] font-bold text-slate-500 uppercase text-center mb-1">Alpa</label><input type="number" id="in_alpa" class="w-full border p-2 rounded-lg text-center font-bold" placeholder="0"></div>
+                                </div>
+                                <div id="areaKeputusan" class="hidden border-t border-slate-100 pt-3 mt-2">
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Keputusan Akhir (Genap)</label>
+                                    <input type="text" id="in_keputusan" placeholder="Cth: Naik ke Kelas II" class="w-full border p-2.5 rounded-lg bg-emerald-50 outline-none text-sm font-bold text-emerald-700">
+                                </div>
+                                <button type="submit" id="btnSimpanKehadiran" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md mt-2">
+                                    💾 Simpan Kehadiran
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="lg:col-span-2 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="text-md font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2"><span>📊</span> Riwayat Nilai & Capaian</h3>
+                            <div class="overflow-x-auto rounded-xl border border-slate-100">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
+                                            <th class="p-3 md:p-4 font-bold border-b whitespace-nowrap w-1/5">Kelas/Smt</th>
+<th class="p-3 md:p-4 font-bold border-b w-3/5">Rekapitulasi Data Rapor</th>
+<th class="p-3 md:p-4 font-bold border-b text-center w-1/5">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabelNilai" class="divide-y divide-slate-100 text-sm">
+                                        <tr><td colspan="4" class="text-center p-6 text-slate-500">Memuat data nilai...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-dokumen" class="hidden animate-fade-in">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        
+                        <div class="lg:col-span-1 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
+                            <h3 class="text-md font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2"><span>📤</span> Upload Dokumen Baru</h3>
+                            <form id="formUploadDokumen" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jenis Dokumen</label>
+                                    <select id="in_jenis_dokumen" required class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm font-bold text-slate-700">
+                                        <option value="">-- Pilih Jenis --</option>
+                                        <option value="Kartu Keluarga">Kartu Keluarga (KK)</option>
+                                        <option value="Akta Kelahiran">Akta Kelahiran</option>
+                                        <option value="Ijazah Sebelumnya">Ijazah Sebelumnya</option>
+                                        <option value="Sertifikat/Piagam">Sertifikat/Piagam</option>
+                                        <option value="Dokumen Lainnya">Lainnya</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pilih File (Gambar/PDF)</label>
+                                    <input type="file" id="in_file_dokumen" required accept="image/*,.pdf" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                                    <p class="text-[10px] text-slate-400 mt-1">*Maksimal 5MB. Format: JPG, PNG, atau PDF.</p>
+                                </div>
+                                <button type="submit" id="btnUploadDokumen" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md mt-2 flex justify-center items-center gap-2">
+                                    <span>🚀</span> Mulai Upload Dokumen
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="lg:col-span-2 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="text-md font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2"><span>📂</span> Lemari Dokumen Siswa</h3>
+                            <div id="galeriDokumen" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="col-span-full text-center p-8 text-slate-400 bg-slate-50 rounded-xl">Memuat dokumen...</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <script type="module">
+        import { supabase } from './js/supabaseConfig.js';
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) window.location.href = 'login.html';
+
+        const idSiswa = new URLSearchParams(window.location.search).get('id');
+        if (!idSiswa) { alert("Siswa tidak ditemukan!"); window.location.href = 'index.html'; }
+
+        // Tombol Navigasi Tab
+        window.bukaTab = function(namaTab) {
+            ['biodata', 'akademik', 'dokumen'].forEach(tab => {
+                document.getElementById('tab-' + tab).classList.add('hidden');
+                document.getElementById('tab-' + tab).classList.remove('block');
+                document.getElementById('btn-' + tab).className = "flex-1 py-4 text-center font-bold text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-all border-b-2 border-transparent flex items-center justify-center gap-2";
+            });
+            document.getElementById('tab-' + namaTab).classList.remove('hidden');
+            document.getElementById('tab-' + namaTab).classList.add('block');
+            document.getElementById('btn-' + namaTab).className = "flex-1 py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 bg-white transition-all flex items-center justify-center gap-2";
+        }
+
+        document.getElementById('btnCetakRapor').addEventListener('click', () => {
+            window.open('cetak-biodata.html?id=' + idSiswa, '_blank');
+        });
+
+        document.getElementById('btnCetakNilai').addEventListener('click', () => {
+            const kls = document.getElementById('in_nilai_kelas').value;
+            const smt = document.getElementById('in_nilai_semester').value;
+            if(!kls || !smt) {
+                alert("Mohon ketik 'Kelas' dan pilih 'Semester' yang ingin dicetak pada form Input Nilai di Tab Akademik terlebih dahulu!");
+                bukaTab('akademik'); 
+                document.getElementById('in_nilai_kelas').focus();
+                return;
+            }
+            window.open(`cetak-rapor.html?id=${idSiswa}&kelas=${kls}&semester=${smt}`, '_blank');
+        });
+
+        // ==========================================
+        // 1. BLOK FUNGSI BIODATA
+        // ==========================================
+        async function muatProfil() {
+            const { data: s, error } = await supabase.from('buku_induk').select('*').eq('id', idSiswa).single();
+            if (error) return;
+
+            document.getElementById('namaCard').innerText = s.nama_lengkap || '-';
+            
+            if (s.foto) { 
+                document.getElementById('fotoProfilSiswa').src = s.foto; 
+            } else {
+                document.getElementById('fotoProfilSiswa').src = `https://ui-avatars.com/api/?name=${s.nama_lengkap}&background=e2e8f0&color=475569&size=128`;
+            }
+            
+            document.getElementById('nisnCard').innerText = s.nisn || '-';
+            document.getElementById('statusBadge').innerHTML = `🟢 <span class="hidden md:inline">Status: </span>${s.status || 'Aktif'}`;
+
+            document.getElementById('in_nama').value = s.nama_lengkap || '';
+            document.getElementById('in_nisn').value = s.nisn || '';
+            document.getElementById('in_status').value = s.status || 'Aktif';
+            document.getElementById('in_rombel_biodata').value = s.rombel || '';
+            document.getElementById('in_tahun_masuk').value = s.tahun_masuk || '';
+            document.getElementById('in_jk').value = s.jenis_kelamin || '';
+            document.getElementById('in_agama').value = s.agama || '';
+            document.getElementById('in_tmpt_lahir').value = s.tempat_lahir || '';
+            document.getElementById('in_tgl_lahir').value = s.tanggal_lahir || '';
+            document.getElementById('in_wn').value = s.kewarganegaraan || 'Indonesia';
+            document.getElementById('in_anak_ke').value = s.anak_ke || '';
+            document.getElementById('in_jml_sdr').value = s.jumlah_saudara || '';
+            document.getElementById('in_alamat').value = s.alamat_siswa || '';
+            
+            document.getElementById('in_ayah_nama').value = s.nama_ayah || '';
+            document.getElementById('in_ayah_tmpt').value = s.tempat_lahir_ayah || '';
+            document.getElementById('in_ayah_tgl').value = s.tanggal_lahir_ayah || '';
+            document.getElementById('in_ayah_agama').value = s.agama_ayah || '';
+            document.getElementById('in_ayah_ijazah').value = s.ijazah_ayah || '';
+            document.getElementById('in_ayah_kerja').value = s.pekerjaan_ayah || '';
+            document.getElementById('in_ayah_alamat').value = s.alamat_ayah || '';
+            
+            document.getElementById('in_ibu_nama').value = s.nama_ibu || '';
+            document.getElementById('in_ibu_tmpt').value = s.tempat_lahir_ibu || '';
+            document.getElementById('in_ibu_tgl').value = s.tanggal_lahir_ibu || '';
+            document.getElementById('in_ibu_agama').value = s.agama_ibu || '';
+            document.getElementById('in_ibu_ijazah').value = s.ijazah_ibu || '';
+            document.getElementById('in_ibu_kerja').value = s.pekerjaan_ibu || '';
+            document.getElementById('in_ibu_alamat').value = s.alamat_ibu || '';
+            
+            document.getElementById('in_wali_nama').value = s.nama_wali || '';
+            document.getElementById('in_wali_hub').value = s.hubungan_wali || '';
+            document.getElementById('in_wali_kerja').value = s.pekerjaan_wali || '';
+            document.getElementById('in_wali_alamat').value = s.alamat_wali || '';
+
+            // 🌟 LOGIKA AUTO-FILL KELAS 🌟
+            document.getElementById('in_nilai_kelas').value = s.rombel || '';
+            document.getElementById('in_hadir_kelas').value = s.rombel || ''; // Menambahkan kelas ke form kehadiran
+        }
+
+        document.getElementById('formUpdateData').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnUpdate');
+            btn.innerHTML = "⏳ Menyimpan Data..."; btn.disabled = true;
+
+            const payload = {
+                nama_lengkap: document.getElementById('in_nama').value,
+                nisn: document.getElementById('in_nisn').value,
+                tahun_masuk: parseInt(document.getElementById('in_tahun_masuk').value) || null,
+                status: document.getElementById('in_status').value,
+                rombel: document.getElementById('in_rombel_biodata').value,
+                jenis_kelamin: document.getElementById('in_jk').value,
+                agama: document.getElementById('in_agama').value,
+                tempat_lahir: document.getElementById('in_tmpt_lahir').value,
+                tanggal_lahir: document.getElementById('in_tgl_lahir').value || null,
+                kewarganegaraan: document.getElementById('in_wn').value,
+                anak_ke: parseInt(document.getElementById('in_anak_ke').value) || null,
+                jumlah_saudara: parseInt(document.getElementById('in_jml_sdr').value) || null,
+                alamat_siswa: document.getElementById('in_alamat').value,
+                nama_ayah: document.getElementById('in_ayah_nama').value,
+                tempat_lahir_ayah: document.getElementById('in_ayah_tmpt').value,
+                tanggal_lahir_ayah: document.getElementById('in_ayah_tgl').value || null,
+                agama_ayah: document.getElementById('in_ayah_agama').value,
+                ijazah_ayah: document.getElementById('in_ayah_ijazah').value,
+                pekerjaan_ayah: document.getElementById('in_ayah_kerja').value,
+                alamat_ayah: document.getElementById('in_ayah_alamat').value,
+                nama_ibu: document.getElementById('in_ibu_nama').value,
+                tempat_lahir_ibu: document.getElementById('in_ibu_tmpt').value,
+                tanggal_lahir_ibu: document.getElementById('in_ibu_tgl').value || null,
+                agama_ibu: document.getElementById('in_ibu_agama').value,
+                ijazah_ibu: document.getElementById('in_ibu_ijazah').value,
+                pekerjaan_ibu: document.getElementById('in_ibu_kerja').value,
+                alamat_ibu: document.getElementById('in_ibu_alamat').value,
+                nama_wali: document.getElementById('in_wali_nama').value,
+                hubungan_wali: document.getElementById('in_wali_hub').value,
+                pekerjaan_wali: document.getElementById('in_wali_kerja').value,
+                alamat_wali: document.getElementById('in_wali_alamat').value
+            };
+
+            const { error } = await supabase.from('buku_induk').update(payload).eq('id', idSiswa);
+            if (error) alert("Gagal menyimpan!\nPesan Error: " + error.message);
+            else { alert("✅ Semua biodata berhasil tersimpan!"); muatProfil(); }
+
+            btn.innerHTML = "💾 Simpan Semua Perubahan Biodata"; btn.disabled = false;
+        });
+
+        // ==========================================
+        // 2. BLOK FUNGSI NILAI AKADEMIK
+        // ==========================================
+        async function muatNilai() {
+            const tbody = document.getElementById('tabelNilai');
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center p-6 text-slate-500">Memuat data nilai...</td></tr>';
+
+            const { data: nilai, error } = await supabase
+                .from('nilai_akademik')
+                .select('*')
+                .eq('siswa_id', idSiswa)
+                .order('kelas', { ascending: true })
+                .order('semester', { ascending: true });
+
+            if (error) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center p-6 text-red-500">Gagal memuat: ${error.message}</td></tr>`;
+                return;
+            }
+
+            if (nilai.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center p-8 text-slate-400 bg-slate-50">Belum ada nilai yang diinputkan untuk siswa ini.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            nilai.forEach(n => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-blue-50 transition-colors";
+                
+                const htmlDeskripsi = n.deskripsi ? `<div class="text-sm text-slate-700 mt-2 p-3 bg-white border border-slate-200 rounded-lg whitespace-pre-wrap font-mono overflow-x-auto shadow-inner">${n.deskripsi}</div>` : '';
+
+                tr.innerHTML = `
+                    <td class="p-3 md:p-4 text-slate-700 align-top w-1/5">
+                        <span class="font-bold">${n.kelas}</span> <br>
+                        <span class="text-xs text-slate-500">${n.semester}</span>
+                    </td>
+                    <td class="p-3 md:p-4 text-slate-800 align-top w-3/5">
+                        <div class="font-bold text-blue-900">${n.mata_pelajaran}</div>
+                        ${htmlDeskripsi}
+                    </td>
+                    <td class="p-3 md:p-4 text-center align-top w-1/5">
+                        <button onclick="hapusNilai('${n.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl border border-red-200 transition-colors shadow-sm" title="Hapus Nilai">🗑️ Hapus Data</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('formTambahNilai').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpanNilai');
+            btn.innerHTML = "⏳ Mengirim..."; btn.disabled = true;
+
+            const payload = {
+                siswa_id: idSiswa,
+                kelas: document.getElementById('in_nilai_kelas').value,
+                semester: document.getElementById('in_nilai_semester').value,
+                mata_pelajaran: "Rekapitulasi Rapor Excel", 
+                nilai: 0, 
+                deskripsi: document.getElementById('in_nilai_gabungan').value 
+            };
+
+            const { error } = await supabase.from('nilai_akademik').insert([payload]);
+
+            if (error) { alert("Gagal menyimpan nilai: " + error.message); } 
+            else {
+                document.getElementById('in_nilai_gabungan').value = '';
+                document.getElementById('in_nilai_gabungan').focus();
+                muatNilai(); 
+            }
+            btn.innerHTML = "Simpan Data Rapor"; btn.disabled = false;
+        });
+
+        window.hapusNilai = async function(idNilai) {
+            if(confirm("Yakin ingin menghapus nilai ini? Data tidak bisa dikembalikan.")) {
+                const { error } = await supabase.from('nilai_akademik').delete().eq('id', idNilai);
+                if(error) alert("Gagal menghapus!"); else muatNilai();
+            }
+        }
+
+        // ==========================================
+        // 3. BLOK FUNGSI DOKUMEN DIGITAL
+        // ==========================================
+        async function muatDokumen() {
+            const galeri = document.getElementById('galeriDokumen');
+            galeri.innerHTML = '<div class="col-span-full text-center p-8 text-slate-400 bg-slate-50 rounded-xl">Memuat dokumen...</div>';
+
+            const { data: dokumen, error } = await supabase
+                .from('dokumen_siswa')
+                .select('*')
+                .eq('siswa_id', idSiswa)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                galeri.innerHTML = `<div class="col-span-full text-center p-6 text-red-500">Gagal memuat: ${error.message}</div>`;
+                return;
+            }
+
+            if (dokumen.length === 0) {
+                galeri.innerHTML = '<div class="col-span-full text-center p-8 text-slate-400 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">Belum ada dokumen yang diunggah.</div>';
+                return;
+            }
+
+            galeri.innerHTML = '';
+            dokumen.forEach(d => {
+                const isPDF = d.file_url.toLowerCase().includes('.pdf');
+                const tampilanFile = isPDF
+                    ? `<div class="h-32 bg-red-50 flex flex-col items-center justify-center text-red-500 rounded-t-xl group-hover:bg-red-100 transition-colors"><span class="text-4xl">📄</span><span class="text-xs font-bold mt-2">File PDF</span></div>`
+                    : `<img src="${d.file_url}" class="h-32 w-full object-cover rounded-t-xl group-hover:opacity-80 transition-opacity">`;
+
+                galeri.innerHTML += `
+                    <div class="border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow bg-white flex flex-col group relative">
+                        <a href="${d.file_url}" target="_blank" class="block flex-1 cursor-pointer" title="Klik untuk membuka dokumen">
+                            ${tampilanFile}
+                        </a>
+                        <div class="p-3 border-t border-slate-100 flex justify-between items-center bg-slate-50 rounded-b-xl">
+                            <span class="font-bold text-xs text-slate-700 truncate pr-2">${d.nama_dokumen}</span>
+                            <button onclick="hapusDokumen('${d.id}', '${d.file_path}')" class="text-red-400 hover:text-red-600 hover:bg-red-100 p-1.5 rounded-lg transition-colors z-10" title="Hapus Dokumen">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById('formUploadDokumen').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnUploadDokumen');
+            const fileInput = document.getElementById('in_file_dokumen');
+            const file = fileInput.files[0];
+            const jenisDokumen = document.getElementById('in_jenis_dokumen').value;
+
+            if (!file) return;
+
+            btn.innerHTML = "⏳ Sedang Mengunggah..."; btn.disabled = true;
+
+            try {
+                const fileExt = file.name.split('.').pop();
+                const filePath = `${idSiswa}_${Date.now()}.${fileExt}`;
+
+                const { error: uploadError } = await supabase.storage.from('berkas_siswa').upload(filePath, file);
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabase.storage.from('berkas_siswa').getPublicUrl(filePath);
+
+                const payload = {
+                    siswa_id: idSiswa,
+                    nama_dokumen: jenisDokumen,
+                    file_url: publicUrl,
+                    file_path: filePath
+                };
+
+                const { error: dbError } = await supabase.from('dokumen_siswa').insert([payload]);
+                if (dbError) throw dbError;
+
+                alert('✅ Alhamdulillah! Dokumen berhasil diunggah.');
+                document.getElementById('formUploadDokumen').reset();
+                muatDokumen(); 
+
+            } catch (error) {
+                alert('Gagal mengunggah dokumen: ' + error.message);
+            } finally {
+                btn.innerHTML = "<span>🚀</span> Mulai Upload Dokumen"; btn.disabled = false;
+            }
+        });
+
+        window.hapusDokumen = async function(idDokumen, filePath) {
+            if(confirm("Peringatan! Yakin ingin menghapus dokumen ini? File akan terhapus secara permanen.")) {
+                try {
+                    const { error: storageError } = await supabase.storage.from('berkas_siswa').remove([filePath]);
+                    if(storageError) throw storageError;
+
+                    const { error: dbError } = await supabase.from('dokumen_siswa').delete().eq('id', idDokumen);
+                    if(dbError) throw dbError;
+
+                    muatDokumen(); 
+                } catch(error) {
+                    alert("Gagal menghapus dokumen: " + error.message);
+                }
+            }
+        }
+
+        // ==========================================
+        // 4. UPLOAD FOTO PROFIL
+        // ==========================================
+        document.getElementById('inputUploadFoto').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const statusUpload = document.getElementById('statusUpload');
+            statusUpload.classList.remove('hidden'); 
+
+            try {
+                const fileExt = file.name.split('.').pop();
+                const namaFileBaru = `${idSiswa}_${Date.now()}.${fileExt}`;
+
+                const { error: uploadError } = await supabase.storage.from('foto_siswa').upload(namaFileBaru, file);
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabase.storage.from('foto_siswa').getPublicUrl(namaFileBaru);
+
+                const { error: updateError } = await supabase.from('buku_induk').update({ foto: publicUrl }).eq('id', idSiswa);
+                if (updateError) throw updateError;
+
+                document.getElementById('fotoProfilSiswa').src = publicUrl;
+                alert('Alhamdulillah! Foto berhasil diperbarui.');
+
+            } catch (error) {
+                alert('Gagal mengunggah foto: ' + error.message);
+            } finally {
+                statusUpload.classList.add('hidden');
+            }
+        });
+
+
+        // ==========================================
+        // 5. 🌟 MESIN KEHADIRAN & KEPUTUSAN (YANG BARU DIPERBAIKI) 🌟
+        // ==========================================
+        const selectSemester = document.getElementById('in_hadir_semester');
+        const boxKeputusan = document.getElementById('areaKeputusan');
+
+        if (selectSemester && boxKeputusan) {
+            selectSemester.addEventListener('change', function() {
+                if (this.value === 'Genap') {
+                    boxKeputusan.classList.remove('hidden');
+                    boxKeputusan.classList.add('block');
+                } else {
+                    boxKeputusan.classList.add('hidden');
+                    boxKeputusan.classList.remove('block');
+                    document.getElementById('in_keputusan').value = ''; 
+                }
+            });
+        }
+
+        document.getElementById('formTambahKehadiran').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpanKehadiran');
+            btn.innerHTML = "⏳ Menyimpan..."; btn.disabled = true;
+
+            const payload = {
+                siswa_id: idSiswa,
+                kelas: document.getElementById('in_hadir_kelas').value,
+                semester: document.getElementById('in_hadir_semester').value,
+                sakit: document.getElementById('in_sakit').value || '-',
+                izin: document.getElementById('in_izin').value || '-',
+                alpa: document.getElementById('in_alpa').value || '-',
+                keputusan: document.getElementById('in_keputusan').value || '-'
+            };
+
+            // Hapus data lama di kelas & semester yang sama agar tidak dobel
+            await supabase.from('rekap_kehadiran').delete()
+                .eq('siswa_id', idSiswa)
+                .eq('kelas', payload.kelas)
+                .eq('semester', payload.semester);
+
+            // Masukkan data baru
+            const { error } = await supabase.from('rekap_kehadiran').insert([payload]);
+
+            if (error) alert("Gagal menyimpan kehadiran: " + error.message);
+            else alert("✅ Data kehadiran berhasil disimpan!");
+
+            btn.innerHTML = "💾 Simpan Kehadiran"; btn.disabled = false;
+            document.getElementById('formTambahKehadiran').reset();
+            document.getElementById('areaKeputusan').classList.add('hidden');
+        });
+
+        // PANGGIL SEMUA SAAT HALAMAN DIBUKA
+        muatProfil();
+        muatNilai();
+        muatDokumen();
+
+    </script>
+</body>
+</html>

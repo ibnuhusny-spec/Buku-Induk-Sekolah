@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Nilai - IndukKu Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans h-screen flex flex-col">
+
+    <!-- Header Lengket -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-10 p-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div>
+                <a href="index.html" class="text-blue-600 hover:underline text-sm font-bold">← Kembali ke Data Siswa</a>
+                <h1 class="text-2xl font-bold text-gray-800 mt-1">Ahmad Abdullah</h1>
+                <p class="text-sm text-gray-500">NISN: 0123456789</p>
+            </div>
+            <button class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold">💾 Simpan Nilai</button>
+        </div>
+    </header>
+
+    <!-- Area Kerja Utama -->
+    <main class="flex-1 max-w-6xl mx-auto w-full p-4 mt-4">
+        
+        <!-- Tab Kelas -->
+        <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+            <!-- Contoh: Tab Kelas 4 sedang aktif -->
+            <button class="px-6 py-2 rounded-lg bg-white border text-gray-600">Kelas 1</button>
+            <button class="px-6 py-2 rounded-lg bg-white border text-gray-600">Kelas 2</button>
+            <button class="px-6 py-2 rounded-lg bg-white border text-gray-600">Kelas 3</button>
+            <button class="px-6 py-2 rounded-lg bg-blue-600 border border-blue-600 text-white font-bold shadow-md">Kelas 4</button>
+            <button class="px-6 py-2 rounded-lg bg-white border text-gray-600">Kelas 5</button>
+            <button class="px-6 py-2 rounded-lg bg-white border text-gray-600">Kelas 6</button>
+        </div>
+
+        <!-- Form Input Nilai -->
+        <div class="bg-white rounded-xl shadow-sm border p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Ganjil -->
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <h3 class="font-bold text-center mb-4 border-b pb-2">Semester Ganjil (Kelas 4)</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-sm font-medium w-2/3">Pendidikan Agama Islam</label>
+                        <input type="number" class="w-20 p-1 text-center border rounded" value="85">
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label class="text-sm font-medium w-2/3">Pendidikan Pancasila</label>
+                        <input type="number" class="w-20 p-1 text-center border rounded" value="80">
+                    </div>
+                    <!-- Ini contoh mapel yang cuma ada di kelas tinggi (4,5,6) -->
+                    <div class="flex justify-between items-center">
+                        <label class="text-sm font-bold text-blue-600 w-2/3">Bahasa Inggris</label>
+                        <input type="number" class="w-20 p-1 text-center border rounded border-blue-400" value="78">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Genap -->
+            <div class="bg-gray-50 p-4 rounded-xl">
+                <h3 class="font-bold text-center mb-4 border-b pb-2">Semester Genap (Kelas 4)</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-sm font-medium w-2/3">Pendidikan Agama Islam</label>
+                        <input type="number" class="w-20 p-1 text-center border rounded" value="88">
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label class="text-sm font-medium w-2/3">Pendidikan Pancasila</label>
+                        <input type="number" class="w-20 p-1 text-center border rounded" value="82">
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <label class="text-sm font-bold text-blue-600 w-2/3">Bahasa Inggris</label>
+                        <input type="number" class="w-20 p-1 text-center border rounded border-blue-400" value="85">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+</html>

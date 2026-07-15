@@ -184,7 +184,7 @@
                                     <thead>
                                         <tr class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
                                             <th class="p-3 md:p-4 font-bold border-b whitespace-nowrap w-1/5">Kelas/Smt</th>
-                                            <th class="p-3 md:p-4 font-bold border-b w-3/5">Rekapitulasi Data Rapor</th>
+                                            <th class="p-3 md:p-4 font-bold border-b w-3/5">Mata Pelajaran & Deskripsi</th>
                                             <th class="p-3 md:p-4 font-bold border-b text-center w-1/5">Aksi</th>
                                         </tr>
                                     </thead>
@@ -194,6 +194,7 @@
                                 </table>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -409,9 +410,7 @@
                 tr.className = "hover:bg-blue-50 transition-colors";
                 
                 const htmlDeskripsi = n.deskripsi ? `<div class="text-sm text-slate-700 mt-2 p-3 bg-white border border-slate-200 rounded-lg whitespace-pre-wrap font-mono overflow-x-auto shadow-inner">${n.deskripsi}</div>` : '';
-                
-                // Variabel baru untuk mengecek jika nilai kosong/strip, maka jangan tampilkan null
-                const nilaiTampil = (n.nilai !== null) ? n.nilai : '-';
+                const nilaiTampil = (n.nilai !== null && n.nilai !== undefined) ? n.nilai : '-';
 
                 tr.innerHTML = `
                     <td class="p-3 md:p-4 text-slate-700 align-top w-1/5">

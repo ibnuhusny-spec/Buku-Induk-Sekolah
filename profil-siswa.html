@@ -431,24 +431,101 @@
         document.getElementById('formTambahNilai').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSimpanNilai');
-            btn.innerHTML = "⏳ Mengirim..."; btn.disabled = true;
+            const teksExcel = document.getElementById('in_nilai_gabungan').value.trim();
 
-            const payload = {
-                siswa_id: idSiswa,
-                kelas: document.getElementById('in_nilai_kelas').value,
-                semester: document.getElementById('in_nilai_semester').value,
-                mata_pelajaran: "Rekapitulasi Rapor Excel", 
-                nilai: 0, 
-                deskripsi: document.getElementById('in_nilai_gabungan').value 
-            };
+            if (!teksExcel) {
+                alert("Kotak teks masih kosong. Silakan paste dari Excel terlebih dahulu.");
+                return;
+            }
 
-            const { error } = await supabase.from('nilai_akademik').insert([payload]);
+            btn.innerHTML = "⏳ Memproses Data Excel..."; btn.disabled = true;
 
-            if (error) { alert("Gagal menyimpan nilai: " + error.message); } 
-            else {
+            const kelasVal = document.getElementById('in_nilai_kelas').value;
+            const semesterVal = document.getElementById('in_nilai_semester').value;
+
+            // 🌟 1. MESIN PINTAR PEMBACA FORMAT EXCEL (TSV Parser) 🌟
+            // Ini akan memecah data yang di-paste tanpa merusak baris baru (Alt+Enter) di dalam sel Excel
+            let rows = [];
+            let currentRow = [];
+            let currentCell = '';
+            let insideQuotes = false;
+
+            for (let i = 0; i < teksExcel.length; i++) {
+                let char = teksExcel[i];
+                let nextChar = teksExcel[i + 1];
+
+                if (char === '"') {
+                    if (insideQuotes && nextChar === '"') {
+                        currentCell += '"'; i++; // Mengabaikan kutipan ganda bawaan Excel
+                    } else {
+                        insideQuotes = !insideQuotes;
+                    }
+                } else if (char === '\t' && !insideQuotes) {
+                    currentRow.push(currentCell.trim());
+                    currentCell = '';
+                } else if (char === '\n' && !insideQuotes) {
+                    currentRow.push(currentCell.trim());
+                    if (currentRow.join('') !== '') rows.push(currentRow);
+                    currentRow = [];
+                    currentCell = '';
+                } else {
+                    currentCell += char;
+                }
+            }
+            if (currentCell !== '' || currentRow.length > 0) {
+                currentRow.push(currentCell.trim());
+                if (currentRow.join('') !== '') rows.push(currentRow);
+            }
+
+            // 🌟 2. MENGUBAH BARIS EXCEL MENJADI DATA DATABASE 🌟
+            const payloadArray = [];
+            for (let cols of rows) {
+                let mapel = "", nilai = 0, deskripsi = "";
+
+                // Deteksi cerdas: Apakah guru meng-copy mulai dari kolom "No" (4 kolom) atau "Muatan Pelajaran" (3 kolom)
+                if (cols.length >= 4) {
+                    mapel = cols[1];
+                    nilai = parseInt(cols[2]) || 0;
+                    deskripsi = cols[3];
+                } else if (cols.length === 3) {
+                    mapel = cols[0];
+                    nilai = parseInt(cols[1]) || 0;
+                    deskripsi = cols[2];
+                } else {
+                    continue; // Lewati jika barisnya berantakan
+                }
+
+                // Abaikan baris Judul Tabel (Header) jika ikut ter-copy
+                if (mapel.toLowerCase().includes('muatan pelajaran') || mapel.toLowerCase().includes('mata pelajaran')) {
+                    continue;
+                }
+
+                payloadArray.push({
+                    siswa_id: idSiswa,
+                    kelas: kelasVal,
+                    semester: semesterVal,
+                    mata_pelajaran: mapel,
+                    nilai: nilai,
+                    deskripsi: deskripsi
+                });
+            }
+
+            if (payloadArray.length === 0) {
+                alert("❌ Format tidak dikenali. Pastikan Anda meng-copy minimal kolom (Mapel, Nilai Akhir, Capaian) dari Excel.");
+                btn.innerHTML = "Simpan Data Rapor"; btn.disabled = false;
+                return;
+            }
+
+            // 🌟 3. SIMPAN BANYAK BARIS SEKALIGUS (BULK INSERT) 🌟
+            const { error } = await supabase.from('nilai_akademik').insert(payloadArray);
+
+            if (error) { 
+                alert("Gagal menyimpan nilai: " + error.message); 
+            } else {
+                alert(`✅ Alhamdulillah! ${payloadArray.length} Mata Pelajaran berhasil di-input otomatis dari Excel.`);
                 document.getElementById('in_nilai_gabungan').value = '';
                 document.getElementById('in_nilai_gabungan').focus();
-                muatNilai(); 
+                muatNilai(); // Tampilkan langsung ke tabel riwayat di bawah
             }
             btn.innerHTML = "Simpan Data Rapor"; btn.disabled = false;
         });

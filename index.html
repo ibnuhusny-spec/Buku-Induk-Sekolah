@@ -126,7 +126,33 @@
                                 <td colspan="4" class="p-10 text-center text-slate-400 font-bold animate-pulse">⏳ Memuat data siswa...</td>
                             </tr>
                         </tbody>
-                    </table>
+                </div>
+
+                <!-- PAGINASI KONTROL BAR MODEREN -->
+                <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-slate-600">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-500 font-semibold">Tampilkan:</span>
+                        <select id="selectLimitPage" class="bg-white border border-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-slate-700 cursor-pointer shadow-sm">
+                            <option value="10">10 data per halaman</option>
+                            <option value="25" selected>25 data per halaman</option>
+                            <option value="50">50 data per halaman</option>
+                            <option value="100">100 data per halaman</option>
+                        </select>
+                    </div>
+
+                    <div id="infoPaginasi" class="text-slate-500 font-semibold text-center">
+                        Menampilkan <span id="teksAwalData" class="text-slate-800 font-bold">0</span> - <span id="teksAkhirData" class="text-slate-800 font-bold">0</span> dari <span id="teksTotalData" class="text-blue-600 font-bold">0</span> data
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button id="btnPrevPage" disabled class="px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all font-bold shadow-sm flex items-center gap-1">
+                            &laquo; Prev
+                        </button>
+                        <span id="labelHalAktif" class="bg-blue-600 text-white px-3.5 py-1.5 rounded-xl shadow-sm font-black text-sm">1</span>
+                        <button id="btnNextPage" disabled class="px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all font-bold shadow-sm flex items-center gap-1">
+                            Next &raquo;
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -229,8 +255,13 @@
         });
 
         let dataSiswaGlobal = []; 
+        let dataTersaringGlobal = [];
         let chartKelasInstance = null;
         let chartGenderInstance = null;
+
+        // Variable Paginasi
+        let halamanSekarang = 1;
+        let limitPerHalaman = 25;
 
         async function muatData() {
             const tableBody = document.getElementById('tableBody');
@@ -245,31 +276,34 @@
                 return;
             }
 
-            dataSiswaGlobal = data;
-            renderTabel(dataSiswaGlobal);
+            dataSiswaGlobal = data || [];
+            dataTersaringGlobal = [...dataSiswaGlobal];
+            renderTabel(true);
         }
 
         // 🌟 FUNGSI MENGGAMBAR GRAFIK (CHART.JS) 🌟
         function renderGrafik(data) {
-            // 1. Hitung Data Gender
-            const jmlLaki = data.filter(s => s.jenis_kelamin === 'Laki-laki').length;
-            const jmlPr = data.filter(s => s.jenis_kelamin === 'Perempuan').length;
-
-            // 2. Hitung Data Kelas (Kelompokkan siswa berdasarkan Rombel)
             const countKelas = {};
+            let jmlLaki = 0;
+            let jmlPr = 0;
+
             data.forEach(s => {
+                if (s.jenis_kelamin === 'Laki-laki') jmlLaki++;
+                if (s.jenis_kelamin === 'Perempuan') jmlPr++;
+
                 if(s.status === 'Aktif' || !s.status) {
                     const kelas = s.rombel || 'Belum Ada Kelas';
                     countKelas[kelas] = (countKelas[kelas] || 0) + 1;
                 }
             });
+
             // Urutkan nama kelas sesuai abjad
             const labelKelas = Object.keys(countKelas).sort();
             const dataKelas = labelKelas.map(k => countKelas[k]);
 
             // ================= GAMBAR GRAFIK GENDER (DONAT) =================
             const ctxGender = document.getElementById('chartGender').getContext('2d');
-            if (chartGenderInstance) chartGenderInstance.destroy(); // Hapus grafik lama jika ada
+            if (chartGenderInstance) chartGenderInstance.destroy();
             
             chartGenderInstance = new Chart(ctxGender, {
                 type: 'doughnut',
@@ -277,7 +311,7 @@
                     labels: ['Laki-laki', 'Perempuan'],
                     datasets: [{
                         data: [jmlLaki, jmlPr],
-                        backgroundColor: ['#3b82f6', '#ec4899'], // Biru dan Pink
+                        backgroundColor: ['#3b82f6', '#ec4899'],
                         borderWidth: 0,
                         hoverOffset: 4
                     }]
@@ -286,7 +320,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { position: 'bottom' } },
-                    cutout: '70%' // Ukuran lubang di tengah
+                    cutout: '70%'
                 }
             });
 
@@ -301,15 +335,15 @@
                     datasets: [{
                         label: 'Jumlah Siswa Aktif',
                         data: dataKelas,
-                        backgroundColor: '#6366f1', // Indigo
-                        borderRadius: 6, // Ujung batang membulat
+                        backgroundColor: '#6366f1',
+                        borderRadius: 6,
                         barPercentage: 0.6
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }, // Sembunyikan legenda
+                    plugins: { legend: { display: false } },
                     scales: {
                         y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
                         x: { grid: { display: false } }
@@ -318,17 +352,18 @@
             });
         }
 
-        // Fungsi menggambar tabel dan statistik
-        function renderTabel(data) {
+        // Fungsi menggambar tabel dan statistik dengan PAGINASI
+        function renderTabel(resetHalaman = false) {
             const tableBody = document.getElementById('tableBody');
+            if (resetHalaman) halamanSekarang = 1;
             
-            // Hitung Statistik
-            const total = data.length;
-            const jmlAktif = data.filter(s => !s.status || s.status === 'Aktif').length;
-            const jmlAlumni = data.filter(s => s.status === 'Alumni').length;
-            const jmlPindah = data.filter(s => s.status === 'Pindah').length;
-            const jmlLaki = data.filter(s => s.jenis_kelamin === 'Laki-laki').length;
-            const jmlPr = data.filter(s => s.jenis_kelamin === 'Perempuan').length;
+            // Hitung Statistik dari Data Tersaring
+            const total = dataTersaringGlobal.length;
+            const jmlAktif = dataTersaringGlobal.filter(s => !s.status || s.status === 'Aktif').length;
+            const jmlAlumni = dataTersaringGlobal.filter(s => s.status === 'Alumni').length;
+            const jmlPindah = dataTersaringGlobal.filter(s => s.status === 'Pindah').length;
+            const jmlLaki = dataTersaringGlobal.filter(s => s.jenis_kelamin === 'Laki-laki').length;
+            const jmlPr = dataTersaringGlobal.filter(s => s.jenis_kelamin === 'Perempuan').length;
 
             document.getElementById('dashTotal').innerText = total;
             document.getElementById('dashAktif').innerText = jmlAktif;
@@ -337,16 +372,32 @@
             document.getElementById('dashL').innerText = jmlLaki;
             document.getElementById('dashP').innerText = jmlPr;
 
-            // Panggil mesin pembuat grafik!
-            renderGrafik(data);
+            // Panggil mesin pembuat grafik dengan data tersaring
+            renderGrafik(dataTersaringGlobal);
+
+            // ================= LOGIKA PAGINASI =================
+            const totalPages = Math.ceil(total / limitPerHalaman) || 1;
+            if (halamanSekarang > totalPages) halamanSekarang = totalPages;
+
+            const startIndex = (halamanSekarang - 1) * limitPerHalaman;
+            const endIndex = Math.min(startIndex + limitPerHalaman, total);
+            const dataHalaman = dataTersaringGlobal.slice(startIndex, endIndex);
+
+            // Update Label & Button Paginasi
+            document.getElementById('teksAwalData').innerText = total === 0 ? 0 : startIndex + 1;
+            document.getElementById('teksAkhirData').innerText = endIndex;
+            document.getElementById('teksTotalData').innerText = total;
+            document.getElementById('labelHalAktif').innerText = halamanSekarang;
+            document.getElementById('btnPrevPage').disabled = halamanSekarang <= 1;
+            document.getElementById('btnNextPage').disabled = halamanSekarang >= totalPages;
 
             tableBody.innerHTML = ''; 
-            if (data.length === 0) {
+            if (dataHalaman.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="4" class="p-12 text-center text-slate-400 font-bold text-lg">📭 Tidak ada data yang ditemukan.</td></tr>';
                 return;
             }
 
-            data.forEach(siswa => {
+            dataHalaman.forEach(siswa => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition-colors group cursor-default";
                 
@@ -379,16 +430,39 @@
             });
         }
 
+        // Event Listener Paginasi Controls
+        document.getElementById('btnPrevPage').addEventListener('click', () => {
+            if (halamanSekarang > 1) {
+                halamanSekarang--;
+                renderTabel(false);
+            }
+        });
+
+        document.getElementById('btnNextPage').addEventListener('click', () => {
+            const totalPages = Math.ceil(dataTersaringGlobal.length / limitPerHalaman) || 1;
+            if (halamanSekarang < totalPages) {
+                halamanSekarang++;
+                renderTabel(false);
+            }
+        });
+
+        document.getElementById('selectLimitPage').addEventListener('change', (e) => {
+            limitPerHalaman = parseInt(e.target.value);
+            halamanSekarang = 1;
+            renderTabel(false);
+        });
+
+        // Event Listener Pencarian Data
         document.getElementById('inputCari').addEventListener('input', (e) => {
-            const kataKunci = e.target.value.toLowerCase();
-            const dataFilter = dataSiswaGlobal.filter(siswa => {
+            const kataKunci = e.target.value.toLowerCase().trim();
+            dataTersaringGlobal = dataSiswaGlobal.filter(siswa => {
                 const nama = (siswa.nama_lengkap || '').toLowerCase();
                 const nisn = (siswa.nisn || '').toLowerCase();
                 const nipd = (siswa.nipd || '').toString().toLowerCase(); 
                 const rombel = (siswa.rombel || '').toLowerCase();
                 return nama.includes(kataKunci) || nisn.includes(kataKunci) || nipd.includes(kataKunci) || rombel.includes(kataKunci);
             });
-            renderTabel(dataFilter); 
+            renderTabel(true); 
         });
 
         muatData();

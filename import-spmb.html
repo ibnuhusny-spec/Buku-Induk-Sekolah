@@ -51,6 +51,7 @@
 
     <script type="module">
         import { supabase } from './js/supabaseConfig.js';
+        import { validasiFile, CONFIG_FILE } from './js/validasiFile.js';
 
         const fileInput = document.getElementById('fileExcel');
         const namaFileDiv = document.getElementById('namaFile');
@@ -61,6 +62,16 @@
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
+
+            // 🛡️ VALIDASI EXCEL SPMB (Max 10MB, XLSX/XLS/CSV)
+            const cekValidasi = validasiFile(file, CONFIG_FILE.EXCEL);
+            if (!cekValidasi.valid) {
+                alert(cekValidasi.pesan);
+                e.target.value = '';
+                namaFileDiv.classList.add('hidden');
+                btnProses.disabled = true;
+                return;
+            }
 
             namaFileDiv.innerText = `Terpilih: ${file.name}`;
             namaFileDiv.classList.remove('hidden');

@@ -242,6 +242,7 @@
 
     <script type="module">
         import { supabase } from './js/supabaseConfig.js';
+        import { validasiFile, CONFIG_FILE } from './js/validasiFile.js';
 
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) window.location.href = 'login.html';
@@ -606,10 +607,18 @@
 
             if (!file) return;
 
+            // 🛡️ VALIDASI BERKAS DOKUMEN (Max 5MB, JPG/PNG/WEBP/PDF)
+            const cekValidasi = validasiFile(file, CONFIG_FILE.DOKUMEN);
+            if (!cekValidasi.valid) {
+                alert(cekValidasi.pesan);
+                fileInput.value = '';
+                return;
+            }
+
             btn.innerHTML = "⏳ Sedang Mengunggah..."; btn.disabled = true;
 
             try {
-                const fileExt = file.name.split('.').pop();
+                const fileExt = file.name.split('.').pop().toLowerCase();
                 const filePath = `${idSiswa}_${Date.now()}.${fileExt}`;
 
                 const { error: uploadError } = await supabase.storage.from('berkas_siswa').upload(filePath, file);
@@ -661,11 +670,19 @@
             const file = e.target.files[0];
             if (!file) return;
 
+            // 🛡️ VALIDASI FOTO PROFIL (Max 2MB, JPG/PNG/WEBP)
+            const cekValidasi = validasiFile(file, CONFIG_FILE.FOTO);
+            if (!cekValidasi.valid) {
+                alert(cekValidasi.pesan);
+                e.target.value = '';
+                return;
+            }
+
             const statusUpload = document.getElementById('statusUpload');
             statusUpload.classList.remove('hidden'); 
 
             try {
-                const fileExt = file.name.split('.').pop();
+                const fileExt = file.name.split('.').pop().toLowerCase();
                 const namaFileBaru = `${idSiswa}_${Date.now()}.${fileExt}`;
 
                 const { error: uploadError } = await supabase.storage.from('foto_siswa').upload(namaFileBaru, file);

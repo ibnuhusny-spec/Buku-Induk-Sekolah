@@ -155,6 +155,64 @@
                         <button type="submit" id="btnSimpan" class="w-2/3 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all">Simpan Data</button>
                     </div>
                 </form>
+        </div>
+
+        <!-- MODAL KENAIKAN KELAS MODEREN -->
+        <div id="modalNaikKelas" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md flex items-center justify-center z-50 transition-all p-4">
+            <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl border border-slate-100 relative overflow-hidden">
+                
+                <!-- Header Modal -->
+                <div class="flex justify-between items-center mb-5 border-b pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl font-bold">🚀</div>
+                        <div>
+                            <h2 class="text-xl font-black text-slate-800">Proses Kenaikan Kelas</h2>
+                            <p class="text-xs text-slate-500 font-medium">Otomatisasi lulus & naik kelas 1-5</p>
+                        </div>
+                    </div>
+                    <button id="btnTutupModalNaik" type="button" class="text-slate-400 hover:text-red-500 text-2xl font-bold transition-colors">&times;</button>
+                </div>
+
+                <!-- Informasi Peringatan -->
+                <div class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl text-xs space-y-2 mb-6">
+                    <p class="font-bold flex items-center gap-1.5 text-sm">
+                        <span>⚠️</span> Peringatan Tindakan Masal:
+                    </p>
+                    <ul class="list-disc list-inside space-y-1 text-amber-700 font-medium">
+                        <li><strong>Kelas 6</strong> akan otomatis diluluskan menjadi <span class="bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-bold">Alumni</span>.</li>
+                        <li><strong>Kelas 1 s/d 5</strong> akan otomatis dinaikkan 1 tingkat.</li>
+                        <li>Tindakan ini berpengaruh pada seluruh data siswa aktif di database.</li>
+                    </ul>
+                </div>
+
+                <!-- Form Password Security -->
+                <form id="formProsesNaikKelas" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Password Keamanan Kepala Sekolah / Admin</label>
+                        <div class="relative">
+                            <input type="password" id="inputSandiNaik" required placeholder="Masukkan password otorisasi..." class="w-full border-2 border-slate-200 p-3.5 pr-12 rounded-xl bg-slate-50 focus:bg-white focus:border-orange-500 outline-none transition-all font-mono text-slate-800">
+                            <button type="button" id="btnTogglePass" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 p-1 text-lg">👁️</button>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar (Tampil Saat Memproses) -->
+                    <div id="boxProgresNaik" class="hidden space-y-2 pt-2">
+                        <div class="flex justify-between text-xs font-bold text-slate-600">
+                            <span id="teksStatusNaik">Sedang memproses siswa...</span>
+                            <span id="persenNaik">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
+                            <div id="barProgresNaik" class="bg-gradient-to-r from-orange-400 to-rose-500 h-3 rounded-full transition-all duration-300 w-0"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3 pt-4 border-t border-slate-100">
+                        <button type="button" id="btnBatalNaik" class="w-1/3 py-3.5 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold transition-all">Batal</button>
+                        <button type="submit" id="btnSubmitNaik" class="w-2/3 py-3.5 bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white rounded-xl font-bold shadow-lg shadow-orange-500/20 transition-all flex items-center justify-center gap-2">
+                            <span>🚀</span> Jalankan Kenaikan Kelas
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </main>
@@ -396,43 +454,110 @@
             btn.innerText = "Simpan Data"; btn.disabled = false;
         });
 
-        document.getElementById('btnNaikKelas').addEventListener('click', async () => {
-            const sandi = prompt("⚠️ PERINGATAN!\nFitur ini akan meluluskan Kelas 6 dan menaikkan kelas 1-5.\n\nMasukkan password rahasia (BISMILLAH):");
-            if (sandi !== "BISMILLAH") { if (sandi !== null) alert("❌ Password salah!"); return; }
+        // 🌟 MODAL KENAIKAN KELAS MODEREN & PROGRESS BAR 🌟
+        const modalNaik = document.getElementById('modalNaikKelas');
+        const btnNaik = document.getElementById('btnNaikKelas');
+        const btnTutupNaik = document.getElementById('btnTutupModalNaik');
+        const btnBatalNaik = document.getElementById('btnBatalNaik');
+        const formNaik = document.getElementById('formProsesNaikKelas');
+        const inputSandi = document.getElementById('inputSandiNaik');
+        const btnTogglePass = document.getElementById('btnTogglePass');
 
-            const yakin = confirm("Apakah Anda YAKIN ingin memproses kenaikan kelas sekarang?");
-            if (!yakin) return;
+        if (btnNaik && modalNaik) {
+            btnNaik.addEventListener('click', () => {
+                modalNaik.classList.remove('hidden');
+                inputSandi.value = '';
+                document.getElementById('boxProgresNaik').classList.add('hidden');
+            });
+        }
 
-            const btn = document.getElementById('btnNaikKelas');
-            const teksAsli = btn.innerHTML;
-            btn.innerHTML = `<span class="text-lg">⏳</span> Memproses...`; btn.disabled = true;
+        if (btnTutupNaik) btnTutupNaik.addEventListener('click', () => modalNaik.classList.add('hidden'));
+        if (btnBatalNaik) btnBatalNaik.addEventListener('click', () => modalNaik.classList.add('hidden'));
 
-            try {
-                let jumlahBerubah = 0;
-                for (let siswa of dataSiswaGlobal) {
-                    if (siswa.status === 'Alumni' || siswa.status === 'Pindah') continue; 
-                    
-                    let rombelBaru = siswa.rombel || '';
-                    let statusBaru = siswa.status || 'Aktif';
+        if (btnTogglePass) {
+            btnTogglePass.addEventListener('click', () => {
+                const isPass = inputSandi.type === 'password';
+                inputSandi.type = isPass ? 'text' : 'password';
+                btnTogglePass.innerText = isPass ? '🙈' : '👁️';
+            });
+        }
 
-                    if (rombelBaru.includes('Kelas 6')) {
-                        statusBaru = 'Alumni'; rombelBaru = `Alumni ${new Date().getFullYear()}`;
-                    } else if (rombelBaru.includes('Kelas 5')) { rombelBaru = rombelBaru.replace('Kelas 5', 'Kelas 6');
-                    } else if (rombelBaru.includes('Kelas 4')) { rombelBaru = rombelBaru.replace('Kelas 4', 'Kelas 5');
-                    } else if (rombelBaru.includes('Kelas 3')) { rombelBaru = rombelBaru.replace('Kelas 3', 'Kelas 4');
-                    } else if (rombelBaru.includes('Kelas 2')) { rombelBaru = rombelBaru.replace('Kelas 2', 'Kelas 3');
-                    } else if (rombelBaru.includes('Kelas 1')) { rombelBaru = rombelBaru.replace('Kelas 1', 'Kelas 2'); }
+        if (formNaik) {
+            formNaik.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const sandi = inputSandi.value;
 
-                    if (rombelBaru !== siswa.rombel || statusBaru !== siswa.status) {
-                        await supabase.from('buku_induk').update({ rombel: rombelBaru, status: statusBaru }).eq('id', siswa.id);
-                        jumlahBerubah++;
-                    }
+                // Verifikasi Password
+                if (sandi !== "BISMILLAH") {
+                    alert("❌ Password otorisasi salah! Hubungi Admin / Kepala Sekolah.");
+                    inputSandi.focus();
+                    return;
                 }
-                alert(`✅ ALHAMDULILLAH!\n${jumlahBerubah} siswa telah dinaikkan kelasnya dan diluluskan.`);
-                location.reload(); 
-            } catch (error) { alert("❌ ERROR: " + error.message); } 
-            finally { btn.innerHTML = teksAsli; btn.disabled = false; }
-        });
+
+                if (!confirm("⚠️ KONFIRMASI TERAKHIR!\nApakah Anda benar-benar yakin ingin memproses kenaikan kelas untuk seluruh siswa sekarang?")) {
+                    return;
+                }
+
+                const btnSubmit = document.getElementById('btnSubmitNaik');
+                const boxProgres = document.getElementById('boxProgresNaik');
+                const barProgres = document.getElementById('barProgresNaik');
+                const teksStatus = document.getElementById('teksStatusNaik');
+                const persenTeks = document.getElementById('persenNaik');
+
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = `⏳ Memproses...`;
+                boxProgres.classList.remove('hidden');
+
+                try {
+                    let siswaTarget = dataSiswaGlobal.filter(s => s.status !== 'Alumni' && s.status !== 'Pindah');
+                    let totalSiswa = siswaTarget.length;
+
+                    if (totalSiswa === 0) {
+                        alert("Tidak ada siswa aktif yang perlu dinaikkan kelasnya.");
+                        modalNaik.classList.add('hidden');
+                        return;
+                    }
+
+                    let jumlahBerubah = 0;
+                    let prosesIndex = 0;
+
+                    for (let siswa of siswaTarget) {
+                        prosesIndex++;
+                        let persen = Math.round((prosesIndex / totalSiswa) * 100);
+                        barProgres.style.width = persen + '%';
+                        persenTeks.innerText = persen + '%';
+                        teksStatus.innerText = `Memproses: ${siswa.nama_lengkap} (${prosesIndex}/${totalSiswa})`;
+
+                        let rombelBaru = siswa.rombel || '';
+                        let statusBaru = siswa.status || 'Aktif';
+
+                        if (rombelBaru.includes('Kelas 6')) {
+                            statusBaru = 'Alumni'; 
+                            rombelBaru = `Alumni ${new Date().getFullYear()}`;
+                        } else if (rombelBaru.includes('Kelas 5')) { rombelBaru = rombelBaru.replace('Kelas 5', 'Kelas 6');
+                        } else if (rombelBaru.includes('Kelas 4')) { rombelBaru = rombelBaru.replace('Kelas 4', 'Kelas 5');
+                        } else if (rombelBaru.includes('Kelas 3')) { rombelBaru = rombelBaru.replace('Kelas 3', 'Kelas 4');
+                        } else if (rombelBaru.includes('Kelas 2')) { rombelBaru = rombelBaru.replace('Kelas 2', 'Kelas 3');
+                        } else if (rombelBaru.includes('Kelas 1')) { rombelBaru = rombelBaru.replace('Kelas 1', 'Kelas 2'); }
+
+                        if (rombelBaru !== siswa.rombel || statusBaru !== siswa.status) {
+                            const { error } = await supabase.from('buku_induk').update({ rombel: rombelBaru, status: statusBaru }).eq('id', siswa.id);
+                            if (!error) jumlahBerubah++;
+                        }
+                    }
+
+                    alert(`✅ ALHAMDULILLAH!\n${jumlahBerubah} siswa berhasil dinaikkan kelasnya dan diluluskan.`);
+                    modalNaik.classList.add('hidden');
+                    muatData();
+
+                } catch (error) {
+                    alert("❌ Gagal memproses kenaikan kelas: " + error.message);
+                } finally {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<span>🚀</span> Jalankan Kenaikan Kelas`;
+                }
+            });
+        }
     </script>
 </body>
 </html>

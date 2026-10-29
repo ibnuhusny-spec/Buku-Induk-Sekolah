@@ -53,6 +53,10 @@
         import { supabase } from './js/supabaseConfig.js';
         import { validasiFile, CONFIG_FILE } from './js/validasiFile.js';
 
+        // 🛡️ Pengaman Session Login
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { window.location.href = 'login.html'; }
+
         const fileInput = document.getElementById('fileExcel');
         const namaFileDiv = document.getElementById('namaFile');
         const btnProses = document.getElementById('btnProses');

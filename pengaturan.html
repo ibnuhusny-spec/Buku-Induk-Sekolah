@@ -3,113 +3,887 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pengaturan Sekolah - IndukKu Pro</title>
+    <title>Pengaturan Sekolah & Tanda Tangan Guru - IndukKu Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .canvas-ttd {
+            touch-action: none;
+            background: #ffffff;
+            cursor: crosshair;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans h-screen flex flex-col">
+<body class="bg-slate-100 font-sans min-h-screen flex flex-col pb-16">
 
-    <header class="bg-white shadow-sm border-b px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+    <!-- Header Lengket -->
+    <header class="bg-white shadow-sm border-b px-6 py-4 flex items-center justify-between sticky top-0 z-30">
         <div class="flex items-center gap-4">
-            <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-bold transition-colors">
-                &larr; Kembali
+            <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl font-bold transition-all flex items-center gap-2">
+                <span>&larr;</span> Kembali
             </a>
-            <h1 class="text-xl font-bold text-slate-800">⚙️ Pengaturan Identitas Sekolah</h1>
+            <div>
+                <h1 class="text-xl font-black text-slate-800 tracking-tight">⚙️ Pengaturan & Tanda Tangan</h1>
+                <p class="text-xs text-slate-500 font-medium">Kelola identitas sekolah, kepala sekolah, dan tanda tangan guru</p>
+            </div>
+        </div>
+        <div id="statusSinkron" class="hidden md:flex items-center gap-2 bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-full text-xs font-bold">
+            <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+            <span id="labelSinkron">Memeriksa Database Cloud...</span>
         </div>
     </header>
 
-    <main class="max-w-3xl mx-auto p-6 w-full mt-10 mb-20">
-        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-                <span>🏫</span> Informasi Utama Sekolah
-            </h2>
-            
-            <form id="formPengaturan" class="space-y-6">
-                <div class="space-y-4 p-5 bg-slate-50 rounded-xl border border-slate-100">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-600 mb-1">Nama Sekolah</label>
-                        <input type="text" id="set_nama" placeholder="Cth: SDIT QURRATU A'YUN AL-ISLAMI" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-blue-500 font-bold uppercase">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-600 mb-1">Alamat Sekolah (Bisa Panjang Lengkap)</label>
-                        <input type="text" id="set_alamat" placeholder="Cth: Jl. Poros Makassar - Maros Km. 26 Maccopa, Kab. Maros" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-blue-500">
+    <!-- Navigasi Tab -->
+    <div class="max-w-5xl mx-auto w-full px-4 mt-6">
+        <div class="bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200 flex gap-2">
+            <button onclick="pindahTab('sekolah')" id="btnTabSekolah" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-blue-600 text-white shadow-md">
+                <span>🏫</span> Identitas Sekolah & Kepsek
+            </button>
+            <button onclick="pindahTab('guru')" id="btnTabGuru" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100">
+                <span>👨‍🏫</span> Wali Kelas & Tanda Tangan Guru
+            </button>
+            <button onclick="pindahTab('cloud')" id="btnTabCloud" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100">
+                <span>☁️</span> Database Cloud & Cadangan
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-5xl mx-auto w-full px-4 mt-6 flex-1">
+
+        <!-- TAB 1: IDENTITAS SEKOLAH & KEPSEK -->
+        <div id="tabSekolah" class="block space-y-6">
+            <form id="formSekolah" class="space-y-6">
+                <!-- Bagian 1: Data Pokok Sekolah -->
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-black text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center gap-2">
+                        <span class="text-2xl">🏫</span> Informasi Pokok Sekolah
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Nama Resmi Sekolah</label>
+                            <input type="text" id="set_nama" placeholder="Contoh: SDIT QURRATU A'YUN AL-ISLAMI" required class="w-full border-2 border-slate-200 p-3.5 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none font-bold text-slate-800 uppercase transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Alamat Lengkap Sekolah</label>
+                            <textarea id="set_alamat" rows="2" placeholder="Nama Jalan, RT/RW, Dusun, Kelurahan, Kecamatan, Kabupaten/Kota..." class="w-full border-2 border-slate-200 p-3.5 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none text-slate-700 transition-all"></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Kota / Tempat Penandatanganan Rapor</label>
+                                <input type="text" id="set_kota_tanggal" placeholder="Contoh: Maros" class="w-full border-2 border-slate-200 p-3.5 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none font-bold text-slate-800 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Tanggal Cetak Rapor (Opsional)</label>
+                                <input type="date" id="set_tanggal_cetak" class="w-full border-2 border-slate-200 p-3.5 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none text-slate-700 transition-all">
+                                <p class="text-[11px] text-slate-400 mt-1">Kosongkan jika ingin tanggal cetak otomatis mengikuti tanggal hari ini.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-blue-50 rounded-xl border border-blue-100">
-                    <div>
-                        <label class="block text-sm font-bold text-blue-800 mb-1">Nama Kepala Sekolah</label>
-                        <input type="text" id="set_kepsek" placeholder="Nama Lengkap & Gelar" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                <!-- Bagian 2: Kepala Sekolah & Tanda Tangan -->
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-black text-slate-800 mb-4 pb-3 border-b border-slate-100 flex items-center gap-2">
+                        <span class="text-2xl">🎓</span> Kepala Sekolah & Tanda Tangan Digital
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Nama Lengkap Kepala Sekolah & Gelar</label>
+                            <input type="text" id="set_kepsek" placeholder="Contoh: Radiant Fadli, S.Pd" required class="w-full border-2 border-slate-200 p-3.5 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none font-bold text-slate-800 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">NIP / NUPTK Kepala Sekolah</label>
+                            <input type="text" id="set_nip" placeholder="Contoh: 19850101... atau isi strip (-)" class="w-full border-2 border-slate-200 p-3.5 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none font-mono text-slate-700 transition-all">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold text-blue-800 mb-1">NIP Kepala Sekolah</label>
-                        <input type="text" id="set_nip" placeholder="Kosongkan jika tidak ada" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-blue-500">
+
+                    <!-- Area Tanda Tangan Digital Kepsek -->
+                    <div class="pt-4 border-t border-slate-100">
+                        <div class="space-y-3 max-w-xl">
+                            <div class="flex items-center justify-between">
+                                <label class="block text-xs font-bold text-blue-700 uppercase tracking-wider">✍️ Tanda Tangan Digital Kepala Sekolah</label>
+                                <span class="text-[11px] text-slate-400 font-medium">Arsip resmi cetak ulang rapor masa lalu/sekarang</span>
+                            </div>
+                            
+                            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-4 bg-slate-50 text-center flex flex-col items-center justify-center min-h-[140px] relative">
+                                <img id="previewTtdKepsek" src="" alt="Pratinjau TTD Kepsek" class="max-h-24 max-w-[220px] object-contain hidden mix-blend-multiply">
+                                <div id="kosongTtdKepsek" class="text-slate-400 text-xs font-medium">
+                                    Belum ada tanda tangan tersimpan.
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <label for="uploadTtdKepsek" class="flex-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 py-2.5 px-3 rounded-xl text-xs font-bold text-center cursor-pointer shadow-sm transition-all flex items-center justify-center gap-1.5">
+                                    <span>📁</span> Upload File TTD (PNG/JPG)
+                                </label>
+                                <input type="file" id="uploadTtdKepsek" accept="image/*" class="hidden">
+                                
+                                <button type="button" onclick="bukaModalGambar('kepsek')" class="flex-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+                                    <span>🖊️</span> Coret / Gambar di Layar
+                                </button>
+                                
+                                <button type="button" id="btnHapusTtdKepsek" class="p-2.5 text-red-500 hover:bg-red-50 rounded-xl border border-red-200 transition-colors" title="Hapus Tanda Tangan">
+                                    🗑️
+                                </button>
+                            </div>
+                            <p class="text-[11px] text-slate-500 italic mt-1.5">
+                                *Catatan: Stempel sekolah menggunakan stempel basah asli fisik saat dicetak.
+                            </p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-emerald-50 rounded-xl border border-emerald-100">
-                    <div>
-                        <label class="block text-sm font-bold text-emerald-800 mb-1">Nama Wali Kelas</label>
-                        <input type="text" id="set_walikelas" placeholder="Nama Lengkap & Gelar" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-emerald-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-emerald-800 mb-1">NIP Wali Kelas</label>
-                        <input type="text" id="set_nip_walikelas" placeholder="Kosongkan jika tidak ada" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-emerald-500">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-amber-50 rounded-xl border border-amber-100">
-                    <div>
-                        <label class="block text-sm font-bold text-amber-800 mb-1">Kota/Tempat Tanggal Cetak</label>
-                        <input type="text" id="set_kota_tanggal" placeholder="Cth: Maros" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-amber-500 font-bold">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-amber-800 mb-1">Tanggal Cetak Rapor (Opsional)</label>
-                        <input type="date" id="set_tanggal_cetak" class="w-full border p-3 rounded-xl bg-white outline-none focus:ring-2 focus:ring-amber-500">
-                    </div>
-                    <div class="md:col-span-2">
-                        <p class="text-xs text-amber-700">Jika tanggal dikosongkan, rapor akan otomatis menggunakan tanggal hari ini saat dicetak.</p>
+                <!-- Bagian 3: Wali Kelas Default / Cadangan -->
+                <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-black text-slate-800 mb-2 pb-3 border-b border-slate-100 flex items-center gap-2">
+                        <span class="text-2xl">👤</span> Wali Kelas Default (Cadangan)
+                    </h2>
+                    <p class="text-xs text-slate-500 mb-4">Wali kelas ini akan otomatis digunakan bila seorang siswa berada di kelas yang belum memiliki guru khusus di tab <b>Wali Kelas & Tanda Tangan Guru</b>.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">Nama Wali Kelas Default</label>
+                            <input type="text" id="set_walikelas" placeholder="Contoh: Nama Guru, S.Pd" class="w-full border-2 border-slate-200 p-3.5 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none text-slate-800 transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5">NIP Wali Kelas Default</label>
+                            <input type="text" id="set_nip_walikelas" placeholder="Isi NIP atau strip (-)" class="w-full border-2 border-slate-200 p-3.5 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none font-mono text-slate-700 transition-all">
+                        </div>
                     </div>
                 </div>
 
-                <div class="pt-4">
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all text-lg">
-                        ✅ Simpan Semua Pengaturan
+                <!-- Tombol Simpan -->
+                <button type="submit" id="btnSimpanSekolah" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-6 rounded-2xl shadow-xl shadow-blue-500/20 transition-all text-base flex items-center justify-center gap-2">
+                    <span>💾</span> Simpan Pengaturan Sekolah & Kepala Sekolah
+                </button>
+            </form>
+        </div>
+
+        <!-- TAB 2: MANAJEMEN GURU, WALI KELAS & TANDA TANGAN -->
+        <div id="tabGuru" class="hidden space-y-6">
+            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                            <span class="text-2xl">👨‍🏫</span> Daftar Wali Kelas & Tanda Tangan Guru
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Sistem akan otomatis mencocokkan rombel siswa saat cetak rapor dengan wali kelas yang terdaftar di sini.</p>
+                    </div>
+                    <button onclick="bukaModalGuru()" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-lg shadow-green-600/20 transition-all flex items-center gap-2 whitespace-nowrap">
+                        <span class="text-lg">+</span> Tambah Guru / Wali Kelas
+                    </button>
+                </div>
+
+                <!-- Tabel Guru -->
+                <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-200">
+                                <th class="p-4 font-bold text-center w-12">No</th>
+                                <th class="p-4 font-bold w-24 text-center">TTD</th>
+                                <th class="p-4 font-bold">Nama Guru & Gelar</th>
+                                <th class="p-4 font-bold">NIP / NUPTK</th>
+                                <th class="p-4 font-bold">Kelas yang Diampu</th>
+                                <th class="p-4 font-bold text-center w-28">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelGuruBody" class="divide-y divide-slate-100 text-sm text-slate-700">
+                            <tr>
+                                <td colspan="6" class="p-8 text-center text-slate-400 font-medium">Memuat data guru...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: CLOUD SUPABASE & CADANGAN -->
+        <div id="tabCloud" class="hidden space-y-6">
+            <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200">
+                <h2 class="text-lg font-black text-slate-800 mb-2 flex items-center gap-2">
+                    <span class="text-2xl">☁️</span> Sinkronisasi Database Supabase
+                </h2>
+                <p class="text-sm text-slate-600 mb-6">
+                    Aplikasi ini dirancang dengan sistem cerdas: Jika tabel di Supabase sudah siap, data otomatis tersinkronisasi untuk seluruh laptop guru di sekolah. Jika belum, data tetap tersimpan aman di komputer ini.
+                </p>
+
+                <div id="boxStatusCloud" class="p-5 rounded-2xl border mb-6 flex items-start gap-4">
+                    <div id="ikonCloud" class="text-3xl">⏳</div>
+                    <div>
+                        <h4 id="judulStatusCloud" class="font-bold text-slate-800 text-sm">Sedang memeriksa status tabel database...</h4>
+                        <p id="deskripsiStatusCloud" class="text-xs text-slate-500 mt-1">Menghubungkan ke Supabase Cloud REST API.</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-xs text-slate-700 uppercase tracking-wider">📜 Skrip SQL Pembuatan Tabel Supabase</span>
+                        <button onclick="salinSqlScript()" class="bg-white hover:bg-slate-100 text-blue-600 border border-slate-300 text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all">
+                            📋 Salin Skrip SQL
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3">Untuk mengaktifkan sinkronisasi cloud permanen, cukup buka <b>Supabase Dashboard &rarr; SQL Editor</b>, paste skrip di bawah ini, lalu klik <b>Run</b>.</p>
+                    <textarea id="sqlCodeBox" readonly rows="7" class="w-full bg-slate-900 text-emerald-400 font-mono text-xs p-3.5 rounded-xl border-none outline-none select-all"></textarea>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 pt-4 border-t border-slate-100">
+                    <button onclick="exportBackupData()" class="flex-1 bg-white hover:bg-slate-50 border-2 border-slate-200 text-slate-700 font-bold py-3.5 px-4 rounded-xl text-sm transition-all flex items-center justify-center gap-2">
+                        <span>📤</span> Backup Data Sekolah & Guru (JSON)
+                    </button>
+                    <label for="inputRestore" class="flex-1 bg-white hover:bg-slate-50 border-2 border-slate-200 text-slate-700 font-bold py-3.5 px-4 rounded-xl text-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+                        <span>📥</span> Restore Data dari File Backup
+                    </label>
+                    <input type="file" id="inputRestore" accept=".json" class="hidden">
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL TAMBAH / EDIT GURU -->
+    <div id="modalGuru" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-5 border-b pb-4">
+                <h3 id="judulModalGuru" class="text-lg font-black text-slate-800">Tambah Guru / Wali Kelas</h3>
+                <button onclick="tutupModalGuru()" class="text-slate-400 hover:text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+
+            <form id="formGuru" class="space-y-4">
+                <input type="hidden" id="in_guru_id">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Nama Lengkap & Gelar</label>
+                    <input type="text" id="in_guru_nama" required placeholder="Contoh: Ustadzah Fatimah, S.Pd" class="w-full border p-3 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none text-sm font-bold text-slate-800">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">NIP / NUPTK</label>
+                        <input type="text" id="in_guru_nip" placeholder="Isi NIP atau (-)" class="w-full border p-3 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none text-sm font-mono text-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Kelas yang Diampu</label>
+                        <input type="text" id="in_guru_rombel" required placeholder="Cth: Kelas 1, Kelas 5 Putri" class="w-full border p-3 rounded-xl bg-emerald-50 focus:bg-white focus:border-emerald-500 outline-none text-sm font-bold text-emerald-800">
+                    </div>
+                </div>
+
+                <!-- Bagian Tanda Tangan Guru -->
+                <div class="pt-3 border-t border-slate-100">
+                    <label class="block text-xs font-bold text-blue-700 uppercase mb-2">✍️ Tanda Tangan Digital Guru</label>
+                    
+                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-3 bg-slate-50 flex items-center justify-center min-h-[110px] mb-3 relative">
+                        <img id="in_guru_ttd_preview" src="" alt="TTD Guru" class="max-h-20 max-w-[180px] object-contain hidden mix-blend-multiply">
+                        <span id="in_guru_ttd_kosong" class="text-xs text-slate-400">Belum ada tanda tangan</span>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <label for="uploadTtdGuruModal" class="flex-1 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 py-2 rounded-xl text-xs font-bold text-center cursor-pointer shadow-sm flex items-center justify-center gap-1">
+                            <span>📁</span> Upload Foto TTD
+                        </label>
+                        <input type="file" id="uploadTtdGuruModal" accept="image/*" class="hidden">
+                        
+                        <button type="button" onclick="bukaModalGambar('guru')" class="flex-1 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1">
+                            <span>🖊️</span> Coret di Layar
+                        </button>
+                        
+                        <button type="button" id="btnHapusTtdGuruModal" class="p-2 text-red-500 hover:bg-red-50 rounded-xl border border-red-200" title="Hapus TTD">
+                            🗑️
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-4 border-t border-slate-100">
+                    <button type="button" onclick="tutupModalGuru()" class="w-1/3 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold text-sm">
+                        Batal
+                    </button>
+                    <button type="submit" class="w-2/3 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm shadow-md shadow-emerald-500/20">
+                        Simpan Data Guru
                     </button>
                 </div>
             </form>
         </div>
-    </main>
+    </div>
 
-    <script>
-        const config = JSON.parse(localStorage.getItem('config_sekolah') || '{}');
-        document.getElementById('set_nama').value = config.nama || '';
-        document.getElementById('set_alamat').value = config.alamat || '';
-        
-        document.getElementById('set_kepsek').value = config.kepsek || '';
-        document.getElementById('set_nip').value = config.nip || '';
-        
-        document.getElementById('set_walikelas').value = config.walikelas || '';
-        document.getElementById('set_nip_walikelas').value = config.nip_walikelas || '';
-        
-        document.getElementById('set_kota_tanggal').value = config.kota_tanggal || 'Maros';
-        document.getElementById('set_tanggal_cetak').value = config.tanggal_cetak || '';
+    <!-- MODAL SIGNATURE PAD (CORET LANGSUNG DI LAYAR) -->
+    <div id="modalSignaturePad" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl border border-slate-100 text-center">
+            <h3 class="text-lg font-black text-slate-800 mb-1">Coret Tanda Tangan di Kotak Ini</h3>
+            <p class="text-xs text-slate-500 mb-4">Gunakan jari tangan Anda (pada smartphone/tablet) atau mouse komputer</p>
+            
+            <div class="border-2 border-slate-300 rounded-2xl overflow-hidden shadow-inner bg-white mb-4 relative">
+                <canvas id="signatureCanvas" width="400" height="200" class="canvas-ttd w-full h-[180px]"></canvas>
+                <div class="absolute bottom-2 right-3 text-[10px] text-slate-300 pointer-events-none select-none">IndukKu Signature Pad</div>
+            </div>
 
-        document.getElementById('formPengaturan').addEventListener('submit', (e) => {
+            <div class="flex justify-between items-center gap-2">
+                <button type="button" onclick="bersihkanCanvas()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 text-xs font-bold">
+                    🔄 Hapus / Ulang
+                </button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="tutupModalGambar()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold">
+                        Batal
+                    </button>
+                    <button type="button" onclick="terapkanSignaturePad()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black shadow-md">
+                        ✅ Gunakan TTD Ini
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIKA UTAMA -->
+    <script type="module">
+        import { supabase } from './js/supabaseConfig.js';
+
+        // 🛡️ Pengaman Session Login
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { window.location.href = 'login.html'; }
+
+        // State Global
+        let dataSekolahGlobal = {};
+        let daftarGuruGlobal = [];
+        let targetPadSaatIni = null; // 'kepsek' atau 'guru'
+        let cloudTersedia = false;
+
+        // ==========================================
+        // 1. KONTROL TAB
+        // ==========================================
+        window.pindahTab = function(tab) {
+            ['sekolah', 'guru', 'cloud'].forEach(t => {
+                const elTab = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+                const btnTab = document.getElementById('btnTab' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (t === tab) {
+                    elTab.classList.remove('hidden');
+                    btnTab.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-blue-600 text-white shadow-md";
+                } else {
+                    elTab.classList.add('hidden');
+                    btnTab.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100";
+                }
+            });
+        };
+
+        // ==========================================
+        // 2. CEK STATUS SUPABASE CLOUD
+        // ==========================================
+        async function cekStatusCloud() {
+            const box = document.getElementById('boxStatusCloud');
+            const ikon = document.getElementById('ikonCloud');
+            const judul = document.getElementById('judulStatusCloud');
+            const desk = document.getElementById('deskripsiStatusCloud');
+            const statusBadge = document.getElementById('labelSinkron');
+
+            try {
+                const { error: err1 } = await supabase.from('pengaturan_sekolah').select('id').limit(1);
+                const { error: err2 } = await supabase.from('guru_staf').select('id').limit(1);
+
+                if (!err1 && !err2) {
+                    cloudTersedia = true;
+                    box.className = "p-5 rounded-2xl border border-emerald-200 bg-emerald-50 mb-6 flex items-start gap-4";
+                    ikon.innerText = "🟢";
+                    judul.innerText = "Database Cloud Supabase Terhubung Aktif!";
+                    judul.className = "font-bold text-emerald-900 text-sm";
+                    desk.innerText = "Tabel 'pengaturan_sekolah' & 'guru_staf' terdeteksi. Data sekolah dan tanda tangan guru tersinkronisasi otomatis untuk seluruh perangkat.";
+                    desk.className = "text-xs text-emerald-700 mt-1";
+                    statusBadge.innerText = "Cloud Supabase Aktif";
+                    document.getElementById('statusSinkron').className = "hidden md:flex items-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-full text-xs font-bold";
+                } else {
+                    throw new Error("Tabel cloud belum dibuat.");
+                }
+            } catch (err) {
+                cloudTersedia = false;
+                box.className = "p-5 rounded-2xl border border-amber-200 bg-amber-50 mb-6 flex items-start gap-4";
+                ikon.innerText = "🟡";
+                judul.innerText = "Mode Penyimpanan Lokal (LocalStorage Aktif)";
+                judul.className = "font-bold text-amber-900 text-sm";
+                desk.innerText = "Data tersimpan di komputer ini. Untuk mengaktifkan sinkronisasi cloud ke seluruh laptop guru, silakan jalankan skrip SQL di bawah ini pada Supabase SQL Editor.";
+                desk.className = "text-xs text-amber-700 mt-1";
+                statusBadge.innerText = "Mode Lokal (Offline Ready)";
+                document.getElementById('statusSinkron').className = "hidden md:flex items-center gap-2 bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-full text-xs font-bold";
+            }
+        }
+
+        // ==========================================
+        // 3. MUAT DATA IDENTITAS SEKOLAH & KEPSEK
+        // ==========================================
+        async function muatDataSekolah() {
+            // Ambil cadangan dari LocalStorage terlebih dahulu
+            let data = JSON.parse(localStorage.getItem('config_sekolah') || '{}');
+
+            // Coba ambil dari Supabase jika ada
+            if (cloudTersedia) {
+                try {
+                    const { data: dbData } = await supabase.from('pengaturan_sekolah').select('*').eq('id', 1).maybeSingle();
+                    if (dbData) {
+                        data = {
+                            nama: dbData.nama_sekolah || data.nama,
+                            alamat: dbData.alamat_sekolah || data.alamat,
+                            kota_tanggal: dbData.kota_cetak || data.kota_tanggal,
+                            tanggal_cetak: dbData.tanggal_cetak || data.tanggal_cetak,
+                            kepsek: dbData.nama_kepsek || data.kepsek,
+                            nip: dbData.nip_kepsek || data.nip,
+                            ttd_kepsek: dbData.ttd_kepsek || data.ttd_kepsek,
+                            
+                            walikelas: data.walikelas,
+                            nip_walikelas: data.nip_walikelas
+                        };
+                        localStorage.setItem('config_sekolah', JSON.stringify(data));
+                    }
+                } catch (e) { console.warn("Supabase load fallback ke local", e); }
+            }
+
+            dataSekolahGlobal = data;
+
+            // Render ke Input Form
+            document.getElementById('set_nama').value = data.nama || "SDIT QURRATU A'YUN AL-ISLAMI";
+            document.getElementById('set_alamat').value = data.alamat || "Jl. Poros Makassar - Maros Km. 26 Maccopa, Kab. Maros";
+            document.getElementById('set_kota_tanggal').value = data.kota_tanggal || "Maros";
+            document.getElementById('set_tanggal_cetak').value = data.tanggal_cetak || "";
+            document.getElementById('set_kepsek').value = data.kepsek || "Radiant Fadli, S.Pd";
+            document.getElementById('set_nip').value = data.nip || "-";
+            document.getElementById('set_walikelas').value = data.walikelas || "";
+            document.getElementById('set_nip_walikelas').value = data.nip_walikelas || "-";
+
+            // Render Pratinjau TTD Kepsek
+            renderPreviewTtdKepsek(data.ttd_kepsek);
+            
+        }
+
+        function renderPreviewTtdKepsek(url) {
+            const img = document.getElementById('previewTtdKepsek');
+            const teks = document.getElementById('kosongTtdKepsek');
+            if (url) {
+                img.src = url;
+                img.classList.remove('hidden');
+                teks.classList.add('hidden');
+            } else {
+                img.src = '';
+                img.classList.add('hidden');
+                teks.classList.remove('hidden');
+            }
+        }
+
+                // ==========================================
+        // 4. SIMPAN FORM SEKOLAH
+        // ==========================================
+        document.getElementById('formSekolah').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = document.getElementById('btnSimpanSekolah');
+            const teksAsli = btn.innerHTML;
+            btn.innerHTML = `⏳ Menyimpan...`;
+            btn.disabled = true;
+
             const dataBaru = {
-                nama: document.getElementById('set_nama').value,
-                alamat: document.getElementById('set_alamat').value,
-                kepsek: document.getElementById('set_kepsek').value,
-                nip: document.getElementById('set_nip').value,
-                walikelas: document.getElementById('set_walikelas').value,
-                nip_walikelas: document.getElementById('set_nip_walikelas').value,
-                kota_tanggal: document.getElementById('set_kota_tanggal').value,
-                tanggal_cetak: document.getElementById('set_tanggal_cetak').value
+                nama: document.getElementById('set_nama').value.trim(),
+                alamat: document.getElementById('set_alamat').value.trim(),
+                kota_tanggal: document.getElementById('set_kota_tanggal').value.trim() || 'Maros',
+                tanggal_cetak: document.getElementById('set_tanggal_cetak').value || null,
+                kepsek: document.getElementById('set_kepsek').value.trim(),
+                nip: document.getElementById('set_nip').value.trim() || '-',
+                walikelas: document.getElementById('set_walikelas').value.trim(),
+                nip_walikelas: document.getElementById('set_nip_walikelas').value.trim() || '-',
+                ttd_kepsek: dataSekolahGlobal.ttd_kepsek || null,
+                
             };
+
+            // Simpan ke LocalStorage
+            dataSekolahGlobal = dataBaru;
             localStorage.setItem('config_sekolah', JSON.stringify(dataBaru));
-            alert("Alhamdulillah! Semua pengaturan (Identitas, Tempat, & Tanggal) berhasil disimpan.");
-            window.location.href = 'index.html';
+
+            // Jika Cloud Tersedia, simpan juga ke Supabase
+            if (cloudTersedia) {
+                try {
+                    await supabase.from('pengaturan_sekolah').upsert({
+                        id: 1,
+                        nama_sekolah: dataBaru.nama,
+                        alamat_sekolah: dataBaru.alamat,
+                        kota_cetak: dataBaru.kota_tanggal,
+                        tanggal_cetak: dataBaru.tanggal_cetak,
+                        nama_kepsek: dataBaru.kepsek,
+                        nip_kepsek: dataBaru.nip,
+                        ttd_kepsek: dataBaru.ttd_kepsek,
+                        
+                        updated_at: new Date().toISOString()
+                    });
+                } catch (err) { console.error("Gagal simpan ke Supabase cloud", err); }
+            }
+
+            alert("✅ Alhamdulillah! Pengaturan Sekolah & Tanda Tangan Kepala Sekolah berhasil disimpan.");
+            btn.innerHTML = teksAsli;
+            btn.disabled = false;
         });
+
+        // Hapus TTD Kepsek & Cap
+        document.getElementById('btnHapusTtdKepsek').addEventListener('click', () => {
+            if (confirm("Hapus tanda tangan Kepala Sekolah?")) {
+                dataSekolahGlobal.ttd_kepsek = null;
+                renderPreviewTtdKepsek(null);
+            }
+        });
+
+        // Upload File TTD Kepsek
+        document.getElementById('uploadTtdKepsek').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                dataSekolahGlobal.ttd_kepsek = ev.target.result;
+                renderPreviewTtdKepsek(dataSekolahGlobal.ttd_kepsek);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // ==========================================
+        // 5. MANAJEMEN DAFTAR GURU & WALI KELAS
+        // ==========================================
+        async function muatDaftarGuru() {
+            let data = JSON.parse(localStorage.getItem('daftar_guru') || '[]');
+
+            if (cloudTersedia) {
+                try {
+                    const { data: dbGuru, error } = await supabase.from('guru_staf').select('*').order('rombel', { ascending: true });
+                    if (!error && dbGuru && dbGuru.length > 0) {
+                        data = dbGuru;
+                        localStorage.setItem('daftar_guru', JSON.stringify(data));
+                    }
+                } catch (e) { console.warn("Supabase load guru fallback ke local", e); }
+            }
+
+            daftarGuruGlobal = data;
+            renderTabelGuru();
+        }
+
+        function renderTabelGuru() {
+            const tbody = document.getElementById('tabelGuruBody');
+            tbody.innerHTML = '';
+
+            if (daftarGuruGlobal.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-slate-400 font-medium bg-slate-50">
+                            Belum ada guru / wali kelas yang ditambahkan.<br>
+                            <span class="text-xs">Klik tombol <b>+ Tambah Guru / Wali Kelas</b> di atas untuk menambahkan guru dan tanda tangannya.</span>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            daftarGuruGlobal.forEach((g, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                
+                const ttdHtml = g.ttd_url 
+                    ? `<img src="${g.ttd_url}" class="h-10 max-w-[80px] object-contain mx-auto mix-blend-multiply" alt="TTD">`
+                    : `<span class="text-xs text-slate-300 italic">Belum ada</span>`;
+
+                tr.innerHTML = `
+                    <td class="p-4 text-center font-bold text-slate-500">${idx + 1}</td>
+                    <td class="p-2 text-center">${ttdHtml}</td>
+                    <td class="p-4 font-bold text-slate-800">${g.nama_lengkap}</td>
+                    <td class="p-4 font-mono text-slate-600 text-xs">${g.nip || '-'}</td>
+                    <td class="p-4">
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-md border border-emerald-200">
+                            🏫 ${g.rombel}
+                        </span>
+                    </td>
+                    <td class="p-4 text-center">
+                        <div class="flex items-center justify-center gap-2">
+                            <button onclick="editGuru('${g.id}')" class="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-colors" title="Edit Data & TTD">
+                                ✏️
+                            </button>
+                            <button onclick="hapusGuru('${g.id}', '${g.nama_lengkap}')" class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors" title="Hapus">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        let guruTtdBuffer = null;
+
+        window.bukaModalGuru = function(guru = null) {
+            document.getElementById('modalGuru').classList.remove('hidden');
+            if (guru) {
+                document.getElementById('judulModalGuru').innerText = "Edit Guru / Wali Kelas";
+                document.getElementById('in_guru_id').value = guru.id;
+                document.getElementById('in_guru_nama').value = guru.nama_lengkap;
+                document.getElementById('in_guru_nip').value = guru.nip || '';
+                document.getElementById('in_guru_rombel').value = guru.rombel || '';
+                guruTtdBuffer = guru.ttd_url || null;
+            } else {
+                document.getElementById('judulModalGuru').innerText = "Tambah Guru / Wali Kelas";
+                document.getElementById('formGuru').reset();
+                document.getElementById('in_guru_id').value = '';
+                guruTtdBuffer = null;
+            }
+            renderPreviewTtdGuruModal(guruTtdBuffer);
+        };
+
+        window.tutupModalGuru = function() {
+            document.getElementById('modalGuru').classList.add('hidden');
+        };
+
+        function renderPreviewTtdGuruModal(url) {
+            const img = document.getElementById('in_guru_ttd_preview');
+            const teks = document.getElementById('in_guru_ttd_kosong');
+            if (url) {
+                img.src = url;
+                img.classList.remove('hidden');
+                teks.classList.add('hidden');
+            } else {
+                img.src = '';
+                img.classList.add('hidden');
+                teks.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('uploadTtdGuruModal').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                guruTtdBuffer = ev.target.result;
+                renderPreviewTtdGuruModal(guruTtdBuffer);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btnHapusTtdGuruModal').addEventListener('click', () => {
+            guruTtdBuffer = null;
+            renderPreviewTtdGuruModal(null);
+        });
+
+        window.editGuru = function(id) {
+            const guru = daftarGuruGlobal.find(g => g.id === id);
+            if (guru) bukaModalGuru(guru);
+        };
+
+        window.hapusGuru = async function(id, nama) {
+            if (confirm(`Hapus guru ${nama} dari daftar wali kelas?`)) {
+                daftarGuruGlobal = daftarGuruGlobal.filter(g => g.id !== id);
+                localStorage.setItem('daftar_guru', JSON.stringify(daftarGuruGlobal));
+
+                if (cloudTersedia) {
+                    try {
+                        await supabase.from('guru_staf').delete().eq('id', id);
+                    } catch (e) { console.error("Gagal hapus guru di cloud", e); }
+                }
+                renderTabelGuru();
+            }
+        };
+
+        document.getElementById('formGuru').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('in_guru_id').value || 'guru_' + Date.now();
+            const nama = document.getElementById('in_guru_nama').value.trim();
+            const nip = document.getElementById('in_guru_nip').value.trim() || '-';
+            const rombel = document.getElementById('in_guru_rombel').value.trim();
+
+            const guruObj = {
+                id: id,
+                nama_lengkap: nama,
+                nip: nip,
+                jabatan: 'Wali Kelas',
+                rombel: rombel,
+                ttd_url: guruTtdBuffer
+            };
+
+            const indexLama = daftarGuruGlobal.findIndex(g => g.id === id);
+            if (indexLama >= 0) {
+                daftarGuruGlobal[indexLama] = guruObj;
+            } else {
+                daftarGuruGlobal.push(guruObj);
+            }
+
+            localStorage.setItem('daftar_guru', JSON.stringify(daftarGuruGlobal));
+
+            if (cloudTersedia) {
+                try {
+                    await supabase.from('guru_staf').upsert(guruObj);
+                } catch (e) { console.error("Gagal upsert guru ke Supabase", e); }
+            }
+
+            tutupModalGuru();
+            renderTabelGuru();
+            alert(`✅ Data guru ${nama} berhasil disimpan.`);
+        });
+
+        // ==========================================
+        // 6. KANVAS DIGITAL SIGNATURE PAD (NATIVE)
+        // ==========================================
+        const canvas = document.getElementById('signatureCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let lastX = 0, lastY = 0;
+
+        function setCanvasStyle() {
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        }
+
+        function getCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            if (e.touches && e.touches[0]) {
+                return {
+                    x: (e.touches[0].clientX - rect.left) * scaleX,
+                    y: (e.touches[0].clientY - rect.top) * scaleY
+                };
+            }
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            const pos = getCoordinates(e);
+            lastX = pos.x; lastY = pos.y;
+            setCanvasStyle();
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            const pos = getCoordinates(e);
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            lastX = pos.x; lastY = pos.y;
+        });
+
+        window.addEventListener('mouseup', () => { isDrawing = false; });
+        canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+
+        // Touch event support for tablet/smartphone
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            const pos = getCoordinates(e);
+            lastX = pos.x; lastY = pos.y;
+            setCanvasStyle();
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const pos = getCoordinates(e);
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+            lastX = pos.x; lastY = pos.y;
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            isDrawing = false;
+        }, { passive: false });
+
+        window.bersihkanCanvas = function() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        };
+
+        window.bukaModalGambar = function(target) {
+            targetPadSaatIni = target;
+            bersihkanCanvas();
+            document.getElementById('modalSignaturePad').classList.remove('hidden');
+        };
+
+        window.tutupModalGambar = function() {
+            document.getElementById('modalSignaturePad').classList.add('hidden');
+        };
+
+        window.terapkanSignaturePad = function() {
+            // Periksa apakah kanvas kosong
+            const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            let adaCoretan = false;
+            for (let i = 3; i < pixelData.length; i += 4) {
+                if (pixelData[i] > 0) { adaCoretan = true; break; }
+            }
+
+            if (!adaCoretan) {
+                alert("Kotak tanda tangan masih kosong. Silakan coretkan tanda tangan terlebih dahulu!");
+                return;
+            }
+
+            const dataUrl = canvas.toDataURL('image/png');
+            if (targetPadSaatIni === 'kepsek') {
+                dataSekolahGlobal.ttd_kepsek = dataUrl;
+                renderPreviewTtdKepsek(dataUrl);
+            } else if (targetPadSaatIni === 'guru') {
+                guruTtdBuffer = dataUrl;
+                renderPreviewTtdGuruModal(dataUrl);
+            }
+
+            tutupModalGambar();
+        };
+
+        // ==========================================
+        // 7. BACKUP, RESTORE & SQL HELPER
+        // ==========================================
+        window.salinSqlScript = function() {
+            const el = document.getElementById('sqlCodeBox');
+            el.select();
+            navigator.clipboard.writeText(el.value);
+            alert("📋 Skrip SQL berhasil disalin ke clipboard! Silakan paste di Supabase Dashboard -> SQL Editor.");
+        };
+
+        window.exportBackupData = function() {
+            const backup = {
+                config_sekolah: dataSekolahGlobal,
+                daftar_guru: daftarGuruGlobal,
+                exported_at: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Backup_Pengaturan_IndukKu_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        document.getElementById('inputRestore').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (data.config_sekolah) {
+                        dataSekolahGlobal = data.config_sekolah;
+                        localStorage.setItem('config_sekolah', JSON.stringify(dataSekolahGlobal));
+                    }
+                    if (data.daftar_guru) {
+                        daftarGuruGlobal = data.daftar_guru;
+                        localStorage.setItem('daftar_guru', JSON.stringify(daftarGuruGlobal));
+                    }
+                    alert("✅ Data berhasil dipulihkan dari file backup!");
+                    window.location.reload();
+                } catch (err) { alert("File JSON tidak valid: " + err.message); }
+            };
+            reader.readAsText(file);
+        });
+
+        // Muat teks SQL ke dalam box
+        fetch('schema_tahap2.sql')
+            .then(r => r.text())
+            .then(sql => { document.getElementById('sqlCodeBox').value = sql; })
+            .catch(() => {
+                document.getElementById('sqlCodeBox').value = `-- Silakan buka file schema_tahap2.sql di folder proyek`;
+            });
+
+        // Inisialisasi awal saat halaman dibuka
+        await cekStatusCloud();
+        await muatDataSekolah();
+        await muatDaftarGuru();
+
     </script>
 </body>
 </html>

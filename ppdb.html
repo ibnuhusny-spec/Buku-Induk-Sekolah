@@ -106,6 +106,10 @@
     <script type="module">
         import { supabase } from './js/supabaseConfig.js';
 
+        // 🛡️ Pengaman Session Login
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { window.location.href = 'login.html'; }
+
         document.getElementById('formPPDB').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -115,31 +119,48 @@
             btn.disabled = true;
 
             try {
-                // Merakit Data dari Inputan Form
-                // CATATAN: Pastikan nama properti (sebelah kiri titik dua) sesuai dengan nama kolom di tabel Supabase Ustadz
-                const payload = {
-                    nama_lengkap: document.getElementById('in_nama').value.toUpperCase(),
-                    nisn: document.getElementById('in_nisn').value || null,
-                    nik: document.getElementById('in_nik').value || null,
-                    no_pendaftaran: document.getElementById('in_no_daftar').value || null,
-                    rombel: document.getElementById('in_rombel').value,
-                    jenis_kelamin: document.getElementById('in_jk').value,
-                    tempat_lahir: document.getElementById('in_tmpt_lahir').value,
-                    tanggal_lahir: document.getElementById('in_tgl_lahir').value || null,
-                    alamat_siswa: document.getElementById('in_alamat').value,
-                    asal_sekolah: document.getElementById('in_asal_sekolah').value,
-                    
-                    nama_ayah: document.getElementById('in_nama_ayah').value,
-                    pekerjaan_ayah: document.getElementById('in_kerja_ayah').value,
-                    nohp_ayah: document.getElementById('in_hp_ayah').value,
-                    
-                    nama_ibu: document.getElementById('in_nama_ibu').value,
-                    pekerjaan_ibu: document.getElementById('in_kerja_ibu').value,
-                    nohp_ibu: document.getElementById('in_hp_ibu').value,
+                // Tangani Tahun Lahir & Kontak Orang Tua
+                const thnAyah = document.getElementById('in_thn_ayah').value;
+                const tglLahirAyah = thnAyah ? `${thnAyah}-01-01` : null;
+                const thnIbu = document.getElementById('in_thn_ibu').value;
+                const tglLahirIbu = thnIbu ? `${thnIbu}-01-01` : null;
 
-                    // Nilai Otomatis untuk Siswa Baru
+                const nohpAyah = document.getElementById('in_hp_ayah').value.trim();
+                const nohpIbu = document.getElementById('in_hp_ibu').value.trim();
+                const asalSekolah = document.getElementById('in_asal_sekolah').value.trim();
+                const noDaftar = document.getElementById('in_no_daftar').value.trim();
+                const nik = document.getElementById('in_nik').value.trim();
+
+                let alamatLengkapSiswa = document.getElementById('in_alamat').value.trim();
+                let catatanTambahan = [];
+                if (asalSekolah) catatanTambahan.push(`Asal TK: ${asalSekolah}`);
+                if (nik) catatanTambahan.push(`NIK: ${nik}`);
+                if (catatanTambahan.length > 0) {
+                    alamatLengkapSiswa += (alamatLengkapSiswa ? ' | ' : '') + catatanTambahan.join(', ');
+                }
+
+                const payload = {
+                    nama_lengkap: document.getElementById('in_nama').value.toUpperCase().trim(),
+                    nisn: document.getElementById('in_nisn').value.trim() || null,
+                    nipd: noDaftar || null,
+                    rombel: document.getElementById('in_rombel').value.trim(),
+                    jenis_kelamin: document.getElementById('in_jk').value,
+                    tempat_lahir: document.getElementById('in_tmpt_lahir').value.trim() || null,
+                    tanggal_lahir: document.getElementById('in_tgl_lahir').value || null,
+                    alamat_siswa: alamatLengkapSiswa || null,
+                    
+                    nama_ayah: document.getElementById('in_nama_ayah').value.trim() || null,
+                    tanggal_lahir_ayah: tglLahirAyah,
+                    pekerjaan_ayah: document.getElementById('in_kerja_ayah').value.trim() || null,
+                    alamat_ayah: nohpAyah ? `No. HP/WA: ${nohpAyah}` : null,
+                    
+                    nama_ibu: document.getElementById('in_nama_ibu').value.trim() || null,
+                    tanggal_lahir_ibu: tglLahirIbu,
+                    pekerjaan_ibu: document.getElementById('in_kerja_ibu').value.trim() || null,
+                    alamat_ibu: nohpIbu ? `No. HP/WA: ${nohpIbu}` : null,
+
                     status: 'Aktif',
-                    tahun_masuk: new Date().getFullYear() // Otomatis tahun saat ini (2026)
+                    tahun_masuk: new Date().getFullYear()
                 };
 
                 // Kirim ke Supabase

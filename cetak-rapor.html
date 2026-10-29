@@ -127,25 +127,90 @@
 
     <script type="module">
         import { supabase } from './js/supabaseConfig.js';
+
+        // 🛡️ Pengaman Session Login
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { window.location.href = 'login.html'; }
         const urlP = new URLSearchParams(window.location.search);
         const idSiswa = urlP.get('id');
         const klsOriginal = urlP.get('kelas') || '';
         const smt = urlP.get('semester');
         
-        const configSekolah = JSON.parse(localStorage.getItem('config_sekolah') || '{}');
+        // 🌟 AMBIL PENGATURAN SEKOLAH & GURU (CLOUD / LOCAL)
+        let configSekolah = JSON.parse(localStorage.getItem('config_sekolah') || '{}');
+        try {
+            const { data: dbSekolah } = await supabase.from('pengaturan_sekolah').select('*').eq('id', 1).maybeSingle();
+            if (dbSekolah) {
+                configSekolah = {
+                    nama: dbSekolah.nama_sekolah || configSekolah.nama,
+                    alamat: dbSekolah.alamat_sekolah || configSekolah.alamat,
+                    kota_tanggal: dbSekolah.kota_cetak || configSekolah.kota_tanggal,
+                    tanggal_cetak: dbSekolah.tanggal_cetak || configSekolah.tanggal_cetak,
+                    kepsek: dbSekolah.nama_kepsek || configSekolah.kepsek,
+                    nip: dbSekolah.nip_kepsek || configSekolah.nip,
+                    ttd_kepsek: dbSekolah.ttd_kepsek || configSekolah.ttd_kepsek,
+                    
+                    walikelas: configSekolah.walikelas,
+                    nip_walikelas: configSekolah.nip_walikelas
+                };
+            }
+        } catch (e) { console.warn("Pakai config local", e); }
+
+        let daftarGuru = JSON.parse(localStorage.getItem('daftar_guru') || '[]');
+        try {
+            const { data: dbGuru } = await supabase.from('guru_staf').select('*');
+            if (dbGuru && dbGuru.length > 0) daftarGuru = dbGuru;
+        } catch (e) { console.warn("Pakai daftar guru local", e); }
+
         const sekolah = configSekolah.nama || "SDIT QURRATU A'YUN AL-ISLAMI";
         const alamatSekolah = configSekolah.alamat || "Maros, Sulawesi Selatan";
-        
         const namaKepsek = configSekolah.kepsek || "Radiant Fadli, S.Pd";
-        const nipKepsek = configSekolah.nip || "-"; 
-        const namaWaliKelas = configSekolah.walikelas || "( ................................... )";
-        const nipWaliKelas = configSekolah.nip_walikelas || "-"; 
-        
+        const nipKepsek = configSekolah.nip || "-";
+        const ttdKepsekUrl = configSekolah.ttd_kepsek || null;
+
         const kotaTanggal = configSekolah.kota_tanggal || "Maros";
         const tanggalCetakGlobal = configSekolah.tanggal_cetak || null;
 
         const angkaKelas = klsOriginal.match(/\d+/);
         const klsBersih = angkaKelas ? "Kelas " + angkaKelas[0] : klsOriginal;
+
+        // Cocokkan Wali Kelas Otomatis Berdasarkan Rombel Siswa
+        let waliKelasDitemukan = null;
+        if (klsOriginal) {
+            const klsLower = klsOriginal.toLowerCase().trim();
+            waliKelasDitemukan = daftarGuru.find(g => {
+                const rLower = (g.rombel || '').toLowerCase().trim();
+                return rLower === klsLower || klsLower.includes(rLower) || rLower.includes(klsLower);
+            });
+        }
+
+        const namaWaliKelas = waliKelasDitemukan ? waliKelasDitemukan.nama_lengkap : (configSekolah.walikelas || "( ................................... )");
+        const nipWaliKelas = waliKelasDitemukan ? (waliKelasDitemukan.nip || "-") : (configSekolah.nip_walikelas || "-");
+        const ttdWaliUrl = waliKelasDitemukan ? waliKelasDitemukan.ttd_url : null;
+
+        // Toggle Tanda Tangan Digital
+        const toggleTtd = document.getElementById('toggleTtdDigital');
+        function updateTampilanTtd() {
+            const aktif = toggleTtd.checked;
+            const imgKepsek = document.getElementById('img_ttd_kepsek');
+            
+            const imgWali = document.getElementById('img_ttd_walikelas');
+
+            if (aktif && ttdKepsekUrl) {
+                imgKepsek.src = ttdKepsekUrl;
+                imgKepsek.classList.remove('hidden');
+            } else {
+                imgKepsek.classList.add('hidden');
+            }
+
+            if (aktif && ttdWaliUrl) {
+                imgWali.src = ttdWaliUrl;
+                imgWali.classList.remove('hidden');
+            } else {
+                imgWali.classList.add('hidden');
+            }
+        }
+        toggleTtd.addEventListener('change', updateTampilanTtd);
 
         async function ambilData() {
             const { data: s } = await supabase.from('buku_induk').select('*').eq('id', idSiswa).single();
@@ -219,8 +284,66 @@
             const bln = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
             
             document.getElementById('tgl_skrg').innerText = `${kotaTanggal}, ${d.getDate()} ${bln[d.getMonth()]} ${d.getFullYear()}`;
+
+            // 📊 Ambil & Tampilkan Rekap Kehadiran dan Keputusan
+            const { data: hadir } = await supabase
+                .from('rekap_kehadiran')
+                .select('*')
+                .eq('siswa_id', idSiswa)
+                .eq('kelas', klsOriginal)
+                .eq('semester', smt)
+                .maybeSingle();
+
+            const wadahKehadiran = document.getElementById('wadah_kehadiran');
+            if (wadahKehadiran) {
+                const sakit = hadir && hadir.sakit ? hadir.sakit : '-';
+                const izin = hadir && hadir.izin ? hadir.izin : '-';
+                const alpa = hadir && hadir.alpa ? hadir.alpa : '-';
+                const keputusan = hadir && hadir.keputusan && hadir.keputusan !== '-' ? hadir.keputusan : '';
+
+                let htmlKehadiran = `
+                    <div class="flex flex-col sm:flex-row gap-6 items-start w-full">
+                        <div class="w-72">
+                            <table class="!m-0 text-[9pt]">
+                                <thead>
+                                    <tr class="bg-gray-100 font-bold text-center">
+                                        <th colspan="2" class="p-1 border border-black">Ketidakhadiran</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="p-1 border border-black w-44">Sakit</td>
+                                        <td class="p-1 border border-black text-center font-bold">${sakit === '-' ? '-' : sakit + ' hari'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-1 border border-black">Izin</td>
+                                        <td class="p-1 border border-black text-center font-bold">${izin === '-' ? '-' : izin + ' hari'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-1 border border-black">Tanpa Keterangan</td>
+                                        <td class="p-1 border border-black text-center font-bold">${alpa === '-' ? '-' : alpa + ' hari'}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                `;
+
+                if (smt && smt.toLowerCase() === 'genap' && keputusan) {
+                    htmlKehadiran += `
+                        <div class="flex-1 border border-black p-3 text-[9pt] leading-relaxed">
+                            <div class="font-bold uppercase tracking-wider mb-1 text-[8.5pt]">Keputusan Kenaikan Kelas:</div>
+                            <div>Berdasarkan pencapaian seluruh kompetensi, peserta didik dinyatakan:</div>
+                            <div class="mt-1 font-bold text-[10pt] underline">${keputusan}</div>
+                        </div>
+                    `;
+                }
+
+                htmlKehadiran += `</div>`;
+                wadahKehadiran.innerHTML = htmlKehadiran;
+            }
         }
-        ambilData();
+        await ambilData();
+        updateTampilanTtd();
     </script>
 </body>
 </html>

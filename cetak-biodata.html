@@ -104,11 +104,48 @@
 
     <script type="module">
         import { supabase } from './js/supabaseConfig.js';
+
+        // 🛡️ Pengaman Session Login
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { window.location.href = 'login.html'; }
         const urlP = new URLSearchParams(window.location.search);
         const idSiswa = urlP.get('id');
         
         // Ambil Data Global (Sama dengan Cetak Rapor)
-        const configSekolah = JSON.parse(localStorage.getItem('config_sekolah') || '{}');
+        let configSekolah = JSON.parse(localStorage.getItem('config_sekolah') || '{}');
+        try {
+            const { data: dbSekolah } = await supabase.from('pengaturan_sekolah').select('*').eq('id', 1).maybeSingle();
+            if (dbSekolah) {
+                configSekolah = {
+                    nama: dbSekolah.nama_sekolah || configSekolah.nama,
+                    alamat: dbSekolah.alamat_sekolah || configSekolah.alamat,
+                    kota_tanggal: dbSekolah.kota_cetak || configSekolah.kota_tanggal,
+                    tanggal_cetak: dbSekolah.tanggal_cetak || configSekolah.tanggal_cetak,
+                    kepsek: dbSekolah.nama_kepsek || configSekolah.kepsek,
+                    nip: dbSekolah.nip_kepsek || configSekolah.nip,
+                    ttd_kepsek: dbSekolah.ttd_kepsek || configSekolah.ttd_kepsek,
+                    
+                };
+            }
+        } catch (e) { console.warn("Pakai config local", e); }
+
+        const ttdKepsekUrl = configSekolah.ttd_kepsek || null;
+
+        const toggleTtd = document.getElementById('toggleTtdDigital');
+        function updateTampilanTtd() {
+            const aktif = toggleTtd.checked;
+            const imgKepsek = document.getElementById('img_ttd_kepsek');
+
+            if (aktif && ttdKepsekUrl) {
+                imgKepsek.src = ttdKepsekUrl;
+                imgKepsek.classList.remove('hidden');
+            } else {
+                imgKepsek.classList.add('hidden');
+            }
+
+        }
+        toggleTtd.addEventListener('change', updateTampilanTtd);
+        
         const namaKepsek = configSekolah.kepsek || "Radiant Fadli, S.Pd";
         const nipKepsek = configSekolah.nip || "-"; 
         const kotaTanggal = configSekolah.kota_tanggal || "Maros";
@@ -177,7 +214,8 @@
             document.getElementById('tgl_skrg').innerText = `${kotaTanggal}, ${d.getDate()} ${blnList[d.getMonth()]} ${d.getFullYear()}`;
         }
         
-        ambilData();
+        await ambilData();
+        updateTampilanTtd();
     </script>
 </body>
 </html>

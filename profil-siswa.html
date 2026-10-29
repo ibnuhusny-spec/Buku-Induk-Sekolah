@@ -3,210 +3,506 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil Siswa - Buku Induk Sekolah</title>
+    <title>Profil Peserta Didik 360° - Buku Induk Sekolah</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-serif-title { font-family: 'Playfair Display', serif; }
-        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom scrollbar for refined appearance */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f3; }
+        ::-webkit-scrollbar-thumb { background: #c2cfc9; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #07332a; }
     </style>
 </head>
-<body class="bg-[#f6f8f7] text-stone-800 h-screen overflow-auto">
+<body class="bg-[#f6f8f7] text-stone-800 min-h-screen flex flex-col">
 
-    <header class="bg-white shadow-sm border-b px-4 md:px-6 py-3 md:py-4 flex items-center justify-between sticky top-0 z-10">
-        <div class="flex items-center gap-3 md:gap-4">
-            <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg font-bold transition-colors flex items-center justify-center">
-                <span class="text-xl">&larr;</span> <span class="hidden md:inline ml-2">Kembali</span>
+    <!-- HEADER RESMI LEMBAGA (PRESTIGIOUS INSTITUTIONAL HEADER) -->
+    <header class="bg-white border-b border-stone-200/90 shadow-sm sticky top-0 z-30 px-4 md:px-8 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-[#07332a] hover:text-white text-stone-700 font-semibold text-xs border border-stone-200 transition-all shadow-sm group">
+                <span class="text-sm transition-transform group-hover:-translate-x-0.5">&larr;</span>
+                <span class="hidden sm:inline">Daftar Buku Induk</span>
             </a>
-            <h1 class="text-lg md:text-xl font-bold text-slate-800">Profil <span class="hidden md:inline">Siswa</span> 360°</h1>
+            <div class="h-6 w-px bg-stone-200 hidden sm:block"></div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-base">🏛️</span>
+                    <h1 class="font-serif-title text-base md:text-xl font-bold text-stone-900 tracking-tight leading-none">
+                        Profil Peserta Didik 360°
+                    </h1>
+                </div>
+                <p class="text-[11px] text-stone-500 font-medium mt-0.5" id="headerSekolahSub">
+                    Arsip Register & Lembar Riwayat Perkembangan Siswa
+                </p>
+            </div>
         </div>
-        <div id="statusBadge" class="bg-green-50 border border-green-200 text-green-700 px-3 py-1.5 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold whitespace-nowrap">
-            Memuat...
+
+        <div class="flex items-center gap-3">
+            <div id="statusBadge" class="bg-emerald-50 border border-emerald-200 text-[#07332a] px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide flex items-center gap-1.5 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Memuat status...</span>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6">
+    <!-- KONTEN UTAMA DENGAN DUA KOLOM -->
+    <main class="max-w-7xl w-full mx-auto p-4 md:p-8 flex flex-col lg:flex-row gap-8 flex-1">
         
-        <aside class="w-full lg:w-1/4 space-y-6">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 text-center sticky top-24">
-                <div class="relative w-24 h-24 md:w-32 md:h-32 mx-auto mb-2 group">
-                    <img id="fotoProfilSiswa" src="https://ui-avatars.com/api/?name=Siswa&background=e2e8f0&color=475569&size=128" alt="Foto Profil" class="w-full h-full object-cover rounded-full shadow-md border-4 border-white">
+        <!-- ASIDE KIRI: KARTU INDIVIDU SISWA & AKSI CETAK -->
+        <aside class="w-full lg:w-80 flex-shrink-0 space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-stone-200/90 text-center sticky top-24">
+                
+                <!-- Frame Foto Siswa dengan Bingkai Emas Prestisius -->
+                <div class="relative w-32 h-32 mx-auto mb-4 group">
+                    <div class="w-full h-full rounded-full p-1 bg-gradient-to-br from-[#c9a857] via-[#e2c77d] to-[#8d7132] shadow-md">
+                        <img id="fotoProfilSiswa" src="https://ui-avatars.com/api/?name=Siswa&background=f1f5f3&color=07332a&size=140" alt="Pasfoto Peserta Didik" class="w-full h-full object-cover rounded-full bg-white border-2 border-white">
+                    </div>
                     
-                    <label for="inputUploadFoto" class="absolute inset-0 bg-black bg-opacity-60 text-white rounded-full flex flex-col items-center justify-center opacity-0 hover:opacity-100 cursor-pointer transition-opacity duration-300">
-                        <span class="text-2xl">📷</span>
-                        <span class="text-[10px] font-bold mt-1">Ubah Foto</span>
+                    <label for="inputUploadFoto" class="absolute inset-0 bg-[#07241e]/80 text-white rounded-full flex flex-col items-center justify-center opacity-0 hover:opacity-100 cursor-pointer transition-opacity duration-200 m-1">
+                        <span class="text-xl">📷</span>
+                        <span class="text-[10px] font-bold tracking-wider uppercase mt-1">Ubah Pasfoto</span>
                     </label>
                     <input type="file" id="inputUploadFoto" accept="image/*" class="hidden">
                 </div>
-                <p id="statusUpload" class="text-xs text-blue-600 font-bold mb-4 hidden animate-pulse">⏳ Mengunggah foto...</p>
-                <h2 id="namaCard" class="text-xl md:text-2xl font-bold text-slate-800 mb-1">Memuat...</h2>
-                <p id="nisnCard" class="text-sm md:text-base text-slate-500 font-mono mb-4">...</p>
-                
-                <button id="btnCetakRapor" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl shadow-md border border-blue-700 hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 mt-4">
-                    <span class="text-xl">🖨️</span> <span class="hidden lg:inline">Cetak Biodata Rapor</span>
-                </button>
 
-                <button id="btnCetakNilai" class="w-full bg-orange-600 text-white font-bold py-3 rounded-xl shadow-md border border-orange-700 hover:bg-orange-700 transition-colors flex items-center justify-center gap-2 mt-3">
-                    <span class="text-xl">📊</span> <span class="hidden lg:inline">Cetak Nilai Rapor</span>
-                </button>
+                <p id="statusUpload" class="text-xs text-[#07332a] font-bold mb-3 hidden animate-pulse">
+                    ⏳ Mengunggah foto resmi...
+                </p>
+
+                <!-- Identitas Singkat -->
+                <h2 id="namaCard" class="font-serif-title text-xl md:text-2xl font-bold text-stone-900 leading-snug mb-1">
+                    Memuat...
+                </h2>
+                
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <span id="nisnCard" class="text-xs font-mono font-bold px-2.5 py-1 bg-stone-100 text-stone-600 rounded-lg border border-stone-200">
+                        NISN: -
+                    </span>
+                    <span id="rombelCard" class="text-xs font-bold px-2.5 py-1 bg-[#07332a]/10 text-[#07332a] rounded-lg border border-[#07332a]/20">
+                        -
+                    </span>
+                </div>
+
+                <div class="border-t border-stone-100 pt-5 space-y-2.5 text-left">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2 text-center">
+                        Dokumen Cetak Resmi
+                    </p>
+
+                    <!-- 1. CETAK LEMBAR BUKU INDUK LENGKAP (UTAMA) -->
+                    <button id="btnCetakBukuInduk" type="button" class="w-full bg-[#07332a] hover:bg-[#0c473b] text-white font-bold py-3 px-4 rounded-xl shadow-md border border-[#c9a857]/40 transition-all flex items-center justify-center gap-2.5 group">
+                        <span class="text-lg transition-transform group-hover:scale-110">📜</span>
+                        <div class="text-left">
+                            <span class="block text-xs font-black tracking-wide leading-tight text-[#f4efe3]">Lembar Buku Induk</span>
+                            <span class="block text-[10px] font-normal text-[#c9a857]">Format 2 Halaman Portofolio</span>
+                        </div>
+                    </button>
+
+                    <!-- 2. CETAK NILAI RAPOR -->
+                    <button id="btnCetakNilai" type="button" class="w-full bg-white hover:bg-stone-50 text-stone-800 font-bold py-2.5 px-4 rounded-xl border border-stone-300 transition-all flex items-center justify-center gap-2.5 shadow-sm text-xs group">
+                        <span class="text-base transition-transform group-hover:scale-110">📊</span>
+                        <span>Cetak Rapor Nilai Akademik</span>
+                    </button>
+
+                    <!-- 3. CETAK BIODATA RAPOR -->
+                    <button id="btnCetakRapor" type="button" class="w-full bg-white hover:bg-stone-50 text-stone-700 font-semibold py-2.5 px-4 rounded-xl border border-stone-300 transition-all flex items-center justify-center gap-2.5 shadow-sm text-xs group">
+                        <span class="text-base transition-transform group-hover:scale-110">🖨️</span>
+                        <span>Cetak Lembar Biodata Siswa</span>
+                    </button>
+                </div>
+
+                <div class="mt-5 pt-4 border-t border-stone-100 text-[11px] text-stone-400 text-center">
+                    ID Register: <span id="idRegisterText" class="font-mono text-stone-500">-</span>
+                </div>
             </div>
         </aside>
 
-        <section class="w-full lg:w-3/4 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+        <!-- AREA KANAN: TAB PANEL BERKUALITAS TINGGI -->
+        <section class="flex-1 bg-white rounded-2xl shadow-sm border border-stone-200/90 overflow-hidden flex flex-col">
             
-            <div class="flex border-b bg-slate-50">
-                <button onclick="bukaTab('biodata')" id="btn-biodata" class="flex-1 py-4 text-center font-bold text-blue-600 border-b-2 border-blue-600 bg-white transition-all flex items-center justify-center gap-2">
-                    <span class="text-2xl md:text-lg">📄</span><span class="hidden md:inline">Biodata Lengkap</span>
+            <!-- HEADER NAVIGASI TAB -->
+            <div class="flex border-b border-stone-200 bg-stone-50/70 p-1.5 gap-1.5">
+                <button onclick="bukaTab('biodata')" id="btn-biodata" class="flex-1 py-3 px-4 rounded-xl text-center font-bold text-[#07332a] bg-white shadow-sm border border-stone-200/80 transition-all flex items-center justify-center gap-2 text-xs md:text-sm">
+                    <span class="text-base">📄</span>
+                    <span>Biodata & Keluarga</span>
                 </button>
-                <button onclick="bukaTab('akademik')" id="btn-akademik" class="flex-1 py-4 text-center font-bold text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-all border-b-2 border-transparent flex items-center justify-center gap-2">
-                    <span class="text-2xl md:text-lg">📈</span><span class="hidden md:inline">Nilai Akademik</span>
+                <button onclick="bukaTab('akademik')" id="btn-akademik" class="flex-1 py-3 px-4 rounded-xl text-center font-semibold text-stone-500 hover:text-stone-800 hover:bg-stone-100 transition-all flex items-center justify-center gap-2 text-xs md:text-sm">
+                    <span class="text-base">📈</span>
+                    <span>Riwayat Nilai & Kehadiran</span>
                 </button>
-                <button onclick="bukaTab('dokumen')" id="btn-dokumen" class="flex-1 py-4 text-center font-bold text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-all border-b-2 border-transparent flex items-center justify-center gap-2">
-                    <span class="text-2xl md:text-lg">📂</span><span class="hidden md:inline">Dokumen Digital</span>
+                <button onclick="bukaTab('dokumen')" id="btn-dokumen" class="flex-1 py-3 px-4 rounded-xl text-center font-semibold text-stone-500 hover:text-stone-800 hover:bg-stone-100 transition-all flex items-center justify-center gap-2 text-xs md:text-sm">
+                    <span class="text-base">📂</span>
+                    <span>Berkas Digital</span>
                 </button>
             </div>
 
-            <div class="p-5 md:p-8 bg-slate-50 min-h-[500px]">
+            <!-- AREA KONTEN TAB -->
+            <div class="p-6 md:p-8 bg-[#fbfcfb] min-h-[600px] flex-1">
                 
+                <!-- ======================================================== -->
+                <!-- TAB 1: BIODATA LENGKAP & KELUARGA                         -->
+                <!-- ======================================================== -->
                 <div id="tab-biodata" class="block animate-fade-in">
-                    <form id="formUpdateData" class="space-y-8">
-                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-                            <h3 class="text-lg font-bold text-slate-800 border-b pb-3 mb-5 flex items-center gap-2"><span>👤</span> Keterangan Tentang Siswa</h3>
+                    <form id="formUpdateData" class="space-y-6">
+                        
+                        <!-- 1. KETERANGAN IDENTITAS SISWA -->
+                        <div class="bg-white p-6 md:p-7 rounded-2xl border border-stone-200/90 shadow-sm">
+                            <div class="flex items-center justify-between border-b border-stone-200 pb-3 mb-5">
+                                <h3 class="font-serif-title text-base md:text-lg font-bold text-stone-900 flex items-center gap-2.5">
+                                    <span class="w-8 h-8 rounded-lg bg-[#07332a]/10 text-[#07332a] flex items-center justify-center text-sm font-bold">1</span>
+                                    <span>Keterangan Diri Peserta Didik</span>
+                                </h3>
+                                <span class="text-[11px] font-semibold text-[#c9a857] uppercase tracking-wider hidden sm:inline">Data Pokok</span>
+                            </div>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Lengkap</label><input type="text" id="in_nama" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none focus:ring-2 focus:ring-blue-500"></div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">NISN</label><input type="text" id="in_nisn" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tahun Masuk</label><input type="number" id="in_tahun_masuk" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Jenis Kelamin</label><select id="in_jk" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"><option value="">-- Pilih --</option><option value="Laki-laki">Laki-laki</option><option value="Perempuan">Perempuan</option></select></div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Agama</label><input type="text" id="in_agama" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tempat Lahir</label><input type="text" id="in_tmpt_lahir" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Tanggal Lahir</label><input type="date" id="in_tgl_lahir" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Kewarganegaraan</label><input type="text" id="in_wn" value="Indonesia" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Status Siswa</label><select id="in_status" class="w-full border p-2.5 rounded-lg bg-emerald-50 outline-none font-bold text-emerald-700"><option value="Aktif">Aktif</option><option value="Alumni">Lulus / Alumni</option><option value="Pindah">Pindah / Tidak Aktif</option></select></div>
-                                <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Kelas Saat Ini</label><input type="text" id="in_rombel_biodata" class="w-full border p-2.5 rounded-lg bg-emerald-50 outline-none font-bold text-emerald-700"></div>
-                                <div class="flex gap-2"><div class="w-1/2"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Anak Ke</label><input type="number" id="in_anak_ke" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div><div class="w-1/2"><label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jml Saudara</label><input type="number" id="in_jml_sdr" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div></div>
-                                <div class="md:col-span-2"><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Alamat Lengkap</label><textarea id="in_alamat" rows="2" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></textarea></div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Nama Lengkap (Sesuai Akta / Ijazah)</label>
+                                    <input type="text" id="in_nama" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 font-semibold focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none transition-all">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Nomor Induk Siswa Nasional (NISN)</label>
+                                    <input type="text" id="in_nisn" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 font-mono focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none transition-all">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Tahun Masuk Sekolah</label>
+                                    <input type="number" id="in_tahun_masuk" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none transition-all">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Jenis Kelamin</label>
+                                    <select id="in_jk" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 font-medium focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none transition-all">
+                                        <option value="">-- Pilih Jenis Kelamin --</option>
+                                        <option value="Laki-laki">Laki-laki</option>
+                                        <option value="Perempuan">Perempuan</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Agama</label>
+                                    <input type="text" id="in_agama" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none transition-all">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Tempat Lahir</label>
+                                    <input type="text" id="in_tmpt_lahir" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none transition-all">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Tanggal Lahir</label>
+                                    <input type="date" id="in_tgl_lahir" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none transition-all">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Kewarganegaraan</label>
+                                    <input type="text" id="in_wn" value="Indonesia" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none transition-all">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Status Keaktifan Siswa</label>
+                                    <select id="in_status" class="w-full border border-stone-200 p-2.5 rounded-xl bg-emerald-50/80 text-[#07332a] font-bold focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none transition-all">
+                                        <option value="Aktif">Aktif</option>
+                                        <option value="Alumni">Lulus / Alumni</option>
+                                        <option value="Pindah">Pindah / Mutasi Keluar</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Kelas / Rombel Terkini</label>
+                                    <input type="text" id="in_rombel_biodata" class="w-full border border-stone-200 p-2.5 rounded-xl bg-emerald-50/80 text-[#07332a] font-bold focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none transition-all" placeholder="Cth: Kelas 1 A Putra">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Anak Ke</label>
+                                        <input type="number" id="in_anak_ke" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 text-center font-bold focus:bg-white focus:border-[#07332a] outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Jml Saudara</label>
+                                        <input type="number" id="in_jml_sdr" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 text-center font-bold focus:bg-white focus:border-[#07332a] outline-none">
+                                    </div>
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Alamat Tempat Tinggal Lengkap</label>
+                                    <textarea id="in_alamat" rows="2" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none transition-all"></textarea>
+                                </div>
                             </div>
                         </div>
 
+                        <!-- 2. KETERANGAN ORANG TUA KANDUNG -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm"><h3 class="text-md font-bold text-blue-800 border-b pb-2 mb-4 flex items-center gap-2"><span>👨🏽</span> Data Ayah Kandung</h3><div class="space-y-3"><div><label class="block text-xs text-slate-500 mb-1">Nama Ayah</label><input type="text" id="in_ayah_nama" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="flex gap-2"><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Tempat Lahir</label><input type="text" id="in_ayah_tmpt" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Tgl Lahir</label><input type="date" id="in_ayah_tgl" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div></div><div class="flex gap-2"><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Agama</label><input type="text" id="in_ayah_agama" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Ijazah</label><input type="text" id="in_ayah_ijazah" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div></div><div><label class="block text-xs text-slate-500 mb-1">Pekerjaan</label><input type="text" id="in_ayah_kerja" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div><label class="block text-xs text-slate-500 mb-1">Alamat Lengkap</label><textarea id="in_ayah_alamat" rows="2" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></textarea></div></div></div>
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm"><h3 class="text-md font-bold text-pink-800 border-b pb-2 mb-4 flex items-center gap-2"><span>👩🏽</span> Data Ibu Kandung</h3><div class="space-y-3"><div><label class="block text-xs text-slate-500 mb-1">Nama Ibu</label><input type="text" id="in_ibu_nama" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="flex gap-2"><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Tempat Lahir</label><input type="text" id="in_ibu_tmpt" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Tgl Lahir</label><input type="date" id="in_ibu_tgl" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div></div><div class="flex gap-2"><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Agama</label><input type="text" id="in_ibu_agama" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div class="w-1/2"><label class="block text-xs text-slate-500 mb-1">Ijazah</label><input type="text" id="in_ibu_ijazah" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div></div><div><label class="block text-xs text-slate-500 mb-1">Pekerjaan</label><input type="text" id="in_ibu_kerja" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></div><div><label class="block text-xs text-slate-500 mb-1">Alamat Lengkap</label><textarea id="in_ibu_alamat" rows="2" class="w-full border p-2 rounded-lg bg-slate-50 outline-none text-sm"></textarea></div></div></div>
-                        </div>
+                            
+                            <!-- AYAH KANDUNG -->
+                            <div class="bg-white p-6 rounded-2xl border border-stone-200/90 shadow-sm">
+                                <div class="border-b border-stone-200 pb-3 mb-4 flex items-center gap-2.5">
+                                    <span class="w-7 h-7 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center text-xs font-bold">2A</span>
+                                    <h4 class="font-serif-title text-base font-bold text-stone-900">Data Ayah Kandung</h4>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Nama Lengkap Ayah</label>
+                                        <input type="text" id="in_ayah_nama" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-sm text-stone-800 font-semibold focus:bg-white focus:border-[#07332a] outline-none">
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Tempat Lahir</label>
+                                            <input type="text" id="in_ayah_tmpt" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Tanggal Lahir</label>
+                                            <input type="date" id="in_ayah_tgl" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Agama</label>
+                                            <input type="text" id="in_ayah_agama" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Pendidikan Terakhir</label>
+                                            <input type="text" id="in_ayah_ijazah" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Pekerjaan</label>
+                                        <input type="text" id="in_ayah_kerja" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-sm text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Alamat Tempat Tinggal</label>
+                                        <textarea id="in_ayah_alamat" rows="2" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-[#07332a] outline-none"></textarea>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <div class="bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-                            <h3 class="text-lg font-bold text-slate-800 border-b pb-3 mb-5 flex items-center gap-2"><span>🛡️</span> Keterangan Tentang Wali</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label class="block text-xs text-slate-500 uppercase mb-1">Nama Wali</label><input type="text" id="in_wali_nama" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
-                                <div><label class="block text-xs text-slate-500 uppercase mb-1">Hubungan Keluarga</label><input type="text" id="in_wali_hub" placeholder="Cth: Paman" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
-                                <div><label class="block text-xs text-slate-500 uppercase mb-1">Pekerjaan Wali</label><input type="text" id="in_wali_kerja" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></div>
-                                <div><label class="block text-xs text-slate-500 uppercase mb-1">Alamat Lengkap</label><textarea id="in_wali_alamat" rows="1" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none"></textarea></div>
+                            <!-- IBU KANDUNG -->
+                            <div class="bg-white p-6 rounded-2xl border border-stone-200/90 shadow-sm">
+                                <div class="border-b border-stone-200 pb-3 mb-4 flex items-center gap-2.5">
+                                    <span class="w-7 h-7 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center text-xs font-bold">2B</span>
+                                    <h4 class="font-serif-title text-base font-bold text-stone-900">Data Ibu Kandung</h4>
+                                </div>
+                                
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Nama Lengkap Ibu</label>
+                                        <input type="text" id="in_ibu_nama" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-sm text-stone-800 font-semibold focus:bg-white focus:border-[#07332a] outline-none">
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Tempat Lahir</label>
+                                            <input type="text" id="in_ibu_tmpt" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Tanggal Lahir</label>
+                                            <input type="date" id="in_ibu_tgl" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Agama</label>
+                                            <input type="text" id="in_ibu_agama" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Pendidikan Terakhir</label>
+                                            <input type="text" id="in_ibu_ijazah" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Pekerjaan</label>
+                                        <input type="text" id="in_ibu_kerja" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-sm text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Alamat Tempat Tinggal</label>
+                                        <textarea id="in_ibu_alamat" rows="2" class="w-full border border-stone-200 p-2 rounded-xl bg-stone-50/50 text-xs text-stone-800 focus:bg-white focus:border-[#07332a] outline-none"></textarea>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="sticky bottom-4 z-20">
-                            <button type="submit" id="btnUpdate" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl shadow-xl transition-all border-2 border-white text-lg">
-                                💾 Simpan Semua Perubahan Biodata
+                        <!-- 3. KETERANGAN WALI SISWA (OPSIONAL) -->
+                        <div class="bg-white p-6 md:p-7 rounded-2xl border border-stone-200/90 shadow-sm">
+                            <div class="border-b border-stone-200 pb-3 mb-5 flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-lg bg-stone-100 text-stone-700 flex items-center justify-center text-sm font-bold">3</span>
+                                <div>
+                                    <h3 class="font-serif-title text-base font-bold text-stone-900">Keterangan Wali Peserta Didik</h3>
+                                    <p class="text-[11px] text-stone-400">Diisi apabila siswa tinggal bersama wali resmi di luar orang tua kandung</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Nama Lengkap Wali</label>
+                                    <input type="text" id="in_wali_nama" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Hubungan Keluarga Terhadap Siswa</label>
+                                    <input type="text" id="in_wali_hub" placeholder="Cth: Paman, Kakek, Kakak Kandung" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Pekerjaan Wali</label>
+                                    <input type="text" id="in_wali_kerja" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Alamat Tempat Tinggal Wali</label>
+                                    <input type="text" id="in_wali_alamat" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TOMBOL SIMPAN BIODATA STICKY -->
+                        <div class="sticky bottom-4 z-20 pt-2">
+                            <button type="submit" id="btnUpdate" class="w-full bg-[#07332a] hover:bg-[#0c473b] text-white font-bold py-4 rounded-xl shadow-xl transition-all border border-[#c9a857]/40 text-sm md:text-base flex items-center justify-center gap-2 group">
+                                <span class="text-xl transition-transform group-hover:scale-110">💾</span>
+                                <span>Simpan Semua Perubahan Data Biodata</span>
                             </button>
                         </div>
                     </form>
                 </div>
 
+                <!-- ======================================================== -->
+                <!-- TAB 2: NILAI AKADEMIK & KEHADIRAN                         -->
+                <!-- ======================================================== -->
                 <div id="tab-akademik" class="hidden animate-fade-in">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         
-                        <div class="lg:col-span-1 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
-                            <h3 class="text-md font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2"><span>➕</span> Input Nilai Baru</h3>
-                            <form id="formTambahNilai" class="space-y-4">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kelas</label>
-                                        <input type="text" id="in_nilai_kelas" required placeholder="Cth: Kelas 1 A Putra" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm font-bold text-slate-700">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Semester</label>
-                                        <select id="in_nilai_semester" required class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm">
-                                            <option value="">-- Pilih --</option>
-                                            <option value="Ganjil">Ganjil</option>
-                                            <option value="Genap">Genap</option>
-                                        </select>
-                                    </div>
+                        <!-- KOLOM INPUT (KIRI 1/3) -->
+                        <div class="lg:col-span-1 space-y-6">
+                            
+                            <!-- 1. INPUT NILAI EXCEL -->
+                            <div class="bg-white p-5 md:p-6 rounded-2xl border border-stone-200/90 shadow-sm">
+                                <div class="border-b border-stone-200 pb-3 mb-4">
+                                    <h3 class="font-serif-title text-base font-bold text-stone-900 flex items-center gap-2">
+                                        <span>📝</span>
+                                        <span>Input Nilai Rapor Baru</span>
+                                    </h3>
+                                    <p class="text-[11px] text-stone-400 mt-0.5">Dukungan impor copy-paste langsung dari lembar Excel</p>
                                 </div>
-                                
+
+                                <form id="formTambahNilai" class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-2.5">
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Kelas</label>
+                                            <input type="text" id="in_nilai_kelas" required placeholder="Cth: Kelas 1 A" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-xs font-bold text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Semester</label>
+                                            <select id="in_nilai_semester" required class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-xs font-bold text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                                <option value="">-- Semester --</option>
+                                                <option value="Ganjil">Ganjil</option>
+                                                <option value="Genap">Genap</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <div class="flex justify-between items-center mb-1.5">
+                                            <label class="text-xs font-bold text-[#07332a] uppercase tracking-wider">Tabel Excel Nilai & Capaian</label>
+                                            <span class="text-[10px] text-stone-400 font-medium">Copy dari Excel</span>
+                                        </div>
+                                        <textarea id="in_nilai_gabungan" required rows="6" placeholder="Blok kolom (Mata Pelajaran | Nilai | Capaian Kompetensi) di Excel Anda, tekan Ctrl+C, lalu Paste di sini..." class="w-full border border-stone-200 p-3 rounded-xl bg-stone-50/50 text-xs font-mono text-stone-800 focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none whitespace-pre-wrap transition-all"></textarea>
+                                    </div>
+                                    
+                                    <button type="submit" id="btnSimpanNilai" class="w-full bg-[#07332a] hover:bg-[#0c473b] text-white font-bold py-3 rounded-xl transition-all shadow-md text-xs border border-[#c9a857]/30 flex items-center justify-center gap-2">
+                                        <span>📥</span>
+                                        <span>Simpan Nilai ke Rapor</span>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- 2. INPUT KEHADIRAN & KEPUTUSAN -->
+                            <div class="bg-white p-5 md:p-6 rounded-2xl border border-stone-200/90 shadow-sm">
+                                <div class="border-b border-stone-200 pb-3 mb-4">
+                                    <h3 class="font-serif-title text-base font-bold text-stone-900 flex items-center gap-2">
+                                        <span>📅</span>
+                                        <span>Rekap Kehadiran Siswa</span>
+                                    </h3>
+                                    <p class="text-[11px] text-stone-400 mt-0.5">Catatan ketidakhadiran & keputusan kenaikan kelas</p>
+                                </div>
+
+                                <form id="formTambahKehadiran" class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-2.5">
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Kelas</label>
+                                            <input type="text" id="in_hadir_kelas" required placeholder="Cth: Kelas 1 A" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-xs font-bold text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Semester</label>
+                                            <select id="in_hadir_semester" required class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-xs font-bold text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                                <option value="">-- Semester --</option>
+                                                <option value="Ganjil">Ganjil</option>
+                                                <option value="Genap">Genap</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <div class="text-center">
+                                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Sakit (S)</label>
+                                            <input type="number" id="in_sakit" class="w-full border border-stone-200 p-2 rounded-xl text-center font-bold text-xs bg-stone-50/50 focus:bg-white focus:border-[#07332a] outline-none" placeholder="0">
+                                        </div>
+                                        <div class="text-center">
+                                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Izin (I)</label>
+                                            <input type="number" id="in_izin" class="w-full border border-stone-200 p-2 rounded-xl text-center font-bold text-xs bg-stone-50/50 focus:bg-white focus:border-[#07332a] outline-none" placeholder="0">
+                                        </div>
+                                        <div class="text-center">
+                                            <label class="block text-[10px] font-bold text-stone-500 uppercase mb-1">Alpa (A)</label>
+                                            <input type="number" id="in_alpa" class="w-full border border-stone-200 p-2 rounded-xl text-center font-bold text-xs bg-stone-50/50 focus:bg-white focus:border-[#07332a] outline-none" placeholder="0">
+                                        </div>
+                                    </div>
+
+                                    <div id="areaKeputusan" class="hidden border-t border-stone-100 pt-3 mt-2">
+                                        <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1">Keputusan Akhir Semester Genap</label>
+                                        <input type="text" id="in_keputusan" placeholder="Cth: Naik ke Kelas II (Dua)" class="w-full border border-emerald-200 p-2.5 rounded-xl bg-emerald-50/80 outline-none text-xs font-bold text-[#07332a]">
+                                    </div>
+
+                                    <button type="submit" id="btnSimpanKehadiran" class="w-full bg-[#07332a] hover:bg-[#0c473b] text-white font-bold py-2.5 rounded-xl transition-all shadow-md text-xs border border-[#c9a857]/30 flex items-center justify-center gap-2">
+                                        <span>💾</span>
+                                        <span>Simpan Kehadiran</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- KOLOM TABEL RIWAYAT NILAI (KANAN 2/3) -->
+                        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-stone-200/90 shadow-sm flex flex-col">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-stone-200 pb-4 mb-4 gap-3">
                                 <div>
-                                    <label class="block text-xs font-bold text-blue-600 uppercase mb-1 flex justify-between items-center">
-                                        <span>Tabel Nilai & Deskripsi Rapor</span>
-                                        <span class="text-[10px] text-slate-400 font-normal normal-case">Copy-Paste dari Excel</span>
-                                    </label>
-                                    <textarea id="in_nilai_gabungan" required rows="6" placeholder="Paste data (Mata Pelajaran, Nilai Akhir, Capaian Kompetensi) dari tabel Excel Anda ke kotak ini..." class="w-full border p-2.5 rounded-lg bg-blue-50 outline-none text-sm font-mono whitespace-pre-wrap"></textarea>
+                                    <h3 class="font-serif-title text-base font-bold text-stone-900 flex items-center gap-2">
+                                        <span>📊</span>
+                                        <span>Riwayat Capaian Akademik Siswa</span>
+                                    </h3>
+                                    <p class="text-[11px] text-stone-400 mt-0.5">Daftar nilai seluruh semester yang tersimpan di sistem</p>
                                 </div>
-                                
-                                <button type="submit" id="btnSimpanNilai" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md mt-2">
-                                    Simpan Data Rapor
-                                </button>
-                            </form>
-                        </div>
 
-                        <div class="lg:col-span-1 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm h-fit mt-6 lg:mt-0">
-                            <h3 class="text-md font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2"><span>📅</span> Input Kehadiran & Keputusan</h3>
-                            <form id="formTambahKehadiran" class="space-y-4">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Kelas</label>
-                                        <input type="text" id="in_hadir_kelas" required placeholder="Cth: Kelas 1" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm font-bold text-slate-700">
-                                    </div>
-                                    <div>
-                                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Semester</label>
-                                        <select id="in_hadir_semester" required class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm font-bold text-slate-700">
-                                            <option value="">-- Pilih --</option>
-                                            <option value="Ganjil">Ganjil</option>
-                                            <option value="Genap">Genap</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <div><label class="block text-[10px] font-bold text-slate-500 uppercase text-center mb-1">Sakit</label><input type="number" id="in_sakit" class="w-full border p-2 rounded-lg text-center font-bold" placeholder="0"></div>
-                                    <div><label class="block text-[10px] font-bold text-slate-500 uppercase text-center mb-1">Izin</label><input type="number" id="in_izin" class="w-full border p-2 rounded-lg text-center font-bold" placeholder="0"></div>
-                                    <div><label class="block text-[10px] font-bold text-slate-500 uppercase text-center mb-1">Alpa</label><input type="number" id="in_alpa" class="w-full border p-2 rounded-lg text-center font-bold" placeholder="0"></div>
-                                </div>
-                                <div id="areaKeputusan" class="hidden border-t border-slate-100 pt-3 mt-2">
-                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Keputusan Akhir (Genap)</label>
-                                    <input type="text" id="in_keputusan" placeholder="Cth: Naik ke Kelas II" class="w-full border p-2.5 rounded-lg bg-emerald-50 outline-none text-sm font-bold text-emerald-700">
-                                </div>
-                                <button type="submit" id="btnSimpanKehadiran" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md mt-2">
-                                    💾 Simpan Kehadiran
-                                </button>
-                            </form>
-                        </div>
-
-                        <div class="lg:col-span-2 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-3 mb-4 gap-2">
-                                <h3 class="text-md font-bold text-slate-800 flex items-center gap-2"><span>📊</span> Riwayat Nilai & Capaian</h3>
                                 <div class="flex items-center gap-2 text-xs">
-                                    <label class="font-bold text-slate-500">Filter Kelas:</label>
-                                    <select id="filterKelasNilai" class="bg-slate-100 border border-slate-200 rounded-lg px-2.5 py-1 font-bold text-slate-700 outline-none">
+                                    <label class="font-bold text-stone-500 whitespace-nowrap">Filter Kelas:</label>
+                                    <select id="filterKelasNilai" class="bg-stone-50 border border-stone-200 rounded-xl px-3 py-1.5 font-bold text-stone-700 outline-none text-xs focus:border-[#07332a]">
                                         <option value="">Semua Kelas</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="overflow-x-auto rounded-xl border border-slate-100">
+
+                            <div class="overflow-x-auto rounded-xl border border-stone-200 flex-1">
                                 <table class="w-full text-left border-collapse">
                                     <thead>
-                                        <tr class="bg-slate-50 text-slate-600 text-xs uppercase tracking-wider">
-                                            <th class="p-3 md:p-4 font-bold border-b whitespace-nowrap w-1/5">Kelas/Smt</th>
-                                            <th class="p-3 md:p-4 font-bold border-b w-3/5">Mata Pelajaran & Deskripsi</th>
-                                            <th class="p-3 md:p-4 font-bold border-b text-center w-1/5">Aksi</th>
+                                        <tr class="bg-[#07241e] text-[#f4efe3] font-serif-title text-[11px] tracking-wider uppercase">
+                                            <th class="p-3.5 font-bold border-b border-[#144238] whitespace-nowrap w-24">Tingkat / Smt</th>
+                                            <th class="p-3.5 font-bold border-b border-[#144238]">Mata Pelajaran & Deskripsi Capaian</th>
+                                            <th class="p-3.5 font-bold border-b border-[#144238] text-center w-28">Nilai Akhir</th>
+                                            <th class="p-3.5 font-bold border-b border-[#144238] text-center w-20">Aksi</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tabelNilai" class="divide-y divide-slate-100 text-sm">
-                                        <tr><td colspan="3" class="text-center p-6 text-slate-500">Memuat data nilai...</td></tr>
+                                    <tbody id="tabelNilai" class="divide-y divide-stone-100 text-xs">
+                                        <tr><td colspan="4" class="text-center p-8 text-stone-400">Memuat riwayat nilai akademik...</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -215,38 +511,61 @@
                     </div>
                 </div>
 
+                <!-- ======================================================== -->
+                <!-- TAB 3: DOKUMEN DIGITAL                                    -->
+                <!-- ======================================================== -->
                 <div id="tab-dokumen" class="hidden animate-fade-in">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         
-                        <div class="lg:col-span-1 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm h-fit">
-                            <h3 class="text-md font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2"><span>📤</span> Upload Dokumen Baru</h3>
+                        <!-- FORM UPLOAD (KIRI 1/3) -->
+                        <div class="lg:col-span-1 bg-white p-5 md:p-6 rounded-2xl border border-stone-200/90 shadow-sm h-fit">
+                            <div class="border-b border-stone-200 pb-3 mb-4">
+                                <h3 class="font-serif-title text-base font-bold text-stone-900 flex items-center gap-2">
+                                    <span>📤</span>
+                                    <span>Unggah Dokumen Siswa</span>
+                                </h3>
+                                <p class="text-[11px] text-stone-400 mt-0.5">Arsip berkas otentik pendukung buku induk</p>
+                            </div>
+
                             <form id="formUploadDokumen" class="space-y-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Jenis Dokumen</label>
-                                    <select id="in_jenis_dokumen" required class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm font-bold text-slate-700">
-                                        <option value="">-- Pilih Jenis --</option>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Klasifikasi Dokumen</label>
+                                    <select id="in_jenis_dokumen" required class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-xs font-bold text-stone-800 focus:bg-white focus:border-[#07332a] outline-none">
+                                        <option value="">-- Pilih Jenis Dokumen --</option>
                                         <option value="Kartu Keluarga">Kartu Keluarga (KK)</option>
                                         <option value="Akta Kelahiran">Akta Kelahiran</option>
-                                        <option value="Ijazah Sebelumnya">Ijazah Sebelumnya</option>
-                                        <option value="Sertifikat/Piagam">Sertifikat/Piagam</option>
-                                        <option value="Dokumen Lainnya">Lainnya</option>
+                                        <option value="Ijazah Sebelumnya">Ijazah / SKL Jenjang Sebelumnya</option>
+                                        <option value="Sertifikat/Piagam">Sertifikat Prestasi / Piagam</option>
+                                        <option value="KTP Orang Tua">KTP Orang Tua / Wali</option>
+                                        <option value="Dokumen Lainnya">Dokumen Pendukung Lainnya</option>
                                     </select>
                                 </div>
+
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Pilih File (Gambar/PDF)</label>
-                                    <input type="file" id="in_file_dokumen" required accept="image/*,.pdf" class="w-full border p-2.5 rounded-lg bg-slate-50 outline-none text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
-                                    <p class="text-[10px] text-slate-400 mt-1">*Maksimal 5MB. Format: JPG, PNG, atau PDF.</p>
+                                    <label class="block text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5">Pilih Berkas (Gambar / PDF)</label>
+                                    <input type="file" id="in_file_dokumen" required accept="image/*,.pdf" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/50 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#07332a]/10 file:text-[#07332a] hover:file:bg-[#07332a]/20 cursor-pointer">
+                                    <p class="text-[10px] text-stone-400 mt-1.5">*Maksimal 5MB. Format yang didukung: JPG, PNG, WEBP, atau PDF.</p>
                                 </div>
-                                <button type="submit" id="btnUploadDokumen" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md mt-2 flex justify-center items-center gap-2">
-                                    <span>🚀</span> Mulai Upload Dokumen
+
+                                <button type="submit" id="btnUploadDokumen" class="w-full bg-[#07332a] hover:bg-[#0c473b] text-white font-bold py-3 rounded-xl transition-all shadow-md text-xs border border-[#c9a857]/30 flex items-center justify-center gap-2">
+                                    <span>🚀</span>
+                                    <span>Mulai Unggah Berkas</span>
                                 </button>
                             </form>
                         </div>
 
-                        <div class="lg:col-span-2 bg-white p-5 md:p-6 rounded-2xl border border-slate-200 shadow-sm">
-                            <h3 class="text-md font-bold text-slate-800 border-b pb-3 mb-4 flex items-center gap-2"><span>📂</span> Lemari Dokumen Siswa</h3>
+                        <!-- LEMARI DOKUMEN (KANAN 2/3) -->
+                        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-stone-200/90 shadow-sm">
+                            <div class="border-b border-stone-200 pb-3 mb-5">
+                                <h3 class="font-serif-title text-base font-bold text-stone-900 flex items-center gap-2">
+                                    <span>📂</span>
+                                    <span>Lemari Dokumen Terverifikasi</span>
+                                </h3>
+                                <p class="text-[11px] text-stone-400 mt-0.5">Berkas digital yang telah diunggah dan terarsip aman di cloud storage</p>
+                            </div>
+
                             <div id="galeriDokumen" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div class="col-span-full text-center p-8 text-slate-400 bg-slate-50 rounded-xl">Memuat dokumen...</div>
+                                <div class="col-span-full text-center p-8 text-stone-400 bg-stone-50 rounded-xl">Memuat berkas dokumen...</div>
                             </div>
                         </div>
 
@@ -257,6 +576,11 @@
         </section>
     </main>
 
+    <footer class="py-4 text-center text-xs text-stone-400 border-t border-stone-200/80 bg-white">
+        Buku Induk Register Resmi &copy; SDIT Qurratu A'yun Al-Islami &bull; Sistem Administrasi Pendidikan Berintegritas
+    </footer>
+
+    <!-- SKRIP LOGIKA & SUPABASE -->
     <script type="module">
         import { supabase } from './js/supabaseConfig.js';
         import { validasiFile, CONFIG_FILE } from './js/validasiFile.js';
@@ -265,20 +589,39 @@
         if (!session) window.location.href = 'login.html';
 
         const idSiswa = new URLSearchParams(window.location.search).get('id');
-        if (!idSiswa) { alert("Siswa tidak ditemukan!"); window.location.href = 'index.html'; }
-
-        // Tombol Navigasi Tab
-        window.bukaTab = function(namaTab) {
-            ['biodata', 'akademik', 'dokumen'].forEach(tab => {
-                document.getElementById('tab-' + tab).classList.add('hidden');
-                document.getElementById('tab-' + tab).classList.remove('block');
-                document.getElementById('btn-' + tab).className = "flex-1 py-4 text-center font-bold text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition-all border-b-2 border-transparent flex items-center justify-center gap-2";
-            });
-            document.getElementById('tab-' + namaTab).classList.remove('hidden');
-            document.getElementById('tab-' + namaTab).classList.add('block');
-            document.getElementById('btn-' + namaTab).className = "flex-1 py-4 text-center font-bold text-[#07332a] border-b-2 border-[#07332a] bg-white transition-all flex items-center justify-center gap-2";
+        if (!idSiswa) { 
+            alert("ID Siswa tidak ditemukan!"); 
+            window.location.href = 'index.html'; 
         }
 
+        // Variabel penampung data nilai untuk fitur filter kelas yang cepat
+        let globalDaftarNilai = [];
+
+        // Tab Switcher dengan Gaya Elegan
+        window.bukaTab = function(namaTab) {
+            ['biodata', 'akademik', 'dokumen'].forEach(tab => {
+                const targetContent = document.getElementById('tab-' + tab);
+                const targetBtn = document.getElementById('btn-' + tab);
+                if (targetContent) {
+                    targetContent.classList.add('hidden');
+                    targetContent.classList.remove('block');
+                }
+                if (targetBtn) {
+                    targetBtn.className = "flex-1 py-3 px-4 rounded-xl text-center font-semibold text-stone-500 hover:text-stone-800 hover:bg-stone-100 transition-all flex items-center justify-center gap-2 text-xs md:text-sm";
+                }
+            });
+            const activeContent = document.getElementById('tab-' + namaTab);
+            const activeBtn = document.getElementById('btn-' + namaTab);
+            if (activeContent) {
+                activeContent.classList.remove('hidden');
+                activeContent.classList.add('block');
+            }
+            if (activeBtn) {
+                activeBtn.className = "flex-1 py-3 px-4 rounded-xl text-center font-bold text-[#07332a] bg-white shadow-sm border border-stone-200/80 transition-all flex items-center justify-center gap-2 text-xs md:text-sm";
+            }
+        };
+
+        // Event Listener Aksi Cetak
         const btnBukuInduk = document.getElementById('btnCetakBukuInduk');
         if (btnBukuInduk) {
             btnBukuInduk.addEventListener('click', () => {
@@ -294,75 +637,99 @@
             const kls = document.getElementById('in_nilai_kelas').value;
             const smt = document.getElementById('in_nilai_semester').value;
             if(!kls || !smt) {
-                alert("Mohon ketik 'Kelas' dan pilih 'Semester' yang ingin dicetak pada form Input Nilai di Tab Akademik terlebih dahulu!");
+                alert("Mohon ketik 'Kelas' dan pilih 'Semester' yang ingin dicetak pada formulir Nilai Rapor di Tab Akademik terlebih dahulu!");
                 bukaTab('akademik'); 
                 document.getElementById('in_nilai_kelas').focus();
                 return;
             }
-            window.open(`cetak-rapor.html?id=${idSiswa}&kelas=${kls}&semester=${smt}`, '_blank');
+            window.open(`cetak-rapor.html?id=${idSiswa}&kelas=${encodeURIComponent(kls)}&semester=${encodeURIComponent(smt)}`, '_blank');
         });
 
         // ==========================================
-        // 1. BLOK FUNGSI BIODATA
+        // 1. BLOK FUNGSI BIODATA SISWA
         // ==========================================
         async function muatProfil() {
-            const { data: s, error } = await supabase.from('buku_induk').select('*').eq('id', idSiswa).single();
-            if (error) return;
+            try {
+                // Muat identitas sekolah untuk subtitle jika ada di DB
+                const { data: sekolah } = await supabase.from('pengaturan_sekolah').select('nama_sekolah').eq('id', 1).maybeSingle();
+                if (sekolah && sekolah.nama_sekolah) {
+                    const sub = document.getElementById('headerSekolahSub');
+                    if (sub) sub.innerText = sekolah.nama_sekolah + " - Lembar Register Peserta Didik";
+                }
 
-            document.getElementById('namaCard').innerText = s.nama_lengkap || '-';
-            
-            if (s.foto) { 
-                document.getElementById('fotoProfilSiswa').src = s.foto; 
-            } else {
-                document.getElementById('fotoProfilSiswa').src = `https://ui-avatars.com/api/?name=${s.nama_lengkap}&background=e2e8f0&color=475569&size=128`;
+                const { data: s, error } = await supabase.from('buku_induk').select('*').eq('id', idSiswa).single();
+                if (error) throw error;
+
+                document.getElementById('namaCard').innerText = s.nama_lengkap || '-';
+                
+                if (s.foto) { 
+                    document.getElementById('fotoProfilSiswa').src = s.foto; 
+                } else {
+                    document.getElementById('fotoProfilSiswa').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(s.nama_lengkap || 'Siswa')}&background=07332a&color=ffffff&size=140`;
+                }
+                
+                document.getElementById('nisnCard').innerText = s.nisn ? `NISN: ${s.nisn}` : 'NISN: -';
+                document.getElementById('rombelCard').innerText = s.rombel || 'Kelas -';
+                
+                const regText = document.getElementById('idRegisterText');
+                if (regText) regText.innerText = (s.nipd || s.id).toString().substring(0, 12);
+
+                const statusColor = s.status === 'Aktif' 
+                    ? 'bg-emerald-50 border-emerald-200 text-[#07332a]' 
+                    : 'bg-amber-50 border-amber-200 text-amber-900';
+                
+                document.getElementById('statusBadge').className = `px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide flex items-center gap-1.5 shadow-sm border ${statusColor}`;
+                document.getElementById('statusBadge').innerHTML = `<span class="w-2 h-2 rounded-full ${s.status === 'Aktif' ? 'bg-emerald-500' : 'bg-amber-500'}"></span><span>Status: ${s.status || 'Aktif'}</span>`;
+
+                // Isi Form Biodata
+                document.getElementById('in_nama').value = s.nama_lengkap || '';
+                document.getElementById('in_nisn').value = s.nisn || '';
+                document.getElementById('in_status').value = s.status || 'Aktif';
+                document.getElementById('in_rombel_biodata').value = s.rombel || '';
+                document.getElementById('in_tahun_masuk').value = s.tahun_masuk || '';
+                document.getElementById('in_jk').value = s.jenis_kelamin || '';
+                document.getElementById('in_agama').value = s.agama || '';
+                document.getElementById('in_tmpt_lahir').value = s.tempat_lahir || '';
+                document.getElementById('in_tgl_lahir').value = s.tanggal_lahir || '';
+                document.getElementById('in_wn').value = s.kewarganegaraan || 'Indonesia';
+                document.getElementById('in_anak_ke').value = s.anak_ke || '';
+                document.getElementById('in_jml_sdr').value = s.jumlah_saudara || '';
+                document.getElementById('in_alamat').value = s.alamat_siswa || '';
+                
+                document.getElementById('in_ayah_nama').value = s.nama_ayah || '';
+                document.getElementById('in_ayah_tmpt').value = s.tempat_lahir_ayah || '';
+                document.getElementById('in_ayah_tgl').value = s.tanggal_lahir_ayah || '';
+                document.getElementById('in_ayah_agama').value = s.agama_ayah || '';
+                document.getElementById('in_ayah_ijazah').value = s.ijazah_ayah || '';
+                document.getElementById('in_ayah_kerja').value = s.pekerjaan_ayah || '';
+                document.getElementById('in_ayah_alamat').value = s.alamat_ayah || '';
+                
+                document.getElementById('in_ibu_nama').value = s.nama_ibu || '';
+                document.getElementById('in_ibu_tmpt').value = s.tempat_lahir_ibu || '';
+                document.getElementById('in_ibu_tgl').value = s.tanggal_lahir_ibu || '';
+                document.getElementById('in_ibu_agama').value = s.agama_ibu || '';
+                document.getElementById('in_ibu_ijazah').value = s.ijazah_ibu || '';
+                document.getElementById('in_ibu_kerja').value = s.pekerjaan_ibu || '';
+                document.getElementById('in_ibu_alamat').value = s.alamat_ibu || '';
+                
+                document.getElementById('in_wali_nama').value = s.nama_wali || '';
+                document.getElementById('in_wali_hub').value = s.hubungan_wali || '';
+                document.getElementById('in_wali_kerja').value = s.pekerjaan_wali || '';
+                document.getElementById('in_wali_alamat').value = s.alamat_wali || '';
+
+                // Sinkronkan ke form nilai & kehadiran
+                document.getElementById('in_nilai_kelas').value = s.rombel || '';
+                document.getElementById('in_hadir_kelas').value = s.rombel || '';
+            } catch (err) {
+                console.error("Gagal memuat profil:", err);
             }
-            
-            document.getElementById('nisnCard').innerText = s.nisn || '-';
-            document.getElementById('statusBadge').innerHTML = `🟢 <span class="hidden md:inline">Status: </span>${s.status || 'Aktif'}`;
-
-            document.getElementById('in_nama').value = s.nama_lengkap || '';
-            document.getElementById('in_nisn').value = s.nisn || '';
-            document.getElementById('in_status').value = s.status || 'Aktif';
-            document.getElementById('in_rombel_biodata').value = s.rombel || '';
-            document.getElementById('in_tahun_masuk').value = s.tahun_masuk || '';
-            document.getElementById('in_jk').value = s.jenis_kelamin || '';
-            document.getElementById('in_agama').value = s.agama || '';
-            document.getElementById('in_tmpt_lahir').value = s.tempat_lahir || '';
-            document.getElementById('in_tgl_lahir').value = s.tanggal_lahir || '';
-            document.getElementById('in_wn').value = s.kewarganegaraan || 'Indonesia';
-            document.getElementById('in_anak_ke').value = s.anak_ke || '';
-            document.getElementById('in_jml_sdr').value = s.jumlah_saudara || '';
-            document.getElementById('in_alamat').value = s.alamat_siswa || '';
-            
-            document.getElementById('in_ayah_nama').value = s.nama_ayah || '';
-            document.getElementById('in_ayah_tmpt').value = s.tempat_lahir_ayah || '';
-            document.getElementById('in_ayah_tgl').value = s.tanggal_lahir_ayah || '';
-            document.getElementById('in_ayah_agama').value = s.agama_ayah || '';
-            document.getElementById('in_ayah_ijazah').value = s.ijazah_ayah || '';
-            document.getElementById('in_ayah_kerja').value = s.pekerjaan_ayah || '';
-            document.getElementById('in_ayah_alamat').value = s.alamat_ayah || '';
-            
-            document.getElementById('in_ibu_nama').value = s.nama_ibu || '';
-            document.getElementById('in_ibu_tmpt').value = s.tempat_lahir_ibu || '';
-            document.getElementById('in_ibu_tgl').value = s.tanggal_lahir_ibu || '';
-            document.getElementById('in_ibu_agama').value = s.agama_ibu || '';
-            document.getElementById('in_ibu_ijazah').value = s.ijazah_ibu || '';
-            document.getElementById('in_ibu_kerja').value = s.pekerjaan_ibu || '';
-            document.getElementById('in_ibu_alamat').value = s.alamat_ibu || '';
-            
-            document.getElementById('in_wali_nama').value = s.nama_wali || '';
-            document.getElementById('in_wali_hub').value = s.hubungan_wali || '';
-            document.getElementById('in_wali_kerja').value = s.pekerjaan_wali || '';
-            document.getElementById('in_wali_alamat').value = s.alamat_wali || '';
-
-            document.getElementById('in_nilai_kelas').value = s.rombel || '';
-            document.getElementById('in_hadir_kelas').value = s.rombel || '';
         }
 
         document.getElementById('formUpdateData').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnUpdate');
-            btn.innerHTML = "⏳ Menyimpan Data..."; btn.disabled = true;
+            btn.innerHTML = "⏳ Sedang Menyimpan Data..."; 
+            btn.disabled = true;
 
             const payload = {
                 nama_lengkap: document.getElementById('in_nama').value,
@@ -399,18 +766,64 @@
             };
 
             const { error } = await supabase.from('buku_induk').update(payload).eq('id', idSiswa);
-            if (error) alert("Gagal menyimpan!\nPesan Error: " + error.message);
-            else { alert("✅ Semua biodata berhasil tersimpan!"); muatProfil(); }
+            if (error) {
+                alert("Gagal menyimpan perubahan! Pesan: " + error.message);
+            } else { 
+                alert("✅ Alhamdulillah! Perubahan biodata resmi tersimpan dengan sempurna."); 
+                muatProfil(); 
+            }
 
-            btn.innerHTML = "💾 Simpan Semua Perubahan Biodata"; btn.disabled = false;
+            btn.innerHTML = "<span>💾</span><span>Simpan Semua Perubahan Data Biodata</span>"; 
+            btn.disabled = false;
         });
 
         // ==========================================
-        // 2. BLOK FUNGSI NILAI AKADEMIK
+        // 2. BLOK FUNGSI NILAI AKADEMIK & FILTER
         // ==========================================
+        function renderTabelNilai(daftar) {
+            const tbody = document.getElementById('tabelNilai');
+            if (!daftar || daftar.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center p-8 text-stone-400 bg-stone-50/50">Belum ada catatan nilai akademik untuk kriteria ini.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            daftar.forEach(n => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-emerald-50/40 transition-colors";
+                
+                const htmlDeskripsi = n.deskripsi 
+                    ? `<div class="text-[11px] text-stone-600 mt-2 p-2.5 bg-stone-50 border border-stone-200/80 rounded-lg whitespace-pre-wrap leading-relaxed font-sans">${n.deskripsi}</div>` 
+                    : '';
+                const nilaiTampil = (n.nilai !== null && n.nilai !== undefined) ? n.nilai : '-';
+
+                tr.innerHTML = `
+                    <td class="p-3.5 text-stone-700 align-top whitespace-nowrap">
+                        <span class="font-bold text-stone-900 block">${n.kelas}</span>
+                        <span class="text-[11px] text-stone-500">Semester ${n.semester}</span>
+                    </td>
+                    <td class="p-3.5 text-stone-800 align-top">
+                        <div class="font-bold text-[#07332a] text-sm">${n.mata_pelajaran}</div>
+                        ${htmlDeskripsi}
+                    </td>
+                    <td class="p-3.5 text-center align-top whitespace-nowrap">
+                        <span class="inline-block bg-[#07332a]/10 text-[#07332a] px-3 py-1 rounded-lg font-bold text-base border border-[#07332a]/20">
+                            ${nilaiTampil}
+                        </span>
+                    </td>
+                    <td class="p-3.5 text-center align-top whitespace-nowrap">
+                        <button onclick="hapusNilai('${n.id}')" class="text-stone-400 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-lg border border-stone-200 hover:border-red-200 transition-colors" title="Hapus Catatan Nilai">
+                            🗑️
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         async function muatNilai() {
             const tbody = document.getElementById('tabelNilai');
-            tbody.innerHTML = '<tr><td colspan="3" class="text-center p-6 text-slate-500">Memuat data nilai...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center p-8 text-stone-400">Memuat riwayat nilai akademik...</td></tr>';
 
             const { data: nilai, error } = await supabase
                 .from('nilai_akademik')
@@ -420,57 +833,62 @@
                 .order('semester', { ascending: true });
 
             if (error) {
-                tbody.innerHTML = `<tr><td colspan="3" class="text-center p-6 text-red-500">Gagal memuat: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center p-6 text-red-600">Gagal memuat nilai: ${error.message}</td></tr>`;
                 return;
             }
 
-            if (nilai.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="3" class="text-center p-8 text-slate-400 bg-slate-50">Belum ada nilai yang diinputkan untuk siswa ini.</td></tr>';
-                return;
-            }
+            globalDaftarNilai = nilai || [];
 
-            tbody.innerHTML = '';
-            nilai.forEach(n => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-blue-50 transition-colors";
-                
-                const htmlDeskripsi = n.deskripsi ? `<div class="text-sm text-slate-700 mt-2 p-3 bg-white border border-slate-200 rounded-lg whitespace-pre-wrap font-mono overflow-x-auto shadow-inner">${n.deskripsi}</div>` : '';
-                const nilaiTampil = (n.nilai !== null && n.nilai !== undefined) ? n.nilai : '-';
-
-                tr.innerHTML = `
-                    <td class="p-3 md:p-4 text-slate-700 align-top w-1/5">
-                        <span class="font-bold">${n.kelas}</span> <br>
-                        <span class="text-xs text-slate-500">${n.semester}</span>
-                    </td>
-                    <td class="p-3 md:p-4 text-slate-800 align-top w-3/5">
-                        <div class="font-bold text-blue-900">${n.mata_pelajaran}</div>
-                        ${htmlDeskripsi}
-                    </td>
-                    <td class="p-3 md:p-4 text-center align-top w-1/5">
-                        <div class="mb-2"><span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-lg font-bold text-lg">${nilaiTampil}</span></div>
-                        <button onclick="hapusNilai('${n.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl border border-red-200 transition-colors shadow-sm text-xs" title="Hapus Nilai">🗑️ Hapus</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+            // Isi opsi filter kelas secara dinamis
+            const filterEl = document.getElementById('filterKelasNilai');
+            const kelasSet = new Set();
+            globalDaftarNilai.forEach(n => { if (n.kelas) kelasSet.add(n.kelas); });
+            
+            const currentFilter = filterEl.value;
+            filterEl.innerHTML = '<option value="">Semua Kelas</option>';
+            Array.from(kelasSet).sort().forEach(kls => {
+                const opt = document.createElement('option');
+                opt.value = kls;
+                opt.innerText = kls;
+                if (kls === currentFilter) opt.selected = true;
+                filterEl.appendChild(opt);
             });
+
+            // Render sesuai filter yang terpilih
+            if (filterEl.value) {
+                renderTabelNilai(globalDaftarNilai.filter(n => n.kelas === filterEl.value));
+            } else {
+                renderTabelNilai(globalDaftarNilai);
+            }
         }
 
+        // Listener Filter Kelas
+        document.getElementById('filterKelasNilai').addEventListener('change', function() {
+            const terpilih = this.value;
+            if (terpilih) {
+                renderTabelNilai(globalDaftarNilai.filter(n => n.kelas === terpilih));
+            } else {
+                renderTabelNilai(globalDaftarNilai);
+            }
+        });
+
+        // PARSER EXCEL TINGKAT TINGGI UNTUK NILAI & DESKRIPSI
         document.getElementById('formTambahNilai').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btnSimpanNilai');
             const teksExcel = document.getElementById('in_nilai_gabungan').value.trim();
 
             if (!teksExcel) {
-                alert("Kotak teks masih kosong. Silakan paste dari Excel terlebih dahulu.");
+                alert("Kotak teks masih kosong. Silakan paste data tabel dari Excel terlebih dahulu.");
                 return;
             }
 
-            btn.innerHTML = "⏳ Memproses Data Excel..."; btn.disabled = true;
+            btn.innerHTML = "⏳ Memproses Nilai Excel..."; 
+            btn.disabled = true;
 
             const kelasVal = document.getElementById('in_nilai_kelas').value;
             const semesterVal = document.getElementById('in_nilai_semester').value;
 
-            // 🌟 1. MESIN PEMBACA FORMAT EXCEL 🌟
             let rows = [];
             let currentRow = [];
             let currentCell = '';
@@ -503,7 +921,6 @@
                 if (currentRow.join('') !== '') rows.push(currentRow);
             }
 
-            // 🌟 2. MENGGABUNGKAN BARIS YANG TERPISAH KARENA MERGE CELL EXCEL 🌟
             const payloadArray = [];
             let lastPayload = null; 
 
@@ -553,8 +970,9 @@
             }
 
             if (payloadArray.length === 0) {
-                alert("❌ Format tidak dikenali. Pastikan Anda meng-copy minimal kolom (Mapel, Nilai Akhir, Capaian) dari Excel.");
-                btn.innerHTML = "Simpan Data Rapor"; btn.disabled = false;
+                alert("Format teks tidak dikenali. Pastikan Anda meng-copy minimal kolom (Mapel, Nilai Akhir, Capaian) dari Excel.");
+                btn.innerHTML = "<span>📥</span><span>Simpan Nilai ke Rapor</span>"; 
+                btn.disabled = false;
                 return;
             }
 
@@ -563,27 +981,79 @@
             if (error) { 
                 alert("Gagal menyimpan nilai: " + error.message); 
             } else {
-                alert(`✅ Alhamdulillah! ${payloadArray.length} Mata Pelajaran berhasil di-input otomatis.`);
+                alert(`✅ Alhamdulillah! ${payloadArray.length} Mata Pelajaran berhasil di-input ke riwayat rapor.`);
                 document.getElementById('in_nilai_gabungan').value = '';
-                document.getElementById('in_nilai_gabungan').focus();
                 muatNilai(); 
             }
-            btn.innerHTML = "Simpan Data Rapor"; btn.disabled = false;
+            btn.innerHTML = "<span>📥</span><span>Simpan Nilai ke Rapor</span>"; 
+            btn.disabled = false;
         });
 
         window.hapusNilai = async function(idNilai) {
-            if(confirm("Yakin ingin menghapus nilai ini? Data tidak bisa dikembalikan.")) {
+            if (confirm("Peringatan: Yakin ingin menghapus catatan nilai ini?")) {
                 const { error } = await supabase.from('nilai_akademik').delete().eq('id', idNilai);
-                if(error) alert("Gagal menghapus!"); else muatNilai();
+                if (error) alert("Gagal menghapus: " + error.message); 
+                else muatNilai();
             }
-        }
+        };
 
         // ==========================================
-        // 3. BLOK FUNGSI DOKUMEN DIGITAL
+        // 3. BLOK KEHADIRAN & KEPUTUSAN SEMESTER
+        // ==========================================
+        const selectSemester = document.getElementById('in_hadir_semester');
+        const boxKeputusan = document.getElementById('areaKeputusan');
+
+        if (selectSemester && boxKeputusan) {
+            selectSemester.addEventListener('change', function() {
+                if (this.value === 'Genap') {
+                    boxKeputusan.classList.remove('hidden');
+                    boxKeputusan.classList.add('block');
+                } else {
+                    boxKeputusan.classList.add('hidden');
+                    boxKeputusan.classList.remove('block');
+                    document.getElementById('in_keputusan').value = ''; 
+                }
+            });
+        }
+
+        document.getElementById('formTambahKehadiran').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpanKehadiran');
+            btn.innerHTML = "⏳ Menyimpan..."; 
+            btn.disabled = true;
+
+            const payload = {
+                siswa_id: idSiswa,
+                kelas: document.getElementById('in_hadir_kelas').value,
+                semester: document.getElementById('in_hadir_semester').value,
+                sakit: document.getElementById('in_sakit').value || '-',
+                izin: document.getElementById('in_izin').value || '-',
+                alpa: document.getElementById('in_alpa').value || '-',
+                keputusan: document.getElementById('in_keputusan').value || '-'
+            };
+
+            await supabase.from('rekap_kehadiran').delete()
+                .eq('siswa_id', idSiswa)
+                .eq('kelas', payload.kelas)
+                .eq('semester', payload.semester);
+
+            const { error } = await supabase.from('rekap_kehadiran').insert([payload]);
+
+            if (error) alert("Gagal menyimpan catatan kehadiran: " + error.message);
+            else alert("✅ Data kehadiran resmi tersimpan!");
+
+            btn.innerHTML = "<span>💾</span><span>Simpan Kehadiran</span>"; 
+            btn.disabled = false;
+            document.getElementById('formTambahKehadiran').reset();
+            document.getElementById('areaKeputusan').classList.add('hidden');
+        });
+
+        // ==========================================
+        // 4. BLOK FUNGSI DOKUMEN DIGITAL
         // ==========================================
         async function muatDokumen() {
             const galeri = document.getElementById('galeriDokumen');
-            galeri.innerHTML = '<div class="col-span-full text-center p-8 text-slate-400 bg-slate-50 rounded-xl">Memuat dokumen...</div>';
+            galeri.innerHTML = '<div class="col-span-full text-center p-8 text-stone-400 bg-stone-50 rounded-xl">Memuat berkas dokumen...</div>';
 
             const { data: dokumen, error } = await supabase
                 .from('dokumen_siswa')
@@ -592,12 +1062,12 @@
                 .order('created_at', { ascending: false });
 
             if (error) {
-                galeri.innerHTML = `<div class="col-span-full text-center p-6 text-red-500">Gagal memuat: ${error.message}</div>`;
+                galeri.innerHTML = `<div class="col-span-full text-center p-6 text-red-600">Gagal memuat berkas: ${error.message}</div>`;
                 return;
             }
 
             if (dokumen.length === 0) {
-                galeri.innerHTML = '<div class="col-span-full text-center p-8 text-slate-400 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300">Belum ada dokumen yang diunggah.</div>';
+                galeri.innerHTML = '<div class="col-span-full text-center p-8 text-stone-400 bg-stone-50 rounded-xl border border-dashed border-stone-300">Belum ada berkas dokumen yang terunggah untuk siswa ini.</div>';
                 return;
             }
 
@@ -605,17 +1075,17 @@
             dokumen.forEach(d => {
                 const isPDF = d.file_url.toLowerCase().includes('.pdf');
                 const tampilanFile = isPDF
-                    ? `<div class="h-32 bg-red-50 flex flex-col items-center justify-center text-red-500 rounded-t-xl group-hover:bg-red-100 transition-colors"><span class="text-4xl">📄</span><span class="text-xs font-bold mt-2">File PDF</span></div>`
-                    : `<img src="${d.file_url}" class="h-32 w-full object-cover rounded-t-xl group-hover:opacity-80 transition-opacity">`;
+                    ? `<div class="h-32 bg-stone-100 flex flex-col items-center justify-center text-stone-600 rounded-t-xl group-hover:bg-stone-200 transition-colors"><span class="text-4xl">📄</span><span class="text-xs font-bold mt-2 text-stone-700">Dokumen PDF</span></div>`
+                    : `<img src="${d.file_url}" class="h-32 w-full object-cover rounded-t-xl group-hover:opacity-85 transition-opacity">`;
 
                 galeri.innerHTML += `
-                    <div class="border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow bg-white flex flex-col group relative">
+                    <div class="border border-stone-200 rounded-xl shadow-sm hover:shadow-md transition-shadow bg-white flex flex-col group relative">
                         <a href="${d.file_url}" target="_blank" class="block flex-1 cursor-pointer" title="Klik untuk membuka dokumen">
                             ${tampilanFile}
                         </a>
-                        <div class="p-3 border-t border-slate-100 flex justify-between items-center bg-slate-50 rounded-b-xl">
-                            <span class="font-bold text-xs text-slate-700 truncate pr-2">${d.nama_dokumen}</span>
-                            <button onclick="hapusDokumen('${d.id}', '${d.file_path}')" class="text-red-400 hover:text-red-600 hover:bg-red-100 p-1.5 rounded-lg transition-colors z-10" title="Hapus Dokumen">🗑️</button>
+                        <div class="p-3 border-t border-stone-100 flex justify-between items-center bg-stone-50/70 rounded-b-xl">
+                            <span class="font-bold text-xs text-stone-700 truncate pr-2">${d.nama_dokumen}</span>
+                            <button onclick="hapusDokumen('${d.id}', '${d.file_path}')" class="text-stone-400 hover:text-red-600 hover:bg-red-50 p-1 rounded-lg transition-colors z-10" title="Hapus Dokumen">🗑️</button>
                         </div>
                     </div>
                 `;
@@ -631,7 +1101,6 @@
 
             if (!file) return;
 
-            // 🛡️ VALIDASI BERKAS DOKUMEN (Max 5MB, JPG/PNG/WEBP/PDF)
             const cekValidasi = validasiFile(file, CONFIG_FILE.DOKUMEN);
             if (!cekValidasi.valid) {
                 alert(cekValidasi.pesan);
@@ -639,7 +1108,8 @@
                 return;
             }
 
-            btn.innerHTML = "⏳ Sedang Mengunggah..."; btn.disabled = true;
+            btn.innerHTML = "⏳ Sedang Mengunggah Dokumen..."; 
+            btn.disabled = true;
 
             try {
                 const fileExt = file.name.split('.').pop().toLowerCase();
@@ -660,41 +1130,41 @@
                 const { error: dbError } = await supabase.from('dokumen_siswa').insert([payload]);
                 if (dbError) throw dbError;
 
-                alert('✅ Alhamdulillah! Dokumen berhasil diunggah.');
+                alert('✅ Alhamdulillah! Dokumen berhasil diunggah dan terarsip aman.');
                 document.getElementById('formUploadDokumen').reset();
                 muatDokumen(); 
 
             } catch (error) {
                 alert('Gagal mengunggah dokumen: ' + error.message);
             } finally {
-                btn.innerHTML = "<span>🚀</span> Mulai Upload Dokumen"; btn.disabled = false;
+                btn.innerHTML = "<span>🚀</span><span>Mulai Unggah Berkas</span>"; 
+                btn.disabled = false;
             }
         });
 
         window.hapusDokumen = async function(idDokumen, filePath) {
-            if(confirm("Peringatan! Yakin ingin menghapus dokumen ini? File akan terhapus secara permanen.")) {
+            if (confirm("Peringatan: Yakin ingin menghapus berkas dokumen ini secara permanen?")) {
                 try {
                     const { error: storageError } = await supabase.storage.from('berkas_siswa').remove([filePath]);
-                    if(storageError) throw storageError;
+                    if (storageError) throw storageError;
 
                     const { error: dbError } = await supabase.from('dokumen_siswa').delete().eq('id', idDokumen);
-                    if(dbError) throw dbError;
+                    if (dbError) throw dbError;
 
                     muatDokumen(); 
                 } catch(error) {
                     alert("Gagal menghapus dokumen: " + error.message);
                 }
             }
-        }
+        };
 
         // ==========================================
-        // 4. UPLOAD FOTO PROFIL
+        // 5. UPLOAD PASFOTO RESMI SISWA
         // ==========================================
         document.getElementById('inputUploadFoto').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // 🛡️ VALIDASI FOTO PROFIL (Max 2MB, JPG/PNG/WEBP)
             const cekValidasi = validasiFile(file, CONFIG_FILE.FOTO);
             if (!cekValidasi.valid) {
                 alert(cekValidasi.pesan);
@@ -718,7 +1188,7 @@
                 if (updateError) throw updateError;
 
                 document.getElementById('fotoProfilSiswa').src = publicUrl;
-                alert('Alhamdulillah! Foto berhasil diperbarui.');
+                alert('✅ Alhamdulillah! Pasfoto resmi berhasil diperbarui.');
 
             } catch (error) {
                 alert('Gagal mengunggah foto: ' + error.message);
@@ -727,61 +1197,10 @@
             }
         });
 
-
-        // ==========================================
-        // 5. 🌟 MESIN KEHADIRAN & KEPUTUSAN
-        // ==========================================
-        const selectSemester = document.getElementById('in_hadir_semester');
-        const boxKeputusan = document.getElementById('areaKeputusan');
-
-        if (selectSemester && boxKeputusan) {
-            selectSemester.addEventListener('change', function() {
-                if (this.value === 'Genap') {
-                    boxKeputusan.classList.remove('hidden');
-                    boxKeputusan.classList.add('block');
-                } else {
-                    boxKeputusan.classList.add('hidden');
-                    boxKeputusan.classList.remove('block');
-                    document.getElementById('in_keputusan').value = ''; 
-                }
-            });
-        }
-
-        document.getElementById('formTambahKehadiran').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btnSimpanKehadiran');
-            btn.innerHTML = "⏳ Menyimpan..."; btn.disabled = true;
-
-            const payload = {
-                siswa_id: idSiswa,
-                kelas: document.getElementById('in_hadir_kelas').value,
-                semester: document.getElementById('in_hadir_semester').value,
-                sakit: document.getElementById('in_sakit').value || '-',
-                izin: document.getElementById('in_izin').value || '-',
-                alpa: document.getElementById('in_alpa').value || '-',
-                keputusan: document.getElementById('in_keputusan').value || '-'
-            };
-
-            await supabase.from('rekap_kehadiran').delete()
-                .eq('siswa_id', idSiswa)
-                .eq('kelas', payload.kelas)
-                .eq('semester', payload.semester);
-
-            const { error } = await supabase.from('rekap_kehadiran').insert([payload]);
-
-            if (error) alert("Gagal menyimpan kehadiran: " + error.message);
-            else alert("✅ Data kehadiran berhasil disimpan!");
-
-            btn.innerHTML = "💾 Simpan Kehadiran"; btn.disabled = false;
-            document.getElementById('formTambahKehadiran').reset();
-            document.getElementById('areaKeputusan').classList.add('hidden');
-        });
-
-        // PANGGIL SEMUA SAAT HALAMAN DIBUKA
+        // Inisialisasi awal
         muatProfil();
         muatNilai();
         muatDokumen();
-
     </script>
 </body>
 </html>

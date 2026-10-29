@@ -3,39 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - IndukKu Pro</title>
+    <title>Masuk Sistem - Buku Induk Sekolah</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-serif-title { font-family: 'Playfair Display', serif; }
+    </style>
 </head>
-<body class="bg-slate-100 flex items-center justify-center h-screen">
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm border border-slate-200">
+<body class="bg-[#051c17] flex items-center justify-center min-h-screen p-4 relative overflow-hidden">
+    
+    <!-- Ornamen Latar Belakang Halus -->
+    <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#c9a857 1px, transparent 1px); background-size: 24px 24px;"></div>
+    <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-emerald-900/30 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#8d7132]/20 blur-3xl pointer-events-none"></div>
+
+    <div class="bg-white p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-md border border-stone-100 relative z-10">
+        
         <div class="text-center mb-8">
-            <h1 class="text-4xl mb-2">📚</h1>
-            <h2 class="text-2xl font-bold text-slate-800">IndukKu Pro</h2>
-            <p class="text-slate-500 text-sm mt-1">Silakan masuk untuk melanjutkan</p>
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#c9a857] to-[#8d7132] flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg border border-[#e2c77d]/40">
+                📖
+            </div>
+            <h2 class="font-serif-title text-2xl font-black text-stone-900 tracking-tight">BUKU INDUK SISWA</h2>
+            <p class="text-xs text-[#8d7132] font-bold uppercase tracking-widest mt-1">Portal Register & Arsip Resmi</p>
+            <div class="w-12 h-0.5 bg-[#c9a857] mx-auto mt-3"></div>
         </div>
         
-        <form id="loginForm" class="space-y-5">
+        <form id="loginForm" class="space-y-4">
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Email</label>
-                <input type="email" id="email" required class="w-full border border-slate-300 p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1.5">Email Akses Resmi</label>
+                <input type="email" id="email" required placeholder="nama@sekolah.sch.id" class="w-full border border-stone-300 p-3.5 rounded-xl bg-stone-50 focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none text-sm font-medium text-stone-800 transition-all">
             </div>
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1">Password</label>
-                <input type="password" id="password" required class="w-full border border-slate-300 p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                <label class="block text-xs font-bold text-stone-600 uppercase tracking-wider mb-1.5">Kata Sandi (Password)</label>
+                <input type="password" id="password" required placeholder="••••••••" class="w-full border border-stone-300 p-3.5 rounded-xl bg-stone-50 focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none text-sm font-medium text-stone-800 transition-all">
                 
-                <!-- Fitur Tampilkan Password -->
-                <div class="flex items-center mt-3 mb-1">
-                    <input type="checkbox" id="cekTampilPassword" class="mr-2 w-4 h-4 cursor-pointer accent-blue-600">
-                    <label for="cekTampilPassword" class="text-sm text-slate-600 font-medium cursor-pointer select-none">Tampilkan Password</label>
+                <div class="flex items-center mt-3">
+                    <input type="checkbox" id="cekTampilPassword" class="mr-2 w-4 h-4 cursor-pointer accent-[#07332a]">
+                    <label for="cekTampilPassword" class="text-xs text-stone-500 font-semibold cursor-pointer select-none">Tampilkan Kata Sandi</label>
                 </div>
             </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-colors mt-2">
-                Masuk ke Sistem
+
+            <button type="submit" class="w-full bg-[#07332a] hover:bg-[#0c473b] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-[#07332a]/20 transition-all text-sm tracking-wide mt-2">
+                Masuk ke Sistem Register
             </button>
         </form>
+
+        <div class="mt-8 pt-4 border-t border-stone-100 text-center">
+            <p class="text-[11px] text-stone-400 font-medium">Sistem Registrasi Dokumen Induk & Lembar Rapor Digital</p>
+        </div>
     </div>
 
-    <!-- Script Autentikasi yang Lebih Pintar -->
+    <!-- Script Autentikasi -->
     <script type="module">
         import { supabase } from './js/supabaseConfig.js';
 
@@ -45,24 +66,18 @@
         const submitButton = loginForm.querySelector('button');
         const cekTampilPassword = document.getElementById('cekTampilPassword');
 
-        // Logika Tampilkan Password
         cekTampilPassword.addEventListener('change', function() {
-            if (this.checked) {
-                passwordInput.type = 'text';
-            } else {
-                passwordInput.type = 'password';
-            }
+            passwordInput.type = this.checked ? 'text' : 'password';
         });
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault(); 
             
             const originalText = submitButton.innerText;
-            submitButton.innerText = "Memeriksa data...";
+            submitButton.innerText = "Memverifikasi identitas...";
             submitButton.disabled = true;
 
             try {
-                // 1. Proses login ke Supabase
                 const { data, error } = await supabase.auth.signInWithPassword({
                     email: emailInput.value,
                     password: passwordInput.value,
@@ -70,24 +85,21 @@
 
                 if (error) throw error;
                 
-                // 2. DETEKTOR KARCIS: Jika Supabase menolak kasih Karcis
                 if (!data.session) {
-                    alert("⚠️ LOGIN DITOLAK OLEH SUPABASE: Password Anda benar, tapi sistem gagal membuatkan Sesi Karcis. Silakan beritahu pesan ini ke AI Anda.");
+                    alert("⚠️ Otorisasi ditolak. Silakan periksa kembali email dan kata sandi Anda.");
                     submitButton.innerText = originalText;
                     submitButton.disabled = false;
-                    return; // Hentikan script, jangan pindah halaman
+                    return;
                 }
 
-                // 3. Jika berhasil
-                submitButton.innerText = "Karcis Diterima! Masuk sistem...";
-                
+                submitButton.innerText = "Otorisasi Berhasil! Membuka data...";
                 setTimeout(() => {
                     window.location.href = 'index.html';
-                }, 1500);
+                }, 1000);
 
             } catch (error) {
                 console.error("Error Message:", error.message);
-                alert("Login gagal! " + error.message);
+                alert("Gagal masuk: " + error.message);
                 submitButton.innerText = originalText;
                 submitButton.disabled = false;
             }

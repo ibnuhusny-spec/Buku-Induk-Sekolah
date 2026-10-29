@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pengaturan Sekolah & Tanda Tangan Guru - IndukKu Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-serif-title { font-family: 'Playfair Display', serif; }
+        .canvas-ttd { touch-action: none; background: #ffffff; cursor: crosshair; }
+    </style>
     <style>
         .canvas-ttd {
             touch-action: none;
@@ -35,7 +43,7 @@
     <!-- Navigasi Tab -->
     <div class="max-w-5xl mx-auto w-full px-4 mt-6">
         <div class="bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200 flex gap-2">
-            <button onclick="pindahTab('sekolah')" id="btnTabSekolah" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-blue-600 text-white shadow-md">
+            <button onclick="pindahTab('sekolah')" id="btnTabSekolah" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-[#07332a] text-white shadow-md">
                 <span>🏫</span> Identitas Sekolah & Kepsek
             </button>
             <button onclick="pindahTab('guru')" id="btnTabGuru" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100">
@@ -171,7 +179,7 @@
                 </div>
 
                 <!-- Tombol Simpan -->
-                <button type="submit" id="btnSimpanSekolah" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-6 rounded-2xl shadow-xl shadow-blue-500/20 transition-all text-base flex items-center justify-center gap-2">
+                <button type="submit" id="btnSimpanSekolah" class="w-full bg-[#07332a] hover:bg-[#0c473b] text-white font-black py-4 px-6 rounded-2xl shadow-xl shadow-blue-500/20 transition-all text-base flex items-center justify-center gap-2">
                     <span>💾</span> Simpan Pengaturan Sekolah & Kepala Sekolah
                 </button>
             </form>
@@ -375,7 +383,7 @@
                 const btnTab = document.getElementById('btnTab' + t.charAt(0).toUpperCase() + t.slice(1));
                 if (t === tab) {
                     elTab.classList.remove('hidden');
-                    btnTab.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-blue-600 text-white shadow-md";
+                    btnTab.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 bg-[#07332a] text-white shadow-md";
                 } else {
                     elTab.classList.add('hidden');
                     btnTab.className = "flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 text-slate-600 hover:bg-slate-100";

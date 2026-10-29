@@ -3,238 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - IndukKu Pro</title>
+    <title>Buku Induk Siswa - Portal Administrasi Lembaga</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-serif-title { font-family: 'Playfair Display', serif; }
+        .bg-islamic-pattern {
+            background-color: #062721;
+            background-image: radial-gradient(#124238 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans flex h-screen overflow-hidden">
+<body class="bg-[#f6f8f7] text-slate-800 flex h-screen overflow-hidden">
 
-    <aside class="w-64 bg-slate-900 text-white flex flex-col hidden md:flex shadow-xl z-20">
-        <div class="h-16 flex items-center justify-center border-b border-slate-800 font-black text-2xl tracking-wider text-blue-400">
-            📚 IndukKu <span class="text-white ml-1">Pro</span>
+    <!-- SIDEBAR BERWIBAWA (IMPERIAL DEEP EMERALD) -->
+    <aside class="w-68 bg-[#07241e] text-white flex flex-col hidden md:flex shadow-2xl z-20 border-r border-[#133d34]">
+        
+        <!-- Header Logo Lembaga -->
+        <div class="h-24 flex items-center gap-3.5 px-6 border-b border-[#144238] bg-[#051c17]">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#c9a857] to-[#8d7132] flex items-center justify-center text-2xl shadow-lg border border-[#e2c77d]/30">
+                📖
+            </div>
+            <div>
+                <h2 class="font-serif-title text-lg font-black tracking-wide text-white leading-tight">BUKU INDUK</h2>
+                <p class="text-[10px] tracking-widest uppercase font-bold text-[#c9a857]">Register Resmi</p>
+            </div>
         </div>
+
+        <!-- Menu Navigasi Elegan -->
         <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="index.html" class="block px-4 py-3 rounded-xl bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/30">👥 Beranda & Data</a>
-            <a href="pengaturan.html" class="block px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-colors font-bold">🏫 Pengaturan Sekolah</a>
+            <a href="index.html" class="flex items-center gap-3 px-4 py-3.5 rounded-xl bg-[#123e35] text-[#f4efe3] font-bold text-sm border-l-4 border-[#c9a857] shadow-inner transition-all">
+                <span class="text-lg">🏛️</span>
+                <span>Master Data Siswa</span>
+            </a>
             
-            <button id="btnLogout" class="w-full text-left px-4 py-3 mt-10 rounded-xl text-red-400 hover:bg-red-500 hover:text-white transition-colors font-bold">🚪 Keluar (Logout)</button>
+            <a href="pengaturan.html" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-slate-300 hover:text-white hover:bg-[#0e312a] font-semibold text-sm transition-all">
+                <span class="text-lg">⚙️</span>
+                <span>Pengaturan & TTD Guru</span>
+            </a>
+
+            <div class="pt-6 pb-2 px-4">
+                <p class="text-[10px] font-bold text-emerald-400/60 uppercase tracking-widest">Layanan Terpadu</p>
+            </div>
+
+            <a href="import-dapodik.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-[#0e312a] text-xs font-semibold transition-all">
+                <span class="text-base">📥</span>
+                <span>Sinkronisasi Dapodik</span>
+            </a>
+            <a href="import-spmb.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-[#0e312a] text-xs font-semibold transition-all">
+                <span class="text-base">📥</span>
+                <span>Import SPMB Excel</span>
+            </a>
+            <a href="ppdb.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-[#0e312a] text-xs font-semibold transition-all">
+                <span class="text-base">🎓</span>
+                <span>Registrasi PPDB Baru</span>
+            </a>
         </nav>
+
+        <!-- Footer Sidebar -->
+        <div class="p-4 border-t border-[#144238] bg-[#051c17]/60">
+            <button id="btnLogout" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-stone-300 hover:text-red-400 hover:bg-red-950/30 text-xs font-bold transition-all border border-[#144238]">
+                <span>🚪</span> Keluar Sistem
+            </button>
+        </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen relative">
+    <!-- KONTEN UTAMA -->
+    <main class="flex-1 flex flex-col h-screen relative bg-[#f6f8f7]">
         
-        <header class="h-20 bg-white shadow-sm flex flex-col md:flex-row items-center justify-between px-8 py-4 gap-4 z-10">
-            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Master Data Siswa</h1>
-            <div class="relative w-full md:w-[400px]">
-                <input type="text" id="inputCari" placeholder="Ketik Nama, NISN, NIPD, atau Kelas..." class="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-100 border-none focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-inner font-medium text-slate-700">
-                <span class="absolute left-4 top-3 text-xl">🔍</span>
+        <!-- HEADER ATAS ELEGAN -->
+        <header class="h-20 bg-white shadow-sm border-b border-stone-200/80 flex flex-col md:flex-row items-center justify-between px-8 py-4 gap-4 z-10">
+            <div>
+                <h1 class="font-serif-title text-xl md:text-2xl font-bold text-stone-900 tracking-tight" id="headerNamaSekolah">
+                    SDIT QURRATU A'YUN AL-ISLAMI
+                </h1>
+                <p class="text-[11px] text-stone-500 font-medium tracking-wide">
+                    Buku Induk Register Peserta Didik & Transkrip Akademik Resmi
+                </p>
+            </div>
+
+            <!-- Kolom Pencarian Cerdas -->
+            <div class="relative w-full md:w-[380px]">
+                <input type="text" id="inputCari" placeholder="Cari Nama Siswa, NISN, NIPD, atau Rombel..." class="w-full pl-11 pr-4 py-2.5 rounded-xl bg-stone-100 border border-stone-200 focus:bg-white focus:border-[#0e3b32] focus:ring-2 focus:ring-[#0e3b32]/10 outline-none text-xs font-medium text-stone-800 transition-all placeholder:text-stone-400">
+                <span class="absolute left-3.5 top-2.5 text-stone-400 text-sm">🔍</span>
             </div>
         </header>
 
-        <div class="flex-1 p-6 md:p-8 overflow-auto">
+        <!-- AREA KERJA SCROLLABLE -->
+        <div class="flex-1 p-6 md:p-8 overflow-auto space-y-6">
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-6">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-                    <div class="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-3xl">👥</div>
+            <!-- PANEL STATISTIK EKSEKUTIF BERWIBAWA (TANPA GRAFIK YANG RAMAI) -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+                
+                <!-- Kartu 1: Total Siswa Terdaftar -->
+                <div class="bg-white p-5 rounded-2xl border border-stone-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between hover:border-stone-300 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-stone-400 uppercase tracking-widest">Total Register</span>
+                        <div class="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-sm">📋</div>
+                    </div>
                     <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Total Siswa</p>
-                        <h3 class="text-3xl font-black text-slate-800" id="dashTotal">0</h3>
+                        <h3 class="text-3xl font-black text-stone-900 tracking-tight font-serif-title" id="dashTotal">0</h3>
+                        <p class="text-[11px] text-stone-500 font-medium mt-1">Peserta didik tercatat</p>
                     </div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-                    <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl">🟢</div>
+
+                <!-- Kartu 2: Siswa Aktif -->
+                <div class="bg-white p-5 rounded-2xl border border-emerald-950/10 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between hover:border-emerald-900/30 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-emerald-800 uppercase tracking-widest">Status Aktif</span>
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center text-sm font-bold">✓</div>
+                    </div>
                     <div>
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Siswa Aktif</p>
-                        <h3 class="text-3xl font-black text-slate-800" id="dashAktif">0</h3>
+                        <h3 class="text-3xl font-black text-[#07382e] tracking-tight font-serif-title" id="dashAktif">0</h3>
+                        <p class="text-[11px] text-emerald-700 font-medium mt-1">Dalam masa studi</p>
                     </div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-                    <div class="w-14 h-14 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center text-3xl">🚻</div>
-                    <div class="w-full">
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Laki-laki / Pr</p>
-                        <div class="flex items-baseline gap-1">
-                            <h3 class="text-2xl font-black text-blue-600" id="dashL">0</h3>
-                            <span class="text-slate-300 font-bold text-lg">/</span>
-                            <h3 class="text-2xl font-black text-pink-500" id="dashP">0</h3>
+
+                <!-- Kartu 3: Komposisi Gender -->
+                <div class="bg-white p-5 rounded-2xl border border-stone-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between hover:border-stone-300 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-stone-400 uppercase tracking-widest">Komposisi Gender</span>
+                        <div class="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-sm">⚖️</div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-2xl font-black text-slate-800 font-serif-title" id="dashL">0</span>
+                            <span class="text-xs text-slate-500 font-bold">Ikhwan</span>
+                            <span class="text-stone-300 font-normal">|</span>
+                            <span class="text-2xl font-black text-slate-800 font-serif-title" id="dashP">0</span>
+                            <span class="text-xs text-slate-500 font-bold">Akhwat</span>
                         </div>
+                        <p class="text-[11px] text-stone-500 font-medium mt-1">Laki-laki / Perempuan</p>
                     </div>
                 </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
-                    <div class="w-14 h-14 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-3xl">🎓</div>
-                    <div class="w-full">
-                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Lulus / Pindah</p>
-                        <div class="flex items-baseline gap-1">
-                            <h3 class="text-2xl font-black text-purple-600" id="dashAlumni">0</h3>
-                            <span class="text-slate-300 font-bold text-lg">/</span>
-                            <h3 class="text-2xl font-black text-red-500" id="dashPindah">0</h3>
+
+                <!-- Kartu 4: Alumni & Mutasi -->
+                <div class="bg-white p-5 rounded-2xl border border-stone-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex flex-col justify-between hover:border-stone-300 transition-all">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[11px] font-bold text-stone-400 uppercase tracking-widest">Alumni & Mutasi</span>
+                        <div class="w-8 h-8 rounded-lg bg-stone-100 flex items-center justify-center text-sm">🎓</div>
+                    </div>
+                    <div>
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-2xl font-black text-[#8d7132] font-serif-title" id="dashAlumni">0</span>
+                            <span class="text-xs text-stone-500 font-bold">Lulus</span>
+                            <span class="text-stone-300 font-normal">|</span>
+                            <span class="text-2xl font-black text-stone-600 font-serif-title" id="dashPindah">0</span>
+                            <span class="text-xs text-stone-500 font-bold">Pindah</span>
                         </div>
+                        <p class="text-[11px] text-stone-500 font-medium mt-1">Arsip riwayat kelulusan</p>
                     </div>
                 </div>
+
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">📊 <span class="uppercase tracking-wider text-sm">Distribusi Siswa per Kelas</span></h3>
-                    <div class="relative h-64 w-full">
-                        <canvas id="chartKelas"></canvas>
+            <!-- DAFTAR UTAMA: MASTER REGISTER BUKU INDUK -->
+            <div class="bg-white rounded-3xl border border-stone-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.03)] overflow-hidden">
+                
+                <!-- COMMAND BAR ELEGAN & BERKELAS -->
+                <div class="p-5 md:px-7 md:py-4 border-b border-stone-200 bg-stone-50/70 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h3 class="font-serif-title text-base font-bold text-stone-900">Daftar Induk Peserta Didik</h3>
+                        <p class="text-[11px] text-stone-500 font-medium">Rekam jejak resmi register siswa sekolah</p>
                     </div>
-                </div>
-                <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">🚻 <span class="uppercase tracking-wider text-sm">Rasio Jenis Kelamin</span></h3>
-                    <div class="relative h-64 w-full">
-                        <canvas id="chartGender"></canvas>
-                    </div>
-                </div>
-            </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                
-                <div class="p-6 border-b border-slate-100 bg-slate-50 flex flex-wrap justify-center items-center gap-4">
-                    <button id="btnExport" class="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                        <span class="text-lg">📤</span> Export Excel
-                    </button>
-                    <a href="import-dapodik.html" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                        <span class="text-lg">📥</span> Import Dapodik
-                    </a>
-                    <a href="import-spmb.html" class="bg-gradient-to-r from-teal-400 to-emerald-500 hover:from-teal-500 hover:to-emerald-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                        <span class="text-lg">📥</span> Import SPMB
-                    </a>
-                    <a href="ppdb.html" class="bg-gradient-to-r from-fuchsia-500 to-purple-600 hover:from-fuchsia-600 hover:to-purple-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                        <span class="text-lg">🎓</span> PPDB Kilat
-                    </a>
-                    <button id="btnNaikKelas" class="bg-gradient-to-r from-orange-400 to-rose-500 hover:from-orange-500 hover:to-rose-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                        <span class="text-lg">🚀</span> Kenaikan Kelas
-                    </button>
-                    <button id="btnTambah" class="bg-slate-800 hover:bg-slate-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2">
-                        <span class="text-lg">+</span> Siswa Manual
-                    </button>
+                    <!-- Tombol Operasional Tertata -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button id="btnTambah" class="bg-[#07332a] hover:bg-[#0c473b] text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-[#07332a]/20 transition-all flex items-center gap-1.5">
+                            <span class="text-sm font-normal">+</span>
+                            <span>Tambah Siswa Manual</span>
+                        </button>
+                        
+                        <button id="btnNaikKelas" class="bg-white hover:bg-stone-50 text-stone-700 border border-stone-300 px-3.5 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
+                            <span>🚀</span>
+                            <span>Kenaikan Kelas</span>
+                        </button>
+
+                        <button id="btnExport" class="bg-white hover:bg-stone-50 text-stone-700 border border-stone-300 px-3.5 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
+                            <span>📤</span>
+                            <span>Export Excel</span>
+                        </button>
+                    </div>
                 </div>
                 
+                <!-- TABEL MASTER BERWIBAWA -->
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-white text-slate-400 text-xs uppercase tracking-wider border-b border-slate-200">
-                                <th class="p-4 md:p-5 font-bold">NISN / NIPD</th>
-                                <th class="p-4 md:p-5 font-bold">Nama Lengkap & Kelas</th>
-                                <th class="p-4 md:p-5 font-bold">Status</th>
-                                <th class="p-4 md:p-5 font-bold text-center">Aksi</th>
+                            <tr class="bg-[#07241e] text-white text-[11px] uppercase tracking-wider font-bold">
+                                <th class="py-4 px-6 w-52">Nomor Register (NISN / NIPD)</th>
+                                <th class="py-4 px-6">Nama Peserta Didik & Rombel</th>
+                                <th class="py-4 px-6 w-32 text-center">Status</th>
+                                <th class="py-4 px-6 text-center w-40">Tindakan Arsip</th>
                             </tr>
                         </thead>
-                        <tbody id="tableBody" class="text-sm text-slate-700 divide-y divide-slate-50">
+                        <tbody id="tableBody" class="text-sm text-stone-700 divide-y divide-stone-100">
                             <tr>
-                                <td colspan="4" class="p-10 text-center text-slate-400 font-bold animate-pulse">⏳ Memuat data siswa...</td>
+                                <td colspan="4" class="p-12 text-center text-stone-400 font-medium animate-pulse">
+                                    Memuat data buku induk sekolah...
+                                </td>
                             </tr>
                         </tbody>
+                    </table>
                 </div>
 
-                <!-- PAGINASI KONTROL BAR MODEREN -->
-                <div class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-slate-600">
+                <!-- KONTROL PAGINASI ELEGAN -->
+                <div class="px-6 py-4 border-t border-stone-200 bg-stone-50/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold text-stone-600">
                     <div class="flex items-center gap-2">
-                        <span class="text-slate-500 font-semibold">Tampilkan:</span>
-                        <select id="selectLimitPage" class="bg-white border border-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-slate-700 cursor-pointer shadow-sm">
-                            <option value="10">10 data per halaman</option>
-                            <option value="25" selected>25 data per halaman</option>
-                            <option value="50">50 data per halaman</option>
-                            <option value="100">100 data per halaman</option>
+                        <span class="text-stone-500">Tampilkan per halaman:</span>
+                        <select id="selectLimitPage" class="bg-white border border-stone-300 rounded-xl px-3 py-1.5 focus:outline-none focus:border-[#07332a] font-bold text-stone-800 cursor-pointer shadow-sm">
+                            <option value="15">15 siswa</option>
+                            <option value="25" selected>25 siswa</option>
+                            <option value="50">50 siswa</option>
+                            <option value="100">100 siswa</option>
                         </select>
                     </div>
 
-                    <div id="infoPaginasi" class="text-slate-500 font-semibold text-center">
-                        Menampilkan <span id="teksAwalData" class="text-slate-800 font-bold">0</span> - <span id="teksAkhirData" class="text-slate-800 font-bold">0</span> dari <span id="teksTotalData" class="text-blue-600 font-bold">0</span> data
+                    <div id="infoPaginasi" class="text-stone-500">
+                        Menampilkan <span id="teksAwalData" class="text-stone-900 font-bold">0</span> - <span id="teksAkhirData" class="text-stone-900 font-bold">0</span> dari <span id="teksTotalData" class="text-[#07332a] font-black">0</span> data register
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <button id="btnPrevPage" disabled class="px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all font-bold shadow-sm flex items-center gap-1">
-                            &laquo; Prev
+                    <div class="flex items-center gap-1.5">
+                        <button id="btnPrevPage" disabled class="px-3 py-1.5 bg-white border border-stone-300 rounded-xl text-stone-700 hover:bg-stone-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all font-bold shadow-sm">
+                            &laquo; Sebelumnya
                         </button>
-                        <span id="labelHalAktif" class="bg-blue-600 text-white px-3.5 py-1.5 rounded-xl shadow-sm font-black text-sm">1</span>
-                        <button id="btnNextPage" disabled class="px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all font-bold shadow-sm flex items-center gap-1">
-                            Next &raquo;
+                        <span id="labelHalAktif" class="bg-[#07332a] text-white px-3 py-1.5 rounded-xl shadow-sm font-black text-xs">1</span>
+                        <button id="btnNextPage" disabled class="px-3 py-1.5 bg-white border border-stone-300 rounded-xl text-stone-700 hover:bg-stone-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all font-bold shadow-sm">
+                            Berikutnya &raquo;
                         </button>
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <div id="modalTambah" class="hidden absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 transition-all">
-            <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl mx-4 border border-slate-100 transform scale-100">
-                <div class="flex justify-between items-center mb-6 border-b pb-4">
-                    <h2 class="text-xl font-black text-slate-800">Tambah Siswa Baru</h2>
-                    <button id="btnTutupModal" class="text-slate-400 hover:text-red-500 text-2xl font-bold transition-colors">&times;</button>
+        <!-- MODAL TAMBAH SISWA MANUAL -->
+        <div id="modalTambah" class="hidden fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center z-50 transition-all p-4">
+            <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl border border-stone-100">
+                <div class="flex justify-between items-center mb-6 border-b border-stone-100 pb-4">
+                    <div>
+                        <h2 class="font-serif-title text-xl font-bold text-stone-900">Registrasi Siswa Baru</h2>
+                        <p class="text-xs text-stone-500">Tambahkan data pokok peserta didik</p>
+                    </div>
+                    <button id="btnTutupModal" class="text-stone-400 hover:text-stone-600 text-2xl font-bold">&times;</button>
                 </div>
-                <form id="formTambah" class="space-y-5">
+                <form id="formTambah" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">NISN Siswa</label>
-                        <input type="text" id="inputNisn" required class="w-full border-2 border-slate-200 p-3 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none transition-colors font-mono">
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1.5">NISN Siswa</label>
+                        <input type="text" id="inputNisn" required placeholder="10 Digit NISN" class="w-full border border-stone-300 p-3 rounded-xl bg-stone-50 focus:bg-white focus:border-[#07332a] outline-none font-mono text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Lengkap</label>
-                        <input type="text" id="inputNama" required class="w-full border-2 border-slate-200 p-3 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none transition-colors font-bold text-slate-800">
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1.5">Nama Lengkap Siswa</label>
+                        <input type="text" id="inputNama" required placeholder="Nama sesuai Akta / KK" class="w-full border border-stone-300 p-3 rounded-xl bg-stone-50 focus:bg-white focus:border-[#07332a] outline-none font-bold text-stone-900 text-sm uppercase">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tahun Masuk</label>
-                        <input type="number" id="inputTahun" value="2026" required class="w-full border-2 border-slate-200 p-3 rounded-xl bg-slate-50 focus:bg-white focus:border-blue-500 outline-none transition-colors font-bold text-slate-800">
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-1.5">Tahun Masuk Sekolah</label>
+                        <input type="number" id="inputTahun" value="2026" required class="w-full border border-stone-300 p-3 rounded-xl bg-stone-50 focus:bg-white focus:border-[#07332a] outline-none font-bold text-stone-800 text-sm">
                     </div>
-                    <div class="flex gap-3 pt-6">
-                        <button type="button" id="btnBatal" class="w-1/3 py-3 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold transition-all">Batal</button>
-                        <button type="submit" id="btnSimpan" class="w-2/3 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-500/30 transition-all">Simpan Data</button>
+                    <div class="flex gap-3 pt-4 border-t border-stone-100">
+                        <button type="button" id="btnBatal" class="w-1/3 py-3 text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl font-bold text-xs transition-all">Batal</button>
+                        <button type="submit" id="btnSimpan" class="w-2/3 py-3 bg-[#07332a] hover:bg-[#0c473b] text-white rounded-xl font-bold text-xs shadow-md shadow-[#07332a]/20 transition-all">Simpan ke Buku Induk</button>
                     </div>
                 </form>
+            </div>
         </div>
 
-        <!-- MODAL KENAIKAN KELAS MODEREN -->
-        <div id="modalNaikKelas" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-md flex items-center justify-center z-50 transition-all p-4">
-            <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl border border-slate-100 relative overflow-hidden">
-                
-                <!-- Header Modal -->
-                <div class="flex justify-between items-center mb-5 border-b pb-4">
+        <!-- MODAL KENAIKAN KELAS BERWIBAWA -->
+        <div id="modalNaikKelas" class="hidden fixed inset-0 bg-stone-900/70 backdrop-blur-sm flex items-center justify-center z-50 transition-all p-4">
+            <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl border border-stone-100">
+                <div class="flex justify-between items-center mb-5 border-b border-stone-100 pb-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl font-bold">🚀</div>
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-800 flex items-center justify-center text-2xl font-bold border border-amber-200">🚀</div>
                         <div>
-                            <h2 class="text-xl font-black text-slate-800">Proses Kenaikan Kelas</h2>
-                            <p class="text-xs text-slate-500 font-medium">Otomatisasi lulus & naik kelas 1-5</p>
+                            <h2 class="font-serif-title text-lg font-bold text-stone-900">Proses Kenaikan Kelas Masal</h2>
+                            <p class="text-xs text-stone-500 font-medium">Otomatisasi transisi tingkat kelas dan alumni</p>
                         </div>
                     </div>
-                    <button id="btnTutupModalNaik" type="button" class="text-slate-400 hover:text-red-500 text-2xl font-bold transition-colors">&times;</button>
+                    <button id="btnTutupModalNaik" type="button" class="text-stone-400 hover:text-stone-600 text-2xl font-bold">&times;</button>
                 </div>
 
-                <!-- Informasi Peringatan -->
-                <div class="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-2xl text-xs space-y-2 mb-6">
-                    <p class="font-bold flex items-center gap-1.5 text-sm">
-                        <span>⚠️</span> Peringatan Tindakan Masal:
+                <div class="bg-amber-50/70 border border-amber-200 text-amber-900 p-4 rounded-2xl text-xs space-y-2 mb-6">
+                    <p class="font-bold flex items-center gap-1.5 text-sm text-amber-900">
+                        <span>⚠️</span> Ketentuan Proses Otomatis:
                     </p>
-                    <ul class="list-disc list-inside space-y-1 text-amber-700 font-medium">
-                        <li><strong>Kelas 6</strong> akan otomatis diluluskan menjadi <span class="bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-bold">Alumni</span>.</li>
-                        <li><strong>Kelas 1 s/d 5</strong> akan otomatis dinaikkan 1 tingkat.</li>
-                        <li>Tindakan ini berpengaruh pada seluruh data siswa aktif di database.</li>
+                    <ul class="list-disc list-inside space-y-1 text-amber-800 font-medium leading-relaxed">
+                        <li><strong>Kelas 6</strong> akan otomatis ditetapkan sebagai <span class="bg-stone-100 text-stone-800 px-1.5 py-0.5 rounded font-bold border border-stone-300">Alumni</span>.</li>
+                        <li><strong>Kelas 1 s/d 5</strong> akan otomatis dinaikkan 1 tingkat ke kelas di atasnya.</li>
+                        <li>Tindakan ini mempengaruhi seluruh siswa dengan status aktif.</li>
                     </ul>
                 </div>
 
-                <!-- Form Password Security -->
                 <form id="formProsesNaikKelas" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Password Keamanan Kepala Sekolah / Admin</label>
+                        <label class="block text-xs font-bold text-stone-600 uppercase mb-2">Password Otorisasi Admin / Kepala Sekolah</label>
                         <div class="relative">
-                            <input type="password" id="inputSandiNaik" required placeholder="Masukkan password otorisasi..." class="w-full border-2 border-slate-200 p-3.5 pr-12 rounded-xl bg-slate-50 focus:bg-white focus:border-orange-500 outline-none transition-all font-mono text-slate-800">
-                            <button type="button" id="btnTogglePass" class="absolute right-3 top-3 text-slate-400 hover:text-slate-600 p-1 text-lg">👁️</button>
+                            <input type="password" id="inputSandiNaik" required placeholder="Masukkan kata sandi otorisasi..." class="w-full border border-stone-300 p-3 pr-12 rounded-xl bg-stone-50 focus:bg-white focus:border-[#07332a] outline-none font-mono text-sm">
+                            <button type="button" id="btnTogglePass" class="absolute right-3 top-2.5 text-stone-400 hover:text-stone-600 p-1 text-sm">👁️</button>
                         </div>
                     </div>
 
-                    <!-- Progress Bar (Tampil Saat Memproses) -->
                     <div id="boxProgresNaik" class="hidden space-y-2 pt-2">
-                        <div class="flex justify-between text-xs font-bold text-slate-600">
+                        <div class="flex justify-between text-xs font-bold text-stone-600">
                             <span id="teksStatusNaik">Sedang memproses siswa...</span>
                             <span id="persenNaik">0%</span>
                         </div>
-                        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
-                            <div id="barProgresNaik" class="bg-gradient-to-r from-orange-400 to-rose-500 h-3 rounded-full transition-all duration-300 w-0"></div>
+                        <div class="w-full bg-stone-100 rounded-full h-3 overflow-hidden border border-stone-200">
+                            <div id="barProgresNaik" class="bg-[#07332a] h-3 rounded-full transition-all duration-300 w-0"></div>
                         </div>
                     </div>
 
-                    <div class="flex gap-3 pt-4 border-t border-slate-100">
-                        <button type="button" id="btnBatalNaik" class="w-1/3 py-3.5 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl font-bold transition-all">Batal</button>
-                        <button type="submit" id="btnSubmitNaik" class="w-2/3 py-3.5 bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-600 hover:to-rose-700 text-white rounded-xl font-bold shadow-lg shadow-orange-500/20 transition-all flex items-center justify-center gap-2">
+                    <div class="flex gap-3 pt-4 border-t border-stone-100">
+                        <button type="button" id="btnBatalNaik" class="w-1/3 py-3 text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-xl font-bold text-xs transition-all">Batal</button>
+                        <button type="submit" id="btnSubmitNaik" class="w-2/3 py-3 bg-[#07332a] hover:bg-[#0c473b] text-white rounded-xl font-bold text-xs shadow-md shadow-[#07332a]/20 transition-all flex items-center justify-center gap-2">
                             <span>🚀</span> Jalankan Kenaikan Kelas
                         </button>
                     </div>
@@ -243,9 +328,11 @@
         </div>
     </main>
 
+    <!-- SCRIPT DATA & OPERASIONAL UTAMA -->
     <script type="module">
         import { supabase } from './js/supabaseConfig.js';
 
+        // 🛡️ Pengaman Session Login
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) { window.location.href = 'login.html'; }
 
@@ -254,10 +341,16 @@
             window.location.href = 'login.html';
         });
 
+        // Ambil Nama Sekolah untuk Header
+        try {
+            const configSekolah = JSON.parse(localStorage.getItem('config_sekolah') || '{}');
+            if (configSekolah.nama) {
+                document.getElementById('headerNamaSekolah').innerText = configSekolah.nama;
+            }
+        } catch(e){}
+
         let dataSiswaGlobal = []; 
         let dataTersaringGlobal = [];
-        let chartKelasInstance = null;
-        let chartGenderInstance = null;
 
         // Variable Paginasi
         let halamanSekarang = 1;
@@ -272,7 +365,7 @@
                 .order('nama_lengkap', { ascending: true });
 
             if (error) {
-                tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-red-500 font-bold bg-red-50 rounded-xl">❌ Gagal mengambil data dari server!</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-red-600 font-bold bg-red-50 rounded-xl">❌ Gagal mengambil data register dari server!</td></tr>';
                 return;
             }
 
@@ -281,83 +374,12 @@
             renderTabel(true);
         }
 
-        // 🌟 FUNGSI MENGGAMBAR GRAFIK (CHART.JS) 🌟
-        function renderGrafik(data) {
-            const countKelas = {};
-            let jmlLaki = 0;
-            let jmlPr = 0;
-
-            data.forEach(s => {
-                if (s.jenis_kelamin === 'Laki-laki') jmlLaki++;
-                if (s.jenis_kelamin === 'Perempuan') jmlPr++;
-
-                if(s.status === 'Aktif' || !s.status) {
-                    const kelas = s.rombel || 'Belum Ada Kelas';
-                    countKelas[kelas] = (countKelas[kelas] || 0) + 1;
-                }
-            });
-
-            // Urutkan nama kelas sesuai abjad
-            const labelKelas = Object.keys(countKelas).sort();
-            const dataKelas = labelKelas.map(k => countKelas[k]);
-
-            // ================= GAMBAR GRAFIK GENDER (DONAT) =================
-            const ctxGender = document.getElementById('chartGender').getContext('2d');
-            if (chartGenderInstance) chartGenderInstance.destroy();
-            
-            chartGenderInstance = new Chart(ctxGender, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Laki-laki', 'Perempuan'],
-                    datasets: [{
-                        data: [jmlLaki, jmlPr],
-                        backgroundColor: ['#3b82f6', '#ec4899'],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'bottom' } },
-                    cutout: '70%'
-                }
-            });
-
-            // ================= GAMBAR GRAFIK KELAS (BATANG) =================
-            const ctxKelas = document.getElementById('chartKelas').getContext('2d');
-            if (chartKelasInstance) chartKelasInstance.destroy();
-            
-            chartKelasInstance = new Chart(ctxKelas, {
-                type: 'bar',
-                data: {
-                    labels: labelKelas,
-                    datasets: [{
-                        label: 'Jumlah Siswa Aktif',
-                        data: dataKelas,
-                        backgroundColor: '#6366f1',
-                        borderRadius: 6,
-                        barPercentage: 0.6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        }
-
-        // Fungsi menggambar tabel dan statistik dengan PAGINASI
+        // Fungsi menggambar tabel dan statistik
         function renderTabel(resetHalaman = false) {
             const tableBody = document.getElementById('tableBody');
             if (resetHalaman) halamanSekarang = 1;
             
-            // Hitung Statistik dari Data Tersaring
+            // Hitung Statistik
             const total = dataTersaringGlobal.length;
             const jmlAktif = dataTersaringGlobal.filter(s => !s.status || s.status === 'Aktif').length;
             const jmlAlumni = dataTersaringGlobal.filter(s => s.status === 'Alumni').length;
@@ -372,10 +394,7 @@
             document.getElementById('dashL').innerText = jmlLaki;
             document.getElementById('dashP').innerText = jmlPr;
 
-            // Panggil mesin pembuat grafik dengan data tersaring
-            renderGrafik(dataTersaringGlobal);
-
-            // ================= LOGIKA PAGINASI =================
+            // Logika Paginasi
             const totalPages = Math.ceil(total / limitPerHalaman) || 1;
             if (halamanSekarang > totalPages) halamanSekarang = totalPages;
 
@@ -383,7 +402,7 @@
             const endIndex = Math.min(startIndex + limitPerHalaman, total);
             const dataHalaman = dataTersaringGlobal.slice(startIndex, endIndex);
 
-            // Update Label & Button Paginasi
+            // Update Label Paginasi
             document.getElementById('teksAwalData').innerText = total === 0 ? 0 : startIndex + 1;
             document.getElementById('teksAkhirData').innerText = endIndex;
             document.getElementById('teksTotalData').innerText = total;
@@ -393,35 +412,37 @@
 
             tableBody.innerHTML = ''; 
             if (dataHalaman.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="4" class="p-12 text-center text-slate-400 font-bold text-lg">📭 Tidak ada data yang ditemukan.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="4" class="p-12 text-center text-stone-400 font-medium">📭 Tidak ada data peserta didik yang cocok.</td></tr>';
                 return;
             }
 
-            dataHalaman.forEach(siswa => {
+            dataHalaman.forEach((siswa, index) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-colors group cursor-default";
+                tr.className = "hover:bg-stone-50/80 transition-colors group";
                 
-                let badgeStatus = `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-bold border border-emerald-200 uppercase tracking-widest">Aktif</span>`;
-                if(siswa.status === 'Alumni') badgeStatus = `<span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-[10px] font-bold border border-purple-200 uppercase tracking-widest">Alumni</span>`;
-                if(siswa.status === 'Pindah') badgeStatus = `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-[10px] font-bold border border-red-200 uppercase tracking-widest">Pindah</span>`;
+                let badgeStatus = `<span class="bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full text-[10px] font-bold border border-emerald-200 uppercase tracking-wider">Aktif</span>`;
+                if(siswa.status === 'Alumni') badgeStatus = `<span class="bg-stone-100 text-stone-700 px-3 py-1 rounded-full text-[10px] font-bold border border-stone-300 uppercase tracking-wider">Alumni</span>`;
+                if(siswa.status === 'Pindah') badgeStatus = `<span class="bg-amber-50 text-amber-800 px-3 py-1 rounded-full text-[10px] font-bold border border-amber-200 uppercase tracking-wider">Mutasi</span>`;
 
                 tr.innerHTML = `
-                    <td class="p-4 md:p-5 whitespace-nowrap">
-                        <div class="font-mono text-slate-700 font-bold text-sm">${siswa.nisn || '-'}</div>
-                        <div class="text-[10px] text-slate-400 font-medium tracking-widest uppercase mt-1">NIPD: ${siswa.nipd || '-'}</div>
+                    <td class="py-4 px-6 whitespace-nowrap">
+                        <div class="font-mono text-stone-900 font-bold text-sm tracking-tight">${siswa.nisn || '-'}</div>
+                        <div class="text-[10px] text-stone-400 font-semibold tracking-wider uppercase mt-0.5">NIPD: ${siswa.nipd || '-'}</div>
                     </td>
-                    <td class="p-4 md:p-5">
-                        <div class="font-bold text-slate-800 text-base mb-1">${siswa.nama_lengkap}</div>
-                        <div class="text-[11px] text-slate-500 font-medium bg-slate-100 inline-block px-2.5 py-1 rounded-md border border-slate-200">🏫 ${siswa.rombel || 'Belum masuk kelas'}</div>
+                    <td class="py-4 px-6">
+                        <div class="font-bold text-stone-900 text-sm tracking-tight">${siswa.nama_lengkap}</div>
+                        <div class="text-[11px] text-stone-600 font-semibold bg-stone-100 inline-block px-2.5 py-0.5 rounded-md border border-stone-200 mt-1">
+                            🏛️ ${siswa.rombel || 'Belum Ditetapkan'}
+                        </div>
                     </td>
-                    <td class="p-4 md:p-5">${badgeStatus}</td>
-                    <td class="p-4 md:p-5">
+                    <td class="py-4 px-6 text-center">${badgeStatus}</td>
+                    <td class="py-4 px-6 text-center">
                         <div class="flex items-center justify-center gap-2">
-                            <a href="profil-siswa.html?id=${siswa.id}" class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-3 py-2 rounded-xl font-bold transition-colors flex items-center gap-2 shadow-sm" title="Buka Profil Lengkap">
-                                <span class="text-base">👁️</span> <span class="hidden xl:inline text-xs uppercase tracking-wider">Profil</span>
+                            <a href="profil-siswa.html?id=${siswa.id}" class="bg-[#07332a]/5 hover:bg-[#07332a] text-[#07332a] hover:text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border border-[#07332a]/20" title="Buka Profil & Cetak Buku Induk">
+                                <span>👁️</span> <span>Profil 360°</span>
                             </a>
-                            <button onclick="hapusSiswa('${siswa.id}', '${siswa.nama_lengkap}')" class="bg-red-50 text-red-500 hover:bg-red-600 hover:text-white p-2 rounded-xl font-bold transition-colors shadow-sm opacity-0 group-hover:opacity-100" title="Hapus Permanen">
-                                <span class="text-base">🗑️</span>
+                            <button onclick="hapusSiswa('${siswa.id}', '${siswa.nama_lengkap}')" class="text-stone-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-xl transition-all opacity-0 group-hover:opacity-100" title="Hapus Permanen">
+                                <span>🗑️</span>
                             </button>
                         </div>
                     </td>
@@ -430,7 +451,7 @@
             });
         }
 
-        // Event Listener Paginasi Controls
+        // Event Listener Paginasi
         document.getElementById('btnPrevPage').addEventListener('click', () => {
             if (halamanSekarang > 1) {
                 halamanSekarang--;
@@ -452,7 +473,7 @@
             renderTabel(false);
         });
 
-        // Event Listener Pencarian Data
+        // Event Pencarian
         document.getElementById('inputCari').addEventListener('input', (e) => {
             const kataKunci = e.target.value.toLowerCase().trim();
             dataTersaringGlobal = dataSiswaGlobal.filter(siswa => {
@@ -468,18 +489,19 @@
         muatData();
 
         window.hapusSiswa = async function(idSiswa, namaSiswa) {
-            const yakin = confirm(`Peringatan Keras!\nApakah Anda yakin ingin menghapus permanen data siswa bernama ${namaSiswa}?`);
+            const yakin = confirm(`Peringatan Penting!\nApakah Anda benar-benar yakin ingin menghapus data register ${namaSiswa}?`);
             if (yakin) {
                 const { error } = await supabase.from('buku_induk').delete().eq('id', idSiswa);
-                if (error) alert("Gagal menghapus data: " + error.message);
+                if (error) alert("Gagal menghapus: " + error.message);
                 else muatData();
             }
         };
 
+        // Export Excel
         document.getElementById('btnExport').addEventListener('click', async () => {
             const btn = document.getElementById('btnExport');
             const teksAsli = btn.innerHTML;
-            btn.innerHTML = `<span class="text-lg">⏳</span> Memproses...`;
+            btn.innerHTML = `<span>⏳</span> Memproses...`;
             btn.disabled = true;
 
             try {
@@ -492,11 +514,12 @@
                 XLSX.utils.book_append_sheet(workbook, worksheet, "Buku_Induk");
 
                 const tanggal = new Date().toISOString().split('T')[0];
-                XLSX.writeFile(workbook, `Backup_IndukKu_${tanggal}.xlsx`);
+                XLSX.writeFile(workbook, `Arsip_Buku_Induk_${tanggal}.xlsx`);
             } catch (err) { alert("Gagal export: " + err.message); } 
             finally { btn.innerHTML = teksAsli; btn.disabled = false; }
         });
 
+        // Modal Tambah
         const modal = document.getElementById('modalTambah');
         const formTambah = document.getElementById('formTambah');
 
@@ -513,8 +536,8 @@
             btn.innerText = "⏳ Menyimpan..."; btn.disabled = true;
 
             const { error } = await supabase.from('buku_induk').insert([{
-                nisn: document.getElementById('inputNisn').value,
-                nama_lengkap: document.getElementById('inputNama').value,
+                nisn: document.getElementById('inputNisn').value.trim(),
+                nama_lengkap: document.getElementById('inputNama').value.trim().toUpperCase(),
                 tahun_masuk: parseInt(document.getElementById('inputTahun').value),
                 status: 'Aktif'
             }]);
@@ -525,10 +548,10 @@
                 formTambah.reset();
                 muatData();
             }
-            btn.innerText = "Simpan Data"; btn.disabled = false;
+            btn.innerText = "Simpan ke Buku Induk"; btn.disabled = false;
         });
 
-        // 🌟 MODAL KENAIKAN KELAS MODEREN & PROGRESS BAR 🌟
+        // Modal Kenaikan Kelas
         const modalNaik = document.getElementById('modalNaikKelas');
         const btnNaik = document.getElementById('btnNaikKelas');
         const btnTutupNaik = document.getElementById('btnTutupModalNaik');
@@ -561,7 +584,6 @@
                 e.preventDefault();
                 const sandi = inputSandi.value;
 
-                // Verifikasi Password
                 if (sandi !== "BISMILLAH") {
                     alert("❌ Password otorisasi salah! Hubungi Admin / Kepala Sekolah.");
                     inputSandi.focus();
@@ -605,14 +627,14 @@
                         let rombelBaru = siswa.rombel || '';
                         let statusBaru = siswa.status || 'Aktif';
 
-                        if (rombelBaru.includes('Kelas 6')) {
+                        if (rombelBaru.includes('Kelas 6') || rombelBaru.includes('6')) {
                             statusBaru = 'Alumni'; 
                             rombelBaru = `Alumni ${new Date().getFullYear()}`;
-                        } else if (rombelBaru.includes('Kelas 5')) { rombelBaru = rombelBaru.replace('Kelas 5', 'Kelas 6');
-                        } else if (rombelBaru.includes('Kelas 4')) { rombelBaru = rombelBaru.replace('Kelas 4', 'Kelas 5');
-                        } else if (rombelBaru.includes('Kelas 3')) { rombelBaru = rombelBaru.replace('Kelas 3', 'Kelas 4');
-                        } else if (rombelBaru.includes('Kelas 2')) { rombelBaru = rombelBaru.replace('Kelas 2', 'Kelas 3');
-                        } else if (rombelBaru.includes('Kelas 1')) { rombelBaru = rombelBaru.replace('Kelas 1', 'Kelas 2'); }
+                        } else if (rombelBaru.includes('5')) { rombelBaru = rombelBaru.replace('5', '6');
+                        } else if (rombelBaru.includes('4')) { rombelBaru = rombelBaru.replace('4', '5');
+                        } else if (rombelBaru.includes('3')) { rombelBaru = rombelBaru.replace('3', '4');
+                        } else if (rombelBaru.includes('2')) { rombelBaru = rombelBaru.replace('2', '3');
+                        } else if (rombelBaru.includes('1')) { rombelBaru = rombelBaru.replace('1', '2'); }
 
                         if (rombelBaru !== siswa.rombel || statusBaru !== siswa.status) {
                             const { error } = await supabase.from('buku_induk').update({ rombel: rombelBaru, status: statusBaru }).eq('id', siswa.id);
@@ -620,12 +642,12 @@
                         }
                     }
 
-                    alert(`✅ ALHAMDULILLAH!\n${jumlahBerubah} siswa berhasil dinaikkan kelasnya dan diluluskan.`);
+                    alert(`✅ ALHAMDULILLAH!\n${jumlahBerubah} siswa berhasil dinaikkan kelasnya.`);
                     modalNaik.classList.add('hidden');
                     muatData();
 
                 } catch (error) {
-                    alert("❌ Gagal memproses kenaikan kelas: " + error.message);
+                    alert("❌ Gagal memproses: " + error.message);
                 } finally {
                     btnSubmit.disabled = false;
                     btnSubmit.innerHTML = `<span>🚀</span> Jalankan Kenaikan Kelas`;

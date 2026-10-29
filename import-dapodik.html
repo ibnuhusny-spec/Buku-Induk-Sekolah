@@ -3,47 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Import Dapodik - IndukKu Pro</title>
+    <title>Import Dapodik Cerdas - Buku Induk Sekolah</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-serif-title { font-family: 'Playfair Display', serif; }
+        .animate-fade-in { animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f3; }
+        ::-webkit-scrollbar-thumb { background: #c2cfc9; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #07332a; }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans h-screen flex flex-col">
+<body class="bg-[#f6f8f7] text-stone-800 min-h-screen flex flex-col">
 
-    <header class="bg-white shadow-sm border-b px-6 py-4 flex items-center gap-4 sticky top-0 z-10">
-        <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-bold transition-colors">
-            &larr; Kembali
-        </a>
-        <h1 class="text-xl font-bold text-slate-800">📥 Import Data dari Dapodik</h1>
+    <!-- HEADER RESMI -->
+    <header class="bg-white border-b border-stone-200/90 shadow-sm sticky top-0 z-30 px-6 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-[#07332a] hover:text-white text-stone-700 font-semibold text-xs border border-stone-200 transition-all shadow-sm group">
+                <span class="text-sm transition-transform group-hover:-translate-x-0.5">&larr;</span>
+                <span>Kembali ke Master Data</span>
+            </a>
+            <div class="h-6 w-px bg-stone-200 hidden sm:block"></div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📥</span>
+                    <h1 class="font-serif-title text-base md:text-xl font-bold text-stone-900 tracking-tight leading-none">
+                        Sinkronisasi Impor Dapodik Adaptif
+                    </h1>
+                </div>
+                <p class="text-[11px] text-stone-500 font-medium mt-0.5">
+                    Mesin Pemindai Cerdas & Pemetaan Kolom Fleksibel Antar-Sekolah
+                </p>
+            </div>
+        </div>
+
+        <div class="hidden sm:flex items-center gap-2 bg-[#07332a]/10 border border-[#07332a]/20 text-[#07332a] px-3 py-1.5 rounded-full text-xs font-bold">
+            <span>🛡️</span>
+            <span>Deteksi Otomatis & Pratinjau Interaktif</span>
+        </div>
     </header>
 
-    <main class="max-w-3xl mx-auto p-6 w-full mt-10">
-        <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 text-center">
-            
-            <div class="w-24 h-24 mx-auto bg-green-100 text-green-600 rounded-full flex items-center justify-center text-5xl mb-6">
+    <!-- KONTEN UTAMA -->
+    <main class="max-w-5xl w-full mx-auto p-4 md:p-8 flex-1 space-y-6">
+
+        <!-- 1. AREA UPLOAD FILE DAPODIK -->
+        <div id="cardUpload" class="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-stone-200/90 text-center">
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-[#07332a]/10 text-[#07332a] flex items-center justify-center text-4xl mb-4 border border-[#07332a]/20 shadow-inner">
                 📊
             </div>
             
-            <h2 class="text-2xl font-bold text-slate-800 mb-2">Upload File Excel Dapodik</h2>
-            <p class="text-slate-500 mb-8">Pilih file <span class="font-bold">Daftar Peserta Didik</span> yang baru Anda unduh dari web Dapodik (format .xlsx).</p>
-            
-            <label class="block w-full border-2 border-dashed border-slate-300 hover:border-green-500 hover:bg-green-50 transition-all rounded-2xl p-10 cursor-pointer">
-                <span class="text-4xl mb-3 block">📂</span>
-                <span class="font-bold text-slate-700 block text-lg">Klik untuk memilih file Excel</span>
+            <h2 class="font-serif-title text-2xl font-bold text-stone-900 mb-2">
+                Pilih Berkas Excel Dapodik
+            </h2>
+            <p class="text-xs md:text-sm text-stone-500 max-w-xl mx-auto mb-8 leading-relaxed">
+                Unggah berkas <b class="text-stone-800">Daftar Peserta Didik (.xlsx)</b> hasil unduh dari sistem Dapodik. Sistem ini otomatis mendeteksi baris judul dan memetakan letak kolom sekalipun posisi cell berbeda antar-sekolah.
+            </p>
+
+            <label class="block w-full border-2 border-dashed border-stone-300 hover:border-[#07332a] hover:bg-emerald-50/30 transition-all rounded-3xl p-10 cursor-pointer group">
+                <span class="text-5xl mb-3 block transition-transform group-hover:scale-110">📂</span>
+                <span class="font-bold text-stone-700 block text-base group-hover:text-[#07332a]">Klik untuk memilih berkas Excel Dapodik</span>
+                <span class="text-xs text-stone-400 mt-1 block">Mendukung format .xlsx, .xls, atau .csv (Maksimal 10MB)</span>
                 <input type="file" id="fileDapodik" accept=".xlsx, .xls, .csv" class="hidden">
             </label>
 
-            <div id="areaProses" class="hidden mt-8 text-left bg-slate-50 p-6 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-800 mb-2">Status Proses:</h3>
-                <p id="teksStatus" class="text-slate-600">Menunggu file...</p>
+            <!-- Status Pemindaian Singkat -->
+            <div id="statusBacaFile" class="hidden mt-6 p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs font-medium text-stone-600 flex items-center justify-center gap-2">
+                <span class="animate-spin text-base">⏳</span>
+                <span id="teksBacaFile">Sedang memindai susunan cell dan kolom Excel...</span>
+            </div>
+        </div>
+
+        <!-- 2. AREA PEMETAAN KOLOM CERDAS (INTERACTIVE COLUMN MAPPER) -->
+        <div id="cardMapping" class="hidden bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-stone-200/90 space-y-6 animate-fade-in">
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-stone-200 pb-5 gap-3">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">🎯</span>
+                        <h3 class="font-serif-title text-lg md:text-xl font-bold text-stone-900">
+                            Pratinjau & Pemetaan Kolom Excel
+                        </h3>
+                    </div>
+                    <p class="text-xs text-stone-500 mt-1" id="infoDeteksiFile">
+                        File berhasil dipindai. Periksa kecocokan kolom di bawah ini sebelum menyimpan.
+                    </p>
+                </div>
                 
-                <div class="w-full bg-slate-200 rounded-full h-4 mt-4 overflow-hidden">
-                    <div id="barProgres" class="bg-green-500 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="gantiFile()" class="px-3.5 py-2 rounded-xl border border-stone-300 text-stone-600 hover:bg-stone-100 text-xs font-bold transition-all">
+                        🔄 Ganti File
+                    </button>
+                    <div class="bg-emerald-50 text-[#07332a] border border-emerald-200 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-sm">
+                        <span id="totalBarisSiswaBadge">0</span>
+                        <span>Peserta Didik Ditemukan</span>
+                    </div>
                 </div>
             </div>
 
+            <!-- Petunjuk Pintar -->
+            <div class="bg-[#07332a]/5 border border-[#07332a]/20 rounded-2xl p-4 text-xs text-[#07332a] flex items-start gap-3">
+                <span class="text-lg">💡</span>
+                <div class="leading-relaxed">
+                    <b>Sistem Cerdas Telah Memetakan Kolom Otomatis:</b> Jika posisi cell di Dapodik sekolah Anda berbeda (misalnya Nama Ayah berada di kolom lain), cukup ubah pilihan dropdown pada baris yang bersangkutan. Kolom <i>"Contoh Data Baris 1"</i> akan langsung memperlihatkan data asli siswa pertama secara real-time!
+                </div>
+            </div>
+
+            <!-- TABEL PEMETAAN KOLOM -->
+            <div class="overflow-x-auto rounded-2xl border border-stone-200 shadow-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-[#07241e] text-[#f4efe3] font-serif-title text-xs uppercase tracking-wider">
+                            <th class="p-3.5 font-bold border-b border-[#144238] w-1/4">Atribut Buku Induk</th>
+                            <th class="p-3.5 font-bold border-b border-[#144238] w-2/5">Pilihan Kolom di Excel Dapodik</th>
+                            <th class="p-3.5 font-bold border-b border-[#144238] w-1/3">Contoh Data Siswa Pertama</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelMappingBody" class="divide-y divide-stone-100 text-xs">
+                        <!-- Diisi secara dinamis oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- TOMBOL AKSI IMPOR -->
+            <div class="pt-4 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-xs text-stone-500 text-center sm:text-left">
+                    <span class="font-bold text-stone-800">Catatan Keamanan:</span> Siswa dengan NISN ganda otomatis disaring rapi tanpa merusak data lama.
+                </div>
+                <button type="button" id="btnMulaiImpor" onclick="eksekusiImpor()" class="w-full sm:w-auto bg-[#07332a] hover:bg-[#0c473b] text-white font-bold py-3.5 px-8 rounded-xl shadow-lg border border-[#c9a857]/40 text-sm transition-all flex items-center justify-center gap-2 group">
+                    <span class="text-lg transition-transform group-hover:scale-110">🚀</span>
+                    <span>Mulai Impor ke Buku Induk</span>
+                </button>
+            </div>
         </div>
+
+        <!-- 3. AREA PROGRES & LAPORAN HASIL -->
+        <div id="cardProgres" class="hidden bg-white p-8 rounded-3xl shadow-sm border border-stone-200/90 text-center space-y-5 animate-fade-in">
+            <div id="ikonProgres" class="text-4xl animate-bounce">⏳</div>
+            <h3 id="judulProgres" class="font-serif-title text-xl font-bold text-stone-900">Sedang Memproses Impor Data...</h3>
+            <p id="teksDetailProgres" class="text-xs text-stone-500 max-w-md mx-auto">
+                Menyimpan data siswa ke database cloud...
+            </p>
+
+            <div class="w-full max-w-xl mx-auto bg-stone-200 rounded-full h-3 overflow-hidden">
+                <div id="barProgres" class="bg-[#07332a] h-3 rounded-full transition-all duration-300" style="width: 10%"></div>
+            </div>
+
+            <div id="areaSelesai" class="hidden pt-4">
+                <a href="index.html" class="inline-flex items-center gap-2 bg-[#07332a] text-white font-bold px-6 py-3 rounded-xl shadow-md hover:bg-[#0c473b] transition-all text-sm">
+                    <span>🏛️</span>
+                    <span>Buka Master Data Buku Induk</span>
+                </a>
+            </div>
+        </div>
+
     </main>
 
+    <footer class="py-4 text-center text-xs text-stone-400 border-t border-stone-200/80 bg-white">
+        Sistem Integrasi Dapodik Pintar &bull; SDIT Qurratu A'yun Al-Islami &bull; Penataan Database Sekolah Fleksibel
+    </footer>
+
+    <!-- SKRIP LOGIKA ADAPTIF -->
     <script type="module">
         import { supabase } from './js/supabaseConfig.js';
         import { validasiFile, CONFIG_FILE } from './js/validasiFile.js';
@@ -51,11 +177,159 @@
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) window.location.href = 'login.html';
 
+        // Variabel Global Data Excel
+        let rawExcelRows = [];
+        let headerRowIndex = -1;
+        let excelColumns = []; // Array { index, label, colLetter }
+        let sampleRowData = [];
+        let dataSiswaRows = [];
+
+        // Definisi Atribut Target Buku Induk dengan Kamus Sinonim Cerdas
+        const ATRIBUT_BUKU_INDUK = [
+            {
+                key: 'nama_lengkap',
+                label: 'Nama Lengkap Siswa',
+                icon: '👤',
+                required: true,
+                synonyms: ['nama peserta didik', 'nama lengkap', 'nama siswa', 'nama']
+            },
+            {
+                key: 'nisn',
+                label: 'NISN (Nomor Induk Nasional)',
+                icon: '🪪',
+                required: false,
+                synonyms: ['nisn', 'nomor induk siswa nasional']
+            },
+            {
+                key: 'nipd',
+                label: 'NIPD / Nomor Induk Sekolah',
+                icon: '🏷️',
+                required: false,
+                synonyms: ['nipd', 'no. induk', 'nomor induk', 'nis']
+            },
+            {
+                key: 'jenis_kelamin',
+                label: 'Jenis Kelamin (L/P)',
+                icon: '⚧',
+                required: false,
+                synonyms: ['l/p', 'jk', 'jenis kelamin', 'kelamin']
+            },
+            {
+                key: 'tempat_lahir',
+                label: 'Tempat Lahir',
+                icon: '📍',
+                required: false,
+                synonyms: ['tempat lahir', 'tmpt lahir']
+            },
+            {
+                key: 'tanggal_lahir',
+                label: 'Tanggal Lahir',
+                icon: '📅',
+                required: false,
+                synonyms: ['tanggal lahir', 'tgl lahir']
+            },
+            {
+                key: 'agama',
+                label: 'Agama',
+                icon: '🕌',
+                required: false,
+                synonyms: ['agama & kepercayaan', 'agama', 'kepercayaan']
+            },
+            {
+                key: 'alamat_siswa',
+                label: 'Alamat Tempat Tinggal',
+                icon: '🏠',
+                required: false,
+                synonyms: ['alamat jalan', 'nama jalan', 'jalan', 'alamat']
+            },
+            {
+                key: 'kelurahan',
+                label: 'Kelurahan / Desa',
+                icon: '🏘️',
+                required: false,
+                synonyms: ['kelurahan/desa', 'desa/kelurahan', 'kelurahan', 'desa']
+            },
+            {
+                key: 'rombel',
+                label: 'Rombel / Kelas Saat Ini',
+                icon: '🏫',
+                required: false,
+                synonyms: ['rombongan belajar saat ini', 'rombongan belajar', 'rombel saat ini', 'rombel', 'kelas']
+            },
+            {
+                key: 'anak_ke',
+                label: 'Anak Ke-berapa',
+                icon: '👶',
+                required: false,
+                synonyms: ['anak ke-berapa', 'anak ke']
+            },
+            {
+                key: 'jumlah_saudara',
+                label: 'Jumlah Saudara Kandung',
+                icon: '👨‍👧‍👦',
+                required: false,
+                synonyms: ['jumlah saudara kandung', 'jml saudara']
+            },
+            {
+                key: 'nama_ayah',
+                label: 'Nama Ayah Kandung',
+                icon: '👨🏽',
+                required: false,
+                synonyms: ['nama ayah', 'ayah kandung nama', 'data ayah nama', 'nama bapak', 'ayah nama', 'data ayah']
+            },
+            {
+                key: 'pekerjaan_ayah',
+                label: 'Pekerjaan Ayah',
+                icon: '💼',
+                required: false,
+                synonyms: ['pekerjaan ayah', 'ayah kandung pekerjaan', 'data ayah pekerjaan', 'ayah pekerjaan']
+            },
+            {
+                key: 'nama_ibu',
+                label: 'Nama Ibu Kandung',
+                icon: '👩🏽',
+                required: false,
+                synonyms: ['nama ibu', 'ibu kandung nama', 'data ibu nama', 'nama mama', 'ibu nama', 'data ibu']
+            },
+            {
+                key: 'pekerjaan_ibu',
+                label: 'Pekerjaan Ibu',
+                icon: '💼',
+                required: false,
+                synonyms: ['pekerjaan ibu', 'ibu kandung pekerjaan', 'data ibu pekerjaan', 'ibu pekerjaan']
+            },
+            {
+                key: 'nama_wali',
+                label: 'Nama Wali Siswa',
+                icon: '🛡️',
+                required: false,
+                synonyms: ['nama wali', 'data wali nama', 'wali nama', 'data wali']
+            },
+            {
+                key: 'pekerjaan_wali',
+                label: 'Pekerjaan Wali',
+                icon: '💼',
+                required: false,
+                synonyms: ['pekerjaan wali', 'data wali pekerjaan', 'wali pekerjaan']
+            }
+        ];
+
+        // Konversi nomor indeks kolom ke huruf Excel (0 -> A, 1 -> B, 26 -> AA, dst.)
+        function indexToColLetter(index) {
+            let letter = '';
+            let temp = index;
+            while (temp >= 0) {
+                letter = String.fromCharCode((temp % 26) + 65) + letter;
+                temp = Math.floor(temp / 26) - 1;
+            }
+            return letter;
+        }
+
+        // Tangani Pemilihan File Excel
         document.getElementById('fileDapodik').addEventListener('change', function(e) {
             const file = e.target.files[0];
-            if(!file) return;
+            if (!file) return;
 
-            // 🛡️ VALIDASI EXCEL DAPODIK (Max 10MB, XLSX/XLS/CSV)
             const cekValidasi = validasiFile(file, CONFIG_FILE.EXCEL);
             if (!cekValidasi.valid) {
                 alert(cekValidasi.pesan);
@@ -63,204 +337,409 @@
                 return;
             }
 
-            document.getElementById('areaProses').classList.remove('hidden');
-            const teksStatus = document.getElementById('teksStatus');
-            const barProgres = document.getElementById('barProgres');
-            
-            teksStatus.innerHTML = `Membaca file <b>${file.name}</b>...`;
-            barProgres.style.width = '20%';
+            const statusBox = document.getElementById('statusBacaFile');
+            const teksStatus = document.getElementById('teksBacaFile');
+            statusBox.classList.remove('hidden');
+            teksStatus.innerHTML = `Membaca berkas <b>${file.name}</b>...`;
 
             const reader = new FileReader();
-            reader.onload = async function(e) {
-                teksStatus.innerText = "Mesin Radar sedang memetakan kolom Excel...";
-                barProgres.style.width = '40%';
-                
+            reader.onload = function(evt) {
                 try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, {type: 'array'});
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     
-                    const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+                    rawExcelRows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
                     
-                    // ==============================================================
-                    // 🧠 1. KECERDASAN BUATAN: CARI BARIS JUDUL (HEADER)
-                    // ==============================================================
-                    let indexJudul = -1;
-                    let headers = [];
-                    let headersGabungan = [];
+                    if (!rawExcelRows || rawExcelRows.length < 3) {
+                        throw new Error("Berkas Excel tampak kosong atau tidak memiliki data baris.");
+                    }
 
-                    for(let i=0; i<15; i++) {
-                        if(!rows[i]) continue;
-                        const baris = rows[i].map(sel => String(sel || '').toLowerCase().trim());
+                    // 1. PINDAI BARIS HEADER (SCANNER PINTAR HINGGA BARIS 25)
+                    headerRowIndex = -1;
+                    let barisJudulBawah = [];
+                    let barisKategoriAtas = [];
+
+                    for (let r = 0; r < Math.min(25, rawExcelRows.length); r++) {
+                        const row = rawExcelRows[r];
+                        if (!row) continue;
+
+                        const barisStr = row.map(c => String(c || '').toLowerCase().trim());
                         
-                        if(baris.includes('nisn') && (baris.includes('nama') || baris.includes('nama peserta didik'))) {
-                            indexJudul = i;
-                            headers = baris;
-                            
-                            const barisAtas = rows[i-1] || [];
-                            let kategoriAtas = '';
-                            for(let c=0; c<baris.length; c++) {
-                                let atas = String(barisAtas[c] || '').toLowerCase().trim();
-                                if(atas && atas.length > 2) kategoriAtas = atas; 
-                                headersGabungan[c] = kategoriAtas + " " + String(baris[c] || '').toLowerCase().trim();
+                        // Kriteria baris judul Dapodik: memiliki NISN atau (NAMA dan (L/P atau JK atau TEMPAT LAHIR))
+                        const adaNisn = barisStr.some(s => s === 'nisn' || s.includes('nisn'));
+                        const adaNama = barisStr.some(s => s === 'nama' || s.includes('nama peserta didik') || s.includes('nama'));
+                        const adaJk = barisStr.some(s => s === 'l/p' || s === 'jk' || s.includes('kelamin'));
+
+                        if ((adaNisn && adaNama) || (adaNama && adaJk)) {
+                            headerRowIndex = r;
+                            barisJudulBawah = barisStr;
+                            if (r > 0 && rawExcelRows[r - 1]) {
+                                barisKategoriAtas = rawExcelRows[r - 1].map(c => String(c || '').trim());
                             }
                             break;
                         }
                     }
 
-                    if(indexJudul === -1) {
-                        throw new Error("Gagal menemukan baris judul. Pastikan ini format Excel Dapodik asli.");
+                    if (headerRowIndex === -1) {
+                        throw new Error("Gagal mengenali baris judul kolom Dapodik. Pastikan file ini adalah unduhan asli Dapodik yang memuat kolom Nama dan NISN/JK.");
                     }
 
-                    // ==============================================================
-                    // 🗺️ 2. PEMETAAN POSISI KOTAK (RADAR JARAK)
-                    // ==============================================================
-                    const getKolom = (kataKunciArray) => {
-                        return headers.findIndex(judul => {
-                            if (!judul) return false; 
-                            return kataKunciArray.some(kunci => judul.includes(kunci));
+                    // 2. SUSUN LABEL KOLOM LENGKAP DENGAN MERGE DETECTOR
+                    excelColumns = [];
+                    let kategoriBerjalan = '';
+                    const colCount = Math.max(barisJudulBawah.length, (rawExcelRows[headerRowIndex - 1] || []).length);
+
+                    for (let c = 0; c < colCount; c++) {
+                        const subHeader = String((rawExcelRows[headerRowIndex] || [])[c] || '').trim();
+                        const topHeader = String((rawExcelRows[headerRowIndex - 1] || [])[c] || '').trim();
+
+                        if (topHeader && topHeader.length > 2) {
+                            kategoriBerjalan = topHeader;
+                        }
+
+                        let gabungan = subHeader;
+                        if (kategoriBerjalan && !subHeader.toLowerCase().includes(kategoriBerjalan.toLowerCase())) {
+                            gabungan = `${kategoriBerjalan} - ${subHeader}`;
+                        } else if (!gabungan && kategoriBerjalan) {
+                            gabungan = kategoriBerjalan;
+                        }
+
+                        if (!gabungan) {
+                            gabungan = `(Kolom Tanpa Nama)`;
+                        }
+
+                        excelColumns.push({
+                            index: c,
+                            colLetter: indexToColLetter(c),
+                            label: gabungan,
+                            rawSub: subHeader.toLowerCase(),
+                            rawTop: kategoriBerjalan.toLowerCase(),
+                            rawCombined: gabungan.toLowerCase()
                         });
-                    };
-
-                    const cNama = getKolom(['nama', 'nama peserta didik']);
-                    const cNIPD = getKolom(['nipd']);
-                    const cNISN = getKolom(['nisn']);
-                    const cJK = getKolom(['l/p', 'jk', 'jenis kelamin']);
-                    const cTempatLahir = getKolom(['tempat lahir']);
-                    const cTanggalLahir = getKolom(['tanggal lahir']);
-                    const cAgama = getKolom(['agama', 'agama & kepercayaan']);
-                    const cJalan = getKolom(['jalan', 'alamat jalan', 'alamat']);
-                    const cKelurahan = getKolom(['kelurahan/desa', 'desa/kelurahan', 'kelurahan']);
-                    const cRombel = getKolom(['rombongan belajar', 'rombel', 'rombel saat ini']);
-                    const cAnakKe = getKolom(['anak ke-berapa', 'anak ke']);
-                    const cJmlSaudara = getKolom(['jumlah saudara kandung']);
-
-                    const cAyahBase = getKolom(['data ayah']);
-                    const cIbuBase = getKolom(['data ibu']);
-                    const cWaliBase = getKolom(['data wali']);
-
-                    // ==============================================================
-                    // 🚀 3. PROSES AMBIL DATA
-                    // ==============================================================
-                    const dataSiswaKotor = [];
-                    for(let i = indexJudul + 1; i < rows.length; i++) {
-                        const row = rows[i];
-                        
-                        const cekNama = row[cNama] ? String(row[cNama]).trim() : '';
-                        if(!row || cNama === -1 || !cekNama || cekNama.toLowerCase() === 'nama') continue; 
-
-                        let tglLahir = null;
-                        if(cTanggalLahir !== -1 && row[cTanggalLahir]) {
-                            const cellTgl = row[cTanggalLahir];
-                            if(typeof cellTgl === 'number') {
-                                const dateObj = new Date(Math.round((cellTgl - 25569) * 86400 * 1000));
-                                tglLahir = dateObj.toISOString().split('T')[0];
-                            } else if(typeof cellTgl === 'string') {
-                                const teks = cellTgl.trim();
-                                if (/\d{4}/.test(teks)) tglLahir = teks.replace(/\//g, '-');
-                            }
-                        }
-
-                        const jalan = cJalan !== -1 ? (row[cJalan] || '') : '';
-                        const kelurahan = cKelurahan !== -1 ? (row[cKelurahan] || '') : '';
-                        const alamatLengkap = `${jalan} ${kelurahan ? 'Kel. '+kelurahan : ''}`.trim();
-
-                        let jenisKelamin = null;
-                        if(cJK !== -1 && row[cJK]) {
-                            const jk = String(row[cJK]).trim().toUpperCase();
-                            if(jk === 'L' || jk === 'LAKI-LAKI') jenisKelamin = 'Laki-laki';
-                            if(jk === 'P' || jk === 'PEREMPUAN') jenisKelamin = 'Perempuan';
-                        }
-
-                        // Bersihkan NISN: Jika hanya strip (-) atau nol, jadikan null agar tidak dianggap kembar
-                        let nisnSiswa = (cNISN !== -1 && row[cNISN]) ? String(row[cNISN]).trim() : null;
-                        if (nisnSiswa === '' || nisnSiswa === '-' || nisnSiswa === '0') nisnSiswa = null;
-                        
-                        const nipdSiswa = (cNIPD !== -1 && row[cNIPD]) ? String(row[cNIPD]).trim() : null;
-
-                        let tahunMasukSiswa = new Date().getFullYear();
-                        if (nipdSiswa && nipdSiswa.length >= 2) {
-                            const digitTahun = parseInt(nipdSiswa.substring(0, 2));
-                            if (!isNaN(digitTahun)) {
-                                tahunMasukSiswa = 2000 + digitTahun; 
-                            }
-                        }
-
-                        const payload = {
-                            nama_lengkap: cekNama,
-                            nipd: nipdSiswa,
-                            nisn: nisnSiswa,
-                            jenis_kelamin: jenisKelamin,
-                            tempat_lahir: cTempatLahir !== -1 ? (row[cTempatLahir] || null) : null,
-                            tanggal_lahir: tglLahir,
-                            agama: cAgama !== -1 ? (row[cAgama] || null) : null,
-                            alamat_siswa: alamatLengkap,
-                            anak_ke: cAnakKe !== -1 ? (parseInt(row[cAnakKe]) || null) : null,
-                            jumlah_saudara: cJmlSaudara !== -1 ? (parseInt(row[cJmlSaudara]) || null) : null,
-                            
-                            nama_ayah: cAyahBase !== -1 ? (row[cAyahBase] || null) : null,
-                            pekerjaan_ayah: cAyahBase !== -1 ? (row[cAyahBase + 3] || null) : null,
-                            
-                            nama_ibu: cIbuBase !== -1 ? (row[cIbuBase] || null) : null,
-                            pekerjaan_ibu: cIbuBase !== -1 ? (row[cIbuBase + 3] || null) : null,
-                            
-                            nama_wali: cWaliBase !== -1 ? (row[cWaliBase] || null) : null,
-                            pekerjaan_wali: cWaliBase !== -1 ? (row[cWaliBase + 3] || null) : null,
-
-                            rombel: cRombel !== -1 ? (row[cRombel] || null) : null,
-                            status: 'Aktif',
-                            tahun_masuk: tahunMasukSiswa
-                        };
-                        
-                        dataSiswaKotor.push(payload);
                     }
 
-                    // ==============================================================
-                    // 🛡️ 3.5. SARINGAN ANTI-KEMBAR (DEDUPLIKASI)
-                    // ==============================================================
-                    const mapSiswaUnik = new Map();
-                    const dataBersih = [];
-
-                    dataSiswaKotor.forEach(siswa => {
-                        // Jika ada NISN, jadikan ia kunci gemboknya.
-                        // Jika tidak ada NISN, buatkan kunci acak sementara agar tidak ditolak karena "kembar kosong".
-                        const kunci = siswa.nisn ? siswa.nisn : `NO-NISN-${Math.random()}`;
+                    // 3. KUMPULKAN BARIS DATA SISWA & SAMPEL BARIS 1
+                    dataSiswaRows = [];
+                    for (let r = headerRowIndex + 1; r < rawExcelRows.length; r++) {
+                        const row = rawExcelRows[r];
+                        if (!row) continue;
                         
-                        // Map otomatis menghancurkan duplikat (hanya mengambil data baris Excel yang paling bawah/terakhir)
-                        mapSiswaUnik.set(kunci, siswa);
-                    });
+                        // Periksa apakah baris ini memiliki teks yang bukan header/footer rekap
+                        const rowStr = row.map(c => String(c || '').trim()).join('');
+                        if (!rowStr || rowStr.length < 5) continue;
+                        
+                        dataSiswaRows.push(row);
+                    }
 
-                    // Pindahkan data yang sudah bersih ke dalam kotak pengiriman
-                    mapSiswaUnik.forEach(value => dataBersih.push(value));
+                    if (dataSiswaRows.length === 0) {
+                        throw new Error("Tidak ditemukan baris data siswa setelah baris judul header.");
+                    }
 
-                    teksStatus.innerHTML = `Menyaring <b>${dataBersih.length}</b> siswa unik bebas duplikat. Menyimpan ke Database...`;
-                    barProgres.style.width = '70%';
+                    sampleRowData = dataSiswaRows[0];
 
-                    // ==============================================================
-                    // 4. TEMBAKKAN KE SUPABASE
-                    // ==============================================================
-                    const { error } = await supabase.from('buku_induk').upsert(dataBersih, { 
-                        onConflict: 'nisn', 
-                        ignoreDuplicates: false 
-                    });
-
-                    if(error) throw error;
-
-                    teksStatus.innerHTML = `<span class="text-green-700 font-bold">✅ Berhasil Mutlak! Data masuk tanpa ada error duplikat.</span>`;
-                    barProgres.style.width = '100%';
-                    
-                    setTimeout(() => { window.location.href = 'index.html'; }, 2500);
+                    // Tampilkan UI Pemetaan
+                    tampilkanMappingTable();
 
                 } catch (err) {
-                    console.error(err);
-                    teksStatus.innerHTML = `<span class="text-red-600 font-bold">Gagal memproses file: ${err.message}</span>`;
-                    barProgres.classList.replace('bg-green-500', 'bg-red-500');
+                    alert("Gagal membaca file: " + err.message);
+                    statusBox.classList.add('hidden');
                 }
             };
-            
             reader.readAsArrayBuffer(file);
         });
+
+        // 4. ALGORITMA PENCOCOKAN KOLOM PINTAR (FUZZY MATCHER)
+        function cariKolomCocok(atribut) {
+            const { key, synonyms } = atribut;
+
+            // Prioritas 1: Khusus Orang Tua / Wali (Cari kecocokan kategori spesifik)
+            if (key.includes('ayah')) {
+                const subKunci = key.includes('nama') ? 'nama' : 'pekerjaan';
+                const colAyah = excelColumns.find(c => 
+                    c.rawTop.includes('ayah') && c.rawSub.includes(subKunci)
+                );
+                if (colAyah) return colAyah.index;
+            }
+            if (key.includes('ibu')) {
+                const subKunci = key.includes('nama') ? 'nama' : 'pekerjaan';
+                const colIbu = excelColumns.find(c => 
+                    c.rawTop.includes('ibu') && c.rawSub.includes(subKunci)
+                );
+                if (colIbu) return colIbu.index;
+            }
+            if (key.includes('wali')) {
+                const subKunci = key.includes('nama') ? 'nama' : 'pekerjaan';
+                const colWali = excelColumns.find(c => 
+                    c.rawTop.includes('wali') && c.rawSub.includes(subKunci)
+                );
+                if (colWali) return colWali.index;
+            }
+
+            // Prioritas 2: Cocokkan terhadap rawCombined atau rawSub
+            for (let sinonim of synonyms) {
+                const col = excelColumns.find(c => {
+                    const match = c.rawCombined.includes(sinonim) || c.rawSub === sinonim;
+                    // Pastikan nama siswa tidak tercampur nama ayah/ibu
+                    if (key === 'nama_lengkap') {
+                        return match && !c.rawCombined.includes('ayah') && !c.rawCombined.includes('ibu') && !c.rawCombined.includes('wali');
+                    }
+                    if (key === 'tempat_lahir' || key === 'tanggal_lahir') {
+                        return match && !c.rawCombined.includes('ayah') && !c.rawCombined.includes('ibu') && !c.rawCombined.includes('wali');
+                    }
+                    return match;
+                });
+                if (col) return col.index;
+            }
+
+            return -1; // Tidak ditemukan
+        }
+
+        // 5. TAMPILKAN TABEL PEMETAAN KOLOM DENGAN LIVE SAMPLE
+        function tampilkanMappingTable() {
+            document.getElementById('cardUpload').classList.add('hidden');
+            document.getElementById('cardMapping').classList.remove('hidden');
+
+            document.getElementById('totalBarisSiswaBadge').innerText = dataSiswaRows.length;
+            document.getElementById('infoDeteksiFile').innerText = 
+                `Header terdeteksi pada Baris ${headerRowIndex + 1}. Total ${excelColumns.length} kolom ditemukan dari ${dataSiswaRows.length} data siswa.`;
+
+            const tbody = document.getElementById('tabelMappingBody');
+            tbody.innerHTML = '';
+
+            ATRIBUT_BUKU_INDUK.forEach(attr => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-emerald-50/30 transition-colors";
+
+                const autoIndex = cariKolomCocok(attr);
+
+                // Buat Dropdown Opsi Kolom
+                let selectOptionsHtml = '<option value="-1">-- (Lewati / Kosongkan) --</option>';
+                excelColumns.forEach(c => {
+                    const isSelected = c.index === autoIndex ? 'selected' : '';
+                    selectOptionsHtml += `<option value="${c.index}" ${isSelected}>Kolom ${c.colLetter}: ${c.label}</option>`;
+                });
+
+                // Nilai sampel baris pertama
+                const sampleVal = (autoIndex !== -1 && sampleRowData[autoIndex]) 
+                    ? String(sampleRowData[autoIndex]).trim() 
+                    : '-';
+
+                tr.innerHTML = `
+                    <td class="p-3.5 align-middle">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base">${attr.icon}</span>
+                            <div>
+                                <span class="font-bold text-stone-900 block">${attr.label}</span>
+                                ${attr.required ? '<span class="text-[10px] text-red-600 font-bold uppercase tracking-wider">Wajib</span>' : ''}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-3.5 align-middle">
+                        <select id="map_${attr.key}" data-attr="${attr.key}" onchange="updateLiveSample('${attr.key}', this.value)" class="w-full border border-stone-200 p-2.5 rounded-xl bg-stone-50/70 text-xs font-semibold text-stone-800 focus:bg-white focus:border-[#07332a] focus:ring-2 focus:ring-[#07332a]/10 outline-none">
+                            ${selectOptionsHtml}
+                        </select>
+                    </td>
+                    <td class="p-3.5 align-middle">
+                        <div id="sample_${attr.key}" class="p-2 bg-stone-100 rounded-lg text-xs font-mono text-stone-700 truncate max-w-xs border border-stone-200/80" title="${sampleVal}">
+                            ${sampleVal || '(Kosong)'}
+                        </div>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Live Update Sampel saat Dropdown diubah user
+        window.updateLiveSample = function(attrKey, colIdxStr) {
+            const colIdx = parseInt(colIdxStr);
+            const sampleBox = document.getElementById('sample_' + attrKey);
+            if (!sampleBox) return;
+
+            if (colIdx === -1 || !sampleRowData || sampleRowData[colIdx] === undefined || sampleRowData[colIdx] === null) {
+                sampleBox.innerText = '-';
+                sampleBox.title = '-';
+            } else {
+                const val = String(sampleRowData[colIdx]).trim();
+                sampleBox.innerText = val || '(Kosong)';
+                sampleBox.title = val;
+            }
+        };
+
+        window.gantiFile = function() {
+            document.getElementById('cardMapping').classList.add('hidden');
+            document.getElementById('cardUpload').classList.remove('hidden');
+            document.getElementById('statusBacaFile').classList.add('hidden');
+            document.getElementById('fileDapodik').value = '';
+        };
+
+        // 6. EKSEKUSI IMPOR DENGAN PEMETAAN YANG SUDAH DIVERIFIKASI
+        window.eksekusiImpor = async function() {
+            // Ambil pilihan mapping final dari dropdown
+            const mappingFinal = {};
+            ATRIBUT_BUKU_INDUK.forEach(attr => {
+                const el = document.getElementById('map_' + attr.key);
+                mappingFinal[attr.key] = el ? parseInt(el.value) : -1;
+            });
+
+            // Validasi kolom wajib (Nama Lengkap)
+            if (mappingFinal['nama_lengkap'] === -1) {
+                alert("Peringatan: Kolom 'Nama Lengkap Siswa' wajib dipetakan ke salah satu kolom Excel!");
+                return;
+            }
+
+            if (!confirm(`Konfirmasi: Mulai mengimpor ${dataSiswaRows.length} peserta didik ke dalam Buku Induk Sekolah?`)) {
+                return;
+            }
+
+            // Pindah ke layar progres
+            document.getElementById('cardMapping').classList.add('hidden');
+            document.getElementById('cardProgres').classList.remove('hidden');
+
+            const barProgres = document.getElementById('barProgres');
+            const teksDetail = document.getElementById('teksDetailProgres');
+            const judulProgres = document.getElementById('judulProgres');
+
+            try {
+                teksDetail.innerText = "Membaca dan membersihkan format tanggal serta jenis kelamin...";
+                barProgres.style.width = "25%";
+
+                const listSiswaBersih = [];
+                const mapUnik = new Map();
+
+                for (let i = 0; i < dataSiswaRows.length; i++) {
+                    const row = dataSiswaRows[i];
+
+                    const getVal = (key) => {
+                        const colIdx = mappingFinal[key];
+                        if (colIdx === -1 || row[colIdx] === undefined || row[colIdx] === null) return null;
+                        const str = String(row[colIdx]).trim();
+                        return str === '' ? null : str;
+                    };
+
+                    const nama = getVal('nama_lengkap');
+                    if (!nama || nama.toLowerCase() === 'nama' || nama.toLowerCase() === 'nama peserta didik') continue;
+
+                    // Format Tanggal Lahir (Dukungan Serial Excel & Text YYYY-MM-DD / DD-MM-YYYY)
+                    let tglLahir = null;
+                    const colTglIdx = mappingFinal['tanggal_lahir'];
+                    if (colTglIdx !== -1 && row[colTglIdx]) {
+                        const rawTgl = row[colTglIdx];
+                        if (typeof rawTgl === 'number') {
+                            const dateObj = new Date(Math.round((rawTgl - 25569) * 86400 * 1000));
+                            tglLahir = dateObj.toISOString().split('T')[0];
+                        } else if (typeof rawTgl === 'string') {
+                            const strTgl = rawTgl.trim();
+                            if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(strTgl)) {
+                                tglLahir = strTgl.replace(/\//g, '-');
+                            } else if (/^\d{1,2}[-/]\d{1,2}[-/]\d{4}$/.test(strTgl)) {
+                                const parts = strTgl.split(/[-/]/);
+                                tglLahir = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                            } else if (/\d{4}/.test(strTgl)) {
+                                tglLahir = strTgl.replace(/\//g, '-');
+                            }
+                        }
+                    }
+
+                    // Format Jenis Kelamin
+                    let jk = null;
+                    const rawJk = getVal('jenis_kelamin');
+                    if (rawJk) {
+                        const jkUpper = rawJk.toUpperCase();
+                        if (jkUpper === 'L' || jkUpper.includes('LAKI')) jk = 'Laki-laki';
+                        else if (jkUpper === 'P' || jkUpper.includes('PEREMPUAN')) jk = 'Perempuan';
+                    }
+
+                    // Gabungkan Alamat & Kelurahan jika terpisah
+                    const jalan = getVal('alamat_siswa') || '';
+                    const kel = getVal('kelurahan') || '';
+                    const alamatGabung = `${jalan} ${kel ? ('Kel. ' + kel) : ''}`.trim() || null;
+
+                    // Bersihkan NISN
+                    let nisnClean = getVal('nisn');
+                    if (nisnClean === '-' || nisnClean === '0' || nisnClean === '') nisnClean = null;
+
+                    const nipdClean = getVal('nipd');
+
+                    // Estimasi Tahun Masuk dari NIPD atau Tahun Sekarang
+                    let thnMasuk = new Date().getFullYear();
+                    if (nipdClean && nipdClean.length >= 2) {
+                        const digit = parseInt(nipdClean.substring(0, 2));
+                        if (!isNaN(digit) && digit >= 10 && digit <= 40) {
+                            thnMasuk = 2000 + digit;
+                        }
+                    }
+
+                    const siswaObj = {
+                        nama_lengkap: nama,
+                        nisn: nisnClean,
+                        nipd: nipdClean,
+                        jenis_kelamin: jk,
+                        tempat_lahir: getVal('tempat_lahir'),
+                        tanggal_lahir: tglLahir,
+                        agama: getVal('agama'),
+                        alamat_siswa: alamatGabung,
+                        rombel: getVal('rombel'),
+                        anak_ke: parseInt(getVal('anak_ke')) || null,
+                        jumlah_saudara: parseInt(getVal('jumlah_saudara')) || null,
+                        nama_ayah: getVal('nama_ayah'),
+                        pekerjaan_ayah: getVal('pekerjaan_ayah'),
+                        nama_ibu: getVal('nama_ibu'),
+                        pekerjaan_ibu: getVal('pekerjaan_ibu'),
+                        nama_wali: getVal('nama_wali'),
+                        pekerjaan_wali: getVal('pekerjaan_wali'),
+                        status: 'Aktif',
+                        tahun_masuk: thnMasuk
+                    };
+
+                    // Kunci gembok deduplikasi: Utamakan NISN, jika tidak ada gunakan NIPD atau Kombinasi Nama + Tgl Lahir
+                    const kunci = nisnClean ? `NISN-${nisnClean}` : (nipdClean ? `NIPD-${nipdClean}` : `NAMA-${nama}-${tglLahir || Math.random()}`);
+                    mapUnik.set(kunci, siswaObj);
+                }
+
+                mapUnik.forEach(v => listSiswaBersih.push(v));
+
+                teksDetail.innerText = `Menyimpan ${listSiswaBersih.length} data siswa terverifikasi ke Supabase Cloud Database...`;
+                barProgres.style.width = "50%";
+
+                // 7. BATCH INSERT KE SUPABASE (Ukuran Batch 100 Siswa)
+                const BATCH_SIZE = 100;
+                let berhasilCount = 0;
+
+                for (let b = 0; b < listSiswaBersih.length; b += BATCH_SIZE) {
+                    const chunk = listSiswaBersih.slice(b, b + BATCH_SIZE);
+                    
+                    const { error } = await supabase.from('buku_induk').upsert(chunk, {
+                        onConflict: 'nisn',
+                        ignoreDuplicates: false
+                    });
+
+                    if (error) throw error;
+                    
+                    berhasilCount += chunk.length;
+                    const persentase = 50 + Math.round((berhasilCount / listSiswaBersih.length) * 45);
+                    barProgres.style.width = persentase + "%";
+                    teksDetail.innerText = `Menyimpan: ${berhasilCount} dari ${listSiswaBersih.length} siswa berhasil masuk...`;
+                }
+
+                barProgres.style.width = "100%";
+                judulProgres.innerText = "🎉 Alhamdulillah! Impor Dapodik Selesai Sempurna";
+                document.getElementById('ikonProgres').innerText = "✅";
+                document.getElementById('ikonProgres').classList.remove('animate-bounce');
+                teksDetail.innerHTML = `<span class="text-[#07332a] font-bold text-sm">${berhasilCount} peserta didik berhasil terdaftar di Buku Induk Sekolah dengan penempatan kolom yang presisi.</span>`;
+                document.getElementById('areaSelesai').classList.remove('hidden');
+
+            } catch (err) {
+                console.error("Error impor:", err);
+                judulProgres.innerText = "❌ Terjadi Kendala Impor";
+                document.getElementById('ikonProgres').innerText = "⚠️";
+                document.getElementById('ikonProgres').classList.remove('animate-bounce');
+                teksDetail.innerHTML = `<span class="text-red-600 font-bold">${err.message}</span>`;
+                barProgres.classList.replace('bg-[#07332a]', 'bg-red-500');
+            }
+        };
     </script>
 </body>
 </html>

@@ -266,6 +266,52 @@
                     </label>
                     <input type="file" id="inputRestore" accept=".json" class="hidden">
                 </div>
+
+                <!-- ZONA PENGOSONGAN / RESET DATA SISWA -->
+                <div class="mt-8 pt-6 border-t border-slate-200">
+                    <div class="bg-red-50/70 border-2 border-red-200 rounded-3xl p-6 md:p-8">
+                        <div class="flex items-start gap-3.5 mb-4">
+                            <span class="text-3xl">⚠️</span>
+                            <div>
+                                <h3 class="font-bold text-red-950 text-base md:text-lg">
+                                    Zona Pengosongan / Reset Data Siswa
+                                </h3>
+                                <p class="text-xs text-red-700/90 mt-1 leading-relaxed">
+                                    Gunakan fitur ini apabila Anda ingin mengosongkan seluruh data register siswa, riwayat nilai rapor, absensi, dan dokumen lampiran untuk mengimpor ulang data Dapodik dari awal secara bersih.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/95 border border-red-200 rounded-2xl p-4 mb-5 text-xs text-slate-700 space-y-2">
+                            <div class="flex items-center gap-2 text-red-800 font-bold">
+                                <span>🗑️ Data yang akan dikosongkan permanen:</span>
+                            </div>
+                            <ul class="list-disc list-inside text-slate-600 pl-2 space-y-1">
+                                <li>Seluruh Data Induk Siswa (<code class="bg-red-100/80 px-1.5 py-0.5 rounded text-red-800 font-mono">buku_induk</code>)</li>
+                                <li>Seluruh Nilai & Deskripsi Rapor (<code class="bg-red-100/80 px-1.5 py-0.5 rounded text-red-800 font-mono">nilai_akademik</code>)</li>
+                                <li>Rekap Kehadiran / Absensi Siswa (<code class="bg-red-100/80 px-1.5 py-0.5 rounded text-red-800 font-mono">rekap_kehadiran</code>)</li>
+                                <li>Daftar Lampiran Berkas Siswa (<code class="bg-red-100/80 px-1.5 py-0.5 rounded text-red-800 font-mono">dokumen_siswa</code>)</li>
+                            </ul>
+                            <div class="flex items-center gap-2 text-emerald-800 font-bold pt-2 border-t border-red-100">
+                                <span>🛡️ Data yang TETAP AMAN tersimpan:</span>
+                            </div>
+                            <p class="text-emerald-700 pl-2">
+                                Identitas Sekolah, Nama Kepala Sekolah, TTD Kepsek, dan Seluruh Bank Tanda Tangan Guru/Wali Kelas <b>TIDAK AKAN DIHAPUS</b>.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button type="button" onclick="konfirmasiKosongkanDataSiswa()" id="btnResetSiswa" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 px-5 rounded-xl shadow-md text-xs transition-all flex items-center justify-center gap-2">
+                                <span>🗑️</span>
+                                <span>Kosongkan Seluruh Data Siswa Sekarang</span>
+                            </button>
+                            <button type="button" onclick="salinSqlReset()" class="bg-white hover:bg-slate-50 border border-red-300 text-red-800 font-bold py-3.5 px-4 rounded-xl text-xs shadow-sm transition-all flex items-center justify-center gap-2">
+                                <span>📋</span>
+                                <span>Salin Skrip SQL Reset (Supabase)</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -914,6 +960,40 @@
             el.select();
             navigator.clipboard.writeText(el.value);
             alert("📋 Skrip SQL berhasil disalin ke clipboard! Silakan paste di Supabase Dashboard -> SQL Editor.");
+        };
+
+        window.salinSqlReset = function() {
+            const sql = `TRUNCATE TABLE public.nilai_akademik, public.rekap_kehadiran, public.dokumen_siswa, public.buku_induk CASCADE;`;
+            navigator.clipboard.writeText(sql);
+            alert("✅ Skrip SQL Reset berhasil disalin ke clipboard!\n\nPerintah:\n" + sql + "\n\nAnda dapat menjalankannya di Supabase Dashboard -> SQL Editor.");
+        };
+
+        window.konfirmasiKosongkanDataSiswa = async function() {
+            const input = prompt("⚠️ PERINGATAN KERAS PENGOSONGAN DATA!\n\nSeluruh data siswa, nilai rapor, absensi, dan dokumen lampiran akan dihapus permanen!\n(Identitas sekolah & tanda tangan guru tetap aman).\n\nKetik kata 'HAPUS' dengan huruf besar untuk mengonfirmasi:");
+            if (input !== 'HAPUS') {
+                if (input !== null) alert("Pengosongan data dibatalkan (kata konfirmasi tidak sesuai).");
+                return;
+            }
+
+            const btn = document.getElementById('btnResetSiswa');
+            if (btn) { btn.innerHTML = "⏳ Sedang mengosongkan data..."; btn.disabled = true; }
+
+            try {
+                // Hapus child tables terlebih dahulu
+                await supabase.from('nilai_akademik').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                await supabase.from('rekap_kehadiran').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                await supabase.from('dokumen_siswa').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                // Hapus master buku_induk
+                const { error } = await supabase.from('buku_induk').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+                if (error) throw error;
+
+                alert("✅ Alhamdulillah! Seluruh data siswa berhasil dikosongkan secara bersih.\n\nSistem kini siap menerima impor ulang data Dapodik dari awal.");
+                window.location.href = 'index.html';
+            } catch(err) {
+                alert("Gagal mengosongkan via browser: " + err.message + "\n\nSolusi Alternatif: Silakan salin dan jalankan perintah SQL TRUNCATE di Supabase SQL Editor.");
+            } finally {
+                if (btn) { btn.innerHTML = "<span>🗑️</span><span>Kosongkan Seluruh Data Siswa Sekarang</span>"; btn.disabled = false; }
+            }
         };
 
         window.exportBackupData = function() {

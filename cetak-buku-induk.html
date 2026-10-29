@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lembar Buku Induk Siswa - IndukKu Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 1cm;
+        }
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            .lembar-cetak {
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+                page-break-after: always;
+            }
+        }
+        .lembar-cetak {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 1.5rem auto;
+            background: white;
+            padding: 1.2cm 1.5cm;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10pt;
+            color: black;
+            position: relative;
+            box-sizing: border-box;
+        }
+        .table-register {
+            width: 100%;
+            border-collapse: collapse;
+            line-height: 1.4;
+        }
+        .table-register td {
+            padding: 3px 6px;
+            vertical-align: top;
+            border: none;
+        }
+        .table-matriks {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .table-matriks th, .table-matriks td {
+            border: 1px solid black;
+            padding: 4px 3px;
+            font-size: 8.5pt;
+        }
+        .table-matriks th {
+            background-color: #f1f5f9 !important;
+            -webkit-print-color-adjust: exact;
+            text-align: center;
+            font-weight: bold;
+        }
+        .kotak-foto {
+            width: 3cm;
+            height: 4cm;
+            border: 2px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="bg-slate-200">
+
+    <!-- Toolbar Tombol Aksi (Hanya Tampil di Layar) -->
+    <div class="no-print fixed bottom-6 right-6 flex items-center gap-3 z-50 bg-white/95 backdrop-blur-md p-2 rounded-full shadow-2xl border border-slate-300">
+        <label class="flex items-center gap-2 px-3 py-1 cursor-pointer select-none text-xs font-bold text-slate-700 hover:text-blue-600">
+            <input type="checkbox" id="toggleTtdDigital" checked class="w-4 h-4 accent-blue-600 cursor-pointer">
+            <span>Tanda Tangan Digital</span>
+        </label>
+        <button onclick="window.close()" class="bg-slate-600 hover:bg-slate-700 text-white px-5 py-2.5 rounded-full font-bold text-xs shadow-md transition-all">
+            ⬅️ Kembali
+        </button>
+        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-full font-bold text-xs shadow-md transition-all flex items-center gap-1.5">
+            <span>🖨️</span> Cetak Lembar Buku Induk
+        </button>
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- LEMBAR 1: IDENTITAS RESMI PESERTA DIDIK (HALAMAN DEPAN BUKU INDUK) -->
+    <!-- ============================================================== -->
+    <div class="lembar-cetak">
+        
+        <!-- Header Kop Lembar Buku Induk -->
+        <div class="border-b-2 border-black pb-2 mb-4 text-center">
+            <h1 class="font-bold text-base uppercase tracking-wider leading-tight" id="kop_nama_sekolah">SDIT QURRATU A'YUN AL-ISLAMI</h1>
+            <p class="text-[9pt] leading-tight" id="kop_alamat_sekolah">Jl. Poros Makassar - Maros Km. 26 Maccopa, Kab. Maros</p>
+            <h2 class="text-sm font-black uppercase tracking-widest mt-2 underline">LEMBAR BUKU INDUK REGISTER PESERTA DIDIK</h2>
+        </div>
+
+        <!-- Info Nomor Register -->
+        <div class="flex justify-between items-center mb-4 text-[9.5pt] font-bold">
+            <div>NOMOR INDUK (NIPD): <span id="bio_nipd" class="font-mono text-[10.5pt]">-</span></div>
+            <div>NISN: <span id="bio_nisn" class="font-mono text-[10.5pt]">-</span></div>
+        </div>
+
+        <!-- Tabel Identitas Diri -->
+        <table class="table-register text-[9.5pt]">
+            <tr><td colspan="4" class="font-bold uppercase tracking-wider text-[10pt] border-b border-black pb-1 mb-1">A. KETERANGAN DIRI PESERTA DIDIK</td></tr>
+            <tr><td class="w-6 text-center">1.</td><td class="w-52">Nama Lengkap Peserta Didik</td><td class="w-3 text-center">:</td><td class="font-bold uppercase" id="bio_nama">-</td></tr>
+            <tr><td class="text-center">2.</td><td>Jenis Kelamin</td><td class="text-center">:</td><td id="bio_jk">-</td></tr>
+            <tr><td class="text-center">3.</td><td>Tempat, Tanggal Lahir</td><td class="text-center">:</td><td id="bio_ttl">-</td></tr>
+            <tr><td class="text-center">4.</td><td>Agama</td><td class="text-center">:</td><td id="bio_agama">-</td></tr>
+            <tr><td class="text-center">5.</td><td>Kewarganegaraan</td><td class="text-center">:</td><td id="bio_wn">Indonesia</td></tr>
+            <tr><td class="text-center">6.</td><td>Anak ke-</td><td class="text-center">:</td><td id="bio_anak_ke">-</td></tr>
+            <tr><td class="text-center">7.</td><td>Jumlah Saudara Kandung</td><td class="text-center">:</td><td id="bio_jml_sdr">-</td></tr>
+            <tr><td class="text-center">8.</td><td>Alamat Lengkap Siswa</td><td class="text-center">:</td><td id="bio_alamat">-</td></tr>
+            
+            <tr><td colspan="4" class="pt-3 font-bold uppercase tracking-wider text-[10pt] border-b border-black pb-1 mb-1">B. KETERANGAN ORANG TUA / WALI</td></tr>
+            <tr><td class="text-center">9.</td><td colspan="3" class="font-bold">Data Ayah Kandung</td></tr>
+            <tr><td></td><td class="pl-4">a. Nama Ayah</td><td class="text-center">:</td><td id="bio_ayah_nama">-</td></tr>
+            <tr><td></td><td class="pl-4">b. Pendidikan Terakhir</td><td class="text-center">:</td><td id="bio_ayah_ijazah">-</td></tr>
+            <tr><td></td><td class="pl-4">c. Pekerjaan</td><td class="text-center">:</td><td id="bio_ayah_kerja">-</td></tr>
+            <tr><td></td><td class="pl-4">d. Alamat / Kontak</td><td class="text-center">:</td><td id="bio_ayah_alamat">-</td></tr>
+
+            <tr><td class="text-center">10.</td><td colspan="3" class="font-bold">Data Ibu Kandung</td></tr>
+            <tr><td></td><td class="pl-4">a. Nama Ibu</td><td class="text-center">:</td><td id="bio_ibu_nama">-</td></tr>
+            <tr><td></td><td class="pl-4">b. Pendidikan Terakhir</td><td class="text-center">:</td><td id="bio_ibu_ijazah">-</td></tr>
+            <tr><td></td><td class="pl-4">c. Pekerjaan</td><td class="text-center">:</td><td id="bio_ibu_kerja">-</td></tr>
+            <tr><td></td><td class="pl-4">d. Alamat / Kontak</td><td class="text-center">:</td><td id="bio_ibu_alamat">-</td></tr>
+
+            <tr><td class="text-center">11.</td><td colspan="3" class="font-bold">Data Wali Peserta Didik (Bila Ada)</td></tr>
+            <tr><td></td><td class="pl-4">a. Nama Wali</td><td class="text-center">:</td><td id="bio_wali_nama">-</td></tr>
+            <tr><td></td><td class="pl-4">b. Hubungan Keluarga</td><td class="text-center">:</td><td id="bio_wali_hub">-</td></tr>
+            <tr><td></td><td class="pl-4">c. Pekerjaan Wali</td><td class="text-center">:</td><td id="bio_wali_kerja">-</td></tr>
+            <tr><td></td><td class="pl-4">d. Alamat / Kontak</td><td class="text-center">:</td><td id="bio_wali_alamat">-</td></tr>
+
+            <tr><td colspan="4" class="pt-3 font-bold uppercase tracking-wider text-[10pt] border-b border-black pb-1 mb-1">C. RIWAYAT PENERIMAAN SISWA</td></tr>
+            <tr><td class="text-center">12.</td><td>Diterima pada Tanggal</td><td class="text-center">:</td><td id="bio_tgl_masuk">-</td></tr>
+            <tr><td class="text-center">13.</td><td>Ditempatkan di Rombel</td><td class="text-center">:</td><td id="bio_rombel_masuk" class="font-bold">-</td></tr>
+            <tr><td class="text-center">14.</td><td>Status Awal Masuk</td><td class="text-center">:</td><td id="bio_status_masuk">Peserta Didik Baru</td></tr>
+        </table>
+
+        <!-- Foto & Tanda Tangan Pengesahan Buku Induk Halaman 1 -->
+        <div class="mt-8 flex justify-between items-end">
+            <div class="kotak-foto" id="wadah_foto">
+                <div class="text-[8pt] text-gray-400 text-center leading-tight">Pas Foto<br>3 x 4</div>
+            </div>
+
+            <div class="w-[45%] flex flex-col text-center">
+                <div>
+                    <p id="tgl_cetak_p1">Maros, .....................</p>
+                    <p class="font-semibold">Mengetahui,</p>
+                    <p class="font-bold">Kepala Sekolah,</p>
+                </div>
+                <div class="my-auto h-16 flex items-center justify-center relative mt-2">
+                    <img id="img_ttd_kepsek_p1" src="" class="h-16 max-w-[150px] object-contain mix-blend-multiply hidden" alt="TTD Kepsek">
+                </div>
+                <div class="mt-2 inline-block text-left mx-auto">
+                    <div class="font-bold underline text-[10.5pt]" id="ttd_kepsek_nama_p1">-</div>
+                    <div class="text-[9.5pt] font-normal" id="ttd_kepsek_nip_p1">NIP. -</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- LEMBAR 2: TRANSKRIP & REKAPITULASI CAPAIAN NILAI (HALAMAN BELAKANG) -->
+    <!-- ============================================================== -->
+    <div class="lembar-cetak">
+        
+        <div class="border-b-2 border-black pb-2 mb-3 text-center">
+            <h2 class="text-sm font-black uppercase tracking-wider">REKAPITULASI CAPAIAN HASIL BELAJAR (NILAI AKADEMIK)</h2>
+            <div class="flex justify-between items-center text-[9pt] font-bold mt-1.5 px-2">
+                <span>Nama Siswa: <span id="matriks_nama" class="uppercase">-</span></span>
+                <span>NISN / NIPD: <span id="matriks_nisn" class="font-mono">-</span></span>
+                <span>Rombel Saat Ini: <span id="matriks_rombel">-</span></span>
+            </div>
+        </div>
+
+        <!-- Tabel Matriks Nilai 12 Semester (Kelas 1 s/d Kelas 6) -->
+        <div class="overflow-x-auto">
+            <table class="table-matriks">
+                <thead>
+                    <tr>
+                        <th rowspan="2" class="w-7">No</th>
+                        <th rowspan="2" class="w-48 text-left pl-2">Mata Pelajaran</th>
+                        <th colspan="2">Kelas 1</th>
+                        <th colspan="2">Kelas 2</th>
+                        <th colspan="2">Kelas 3</th>
+                        <th colspan="2">Kelas 4</th>
+                        <th colspan="2">Kelas 5</th>
+                        <th colspan="2">Kelas 6</th>
+                    </tr>
+                    <tr>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                    </tr>
+                </thead>
+                <tbody id="isiMatriksNilai">
+                    <tr><td colspan="14" class="text-center p-4 text-slate-400">Memuat transkrip nilai...</td></tr>
+                </tbody>
+                <tfoot id="footerMatriksNilai"></tfoot>
+            </table>
+        </div>
+
+        <!-- Tabel Rekap Kehadiran Seluruh Semester -->
+        <div class="mt-4">
+            <table class="table-matriks">
+                <thead>
+                    <tr>
+                        <th class="text-left pl-2 w-55" rowspan="2">Ketidakhadiran (Hari)</th>
+                        <th colspan="2">Kelas 1</th>
+                        <th colspan="2">Kelas 2</th>
+                        <th colspan="2">Kelas 3</th>
+                        <th colspan="2">Kelas 4</th>
+                        <th colspan="2">Kelas 5</th>
+                        <th colspan="2">Kelas 6</th>
+                    </tr>
+                    <tr>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                        <th class="w-8">I</th><th class="w-8">II</th>
+                    </tr>
+                </thead>
+                <tbody id="isiMatriksHadir"></tbody>
+            </table>
+        </div>
+
+        <!-- Keterangan Tamat Belajar / Meninggalkan Sekolah -->
+        <div class="mt-4 border border-black p-3 text-[9pt] rounded leading-relaxed">
+            <div class="font-bold uppercase tracking-wider mb-1 text-[8.5pt]">D. KETERANGAN MENINGGALKAN SEKOLAH / KELULUSAN:</div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>1. Status Peserta Didik: <span id="end_status" class="font-bold uppercase">-</span></div>
+                <div>2. Tahun Kelulusan / Mutasi: <span id="end_tahun">-</span></div>
+                <div class="col-span-2">3. Nomor Ijazah / SKL: <span id="end_ijazah" class="font-mono font-bold">-</span></div>
+            </div>
+        </div>
+
+        <!-- Pengesahan Buku Induk Halaman 2 -->
+        <div class="mt-6 flex justify-end">
+            <div class="w-[45%] flex flex-col text-center">
+                <div>
+                    <p id="tgl_cetak_p2">Maros, .....................</p>
+                    <p class="font-bold">Kepala Sekolah,</p>
+                </div>
+                <div class="my-auto h-16 flex items-center justify-center relative mt-1">
+                    <img id="img_ttd_kepsek_p2" src="" class="h-16 max-w-[150px] object-contain mix-blend-multiply hidden" alt="TTD Kepsek">
+                </div>
+                <div class="mt-1 inline-block text-left mx-auto">
+                    <div class="font-bold underline text-[10.5pt]" id="ttd_kepsek_nama_p2">-</div>
+                    <div class="text-[9.5pt] font-normal" id="ttd_kepsek_nip_p2">NIP. -</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DATA & RENDER BUKU INDUK -->
+    <script type="module">
+        import { supabase } from './js/supabaseConfig.js';
+
+        // 🛡️ Pengaman Session Login
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { window.location.href = 'login.html'; }
+
+        const urlP = new URLSearchParams(window.location.search);
+        const idSiswa = urlP.get('id');
+        if (!idSiswa) { alert("ID Siswa tidak ditemukan!"); window.close(); }
+
+        // Ambil Konfigurasi Sekolah
+        let configSekolah = JSON.parse(localStorage.getItem('config_sekolah') || '{}');
+        try {
+            const { data: dbSekolah } = await supabase.from('pengaturan_sekolah').select('*').eq('id', 1).maybeSingle();
+            if (dbSekolah) {
+                configSekolah = {
+                    nama: dbSekolah.nama_sekolah || configSekolah.nama,
+                    alamat: dbSekolah.alamat_sekolah || configSekolah.alamat,
+                    kota_tanggal: dbSekolah.kota_cetak || configSekolah.kota_tanggal,
+                    tanggal_cetak: dbSekolah.tanggal_cetak || configSekolah.tanggal_cetak,
+                    kepsek: dbSekolah.nama_kepsek || configSekolah.kepsek,
+                    nip: dbSekolah.nip_kepsek || configSekolah.nip,
+                    ttd_kepsek: dbSekolah.ttd_kepsek || configSekolah.ttd_kepsek
+                };
+            }
+        } catch (e) { console.warn("Pakai config local", e); }
+
+        const sekolah = configSekolah.nama || "SDIT QURRATU A'YUN AL-ISLAMI";
+        const alamatSekolah = configSekolah.alamat || "Maros, Sulawesi Selatan";
+        const namaKepsek = configSekolah.kepsek || "Radiant Fadli, S.Pd";
+        const nipKepsek = configSekolah.nip || "-";
+        const ttdKepsekUrl = configSekolah.ttd_kepsek || null;
+        const kotaTanggal = configSekolah.kota_tanggal || "Maros";
+        const tanggalCetakGlobal = configSekolah.tanggal_cetak || null;
+
+        document.getElementById('kop_nama_sekolah').innerText = sekolah;
+        document.getElementById('kop_alamat_sekolah').innerText = alamatSekolah;
+
+        // Tanggal Cetak
+        let d = tanggalCetakGlobal ? new Date(tanggalCetakGlobal) : new Date();
+        const bln = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        const teksTglCetak = `${kotaTanggal}, ${d.getDate()} ${bln[d.getMonth()]} ${d.getFullYear()}`;
+        document.getElementById('tgl_cetak_p1').innerText = teksTglCetak;
+        document.getElementById('tgl_cetak_p2').innerText = teksTglCetak;
+
+        document.getElementById('ttd_kepsek_nama_p1').innerText = namaKepsek;
+        document.getElementById('ttd_kepsek_nip_p1').innerText = "NIP. " + nipKepsek;
+        document.getElementById('ttd_kepsek_nama_p2').innerText = namaKepsek;
+        document.getElementById('ttd_kepsek_nip_p2').innerText = "NIP. " + nipKepsek;
+
+        // Toggle Tanda Tangan
+        const toggleTtd = document.getElementById('toggleTtdDigital');
+        function updateTampilanTtd() {
+            const aktif = toggleTtd.checked;
+            const img1 = document.getElementById('img_ttd_kepsek_p1');
+            const img2 = document.getElementById('img_ttd_kepsek_p2');
+
+            if (aktif && ttdKepsekUrl) {
+                img1.src = ttdKepsekUrl; img1.classList.remove('hidden');
+                img2.src = ttdKepsekUrl; img2.classList.remove('hidden');
+            } else {
+                img1.classList.add('hidden');
+                img2.classList.add('hidden');
+            }
+        }
+        toggleTtd.addEventListener('change', updateTampilanTtd);
+
+        function formatTanggal(tglStr) {
+            if (!tglStr) return '-';
+            const date = new Date(tglStr);
+            if (isNaN(date.getTime())) return tglStr;
+            return `${date.getDate()} ${bln[date.getMonth()]} ${date.getFullYear()}`;
+        }
+
+        async function muatBukuInduk() {
+            // 1. Ambil Biodata Siswa
+            const { data: s, error: errS } = await supabase.from('buku_induk').select('*').eq('id', idSiswa).single();
+            if (errS || !s) { alert("Data siswa gagal dimuat!"); return; }
+
+            document.getElementById('bio_nama').innerText = s.nama_lengkap || '-';
+            document.getElementById('bio_nipd').innerText = s.nipd || '-';
+            document.getElementById('bio_nisn').innerText = s.nisn || '-';
+            document.getElementById('bio_jk').innerText = s.jenis_kelamin || '-';
+            document.getElementById('bio_ttl').innerText = `${s.tempat_lahir || '-'}, ${formatTanggal(s.tanggal_lahir)}`;
+            document.getElementById('bio_agama').innerText = s.agama || 'Islam';
+            document.getElementById('bio_wn').innerText = s.kewarganegaraan || 'Indonesia';
+            document.getElementById('bio_anak_ke').innerText = s.anak_ke ? `${s.anak_ke}` : '-';
+            document.getElementById('bio_jml_sdr').innerText = s.jumlah_saudara ? `${s.jumlah_saudara}` : '-';
+            document.getElementById('bio_alamat').innerText = s.alamat_siswa || '-';
+
+            // Ortu & Wali
+            document.getElementById('bio_ayah_nama').innerText = s.nama_ayah || '-';
+            document.getElementById('bio_ayah_ijazah').innerText = s.ijazah_ayah || '-';
+            document.getElementById('bio_ayah_kerja').innerText = s.pekerjaan_ayah || '-';
+            document.getElementById('bio_ayah_alamat').innerText = s.alamat_ayah || '-';
+
+            document.getElementById('bio_ibu_nama').innerText = s.nama_ibu || '-';
+            document.getElementById('bio_ibu_ijazah').innerText = s.ijazah_ibu || '-';
+            document.getElementById('bio_ibu_kerja').innerText = s.pekerjaan_ibu || '-';
+            document.getElementById('bio_ibu_alamat').innerText = s.alamat_ibu || '-';
+
+            document.getElementById('bio_wali_nama').innerText = s.nama_wali || '-';
+            document.getElementById('bio_wali_hub').innerText = s.hubungan_wali || '-';
+            document.getElementById('bio_wali_kerja').innerText = s.pekerjaan_wali || '-';
+            document.getElementById('bio_wali_alamat').innerText = s.alamat_wali || '-';
+
+            document.getElementById('bio_tgl_masuk').innerText = s.tahun_masuk ? `Tahun Pelajaran ${s.tahun_masuk}/${parseInt(s.tahun_masuk)+1}` : '-';
+            document.getElementById('bio_rombel_masuk').innerText = s.rombel || '-';
+
+            if (s.foto) {
+                document.getElementById('wadah_foto').innerHTML = `<img src="${s.foto}" class="w-full h-full object-cover">`;
+            }
+
+            // Halaman 2 Header Singkat
+            document.getElementById('matriks_nama').innerText = s.nama_lengkap || '-';
+            document.getElementById('matriks_nisn').innerText = `${s.nisn || '-'} / ${s.nipd || '-'}`;
+            document.getElementById('matriks_rombel').innerText = s.rombel || '-';
+
+            document.getElementById('end_status').innerText = s.status || 'Aktif';
+            document.getElementById('end_tahun').innerText = s.tahun_lulus ? s.tahun_lulus : (s.status === 'Alumni' ? 'Sudah Lulus' : '-');
+            document.getElementById('end_ijazah').innerText = s.ijazah_nomor || '-';
+
+            // 2. Ambil Transkrip Seluruh Nilai
+            const { data: listNilai } = await supabase
+                .from('nilai_akademik')
+                .select('*')
+                .eq('siswa_id', idSiswa);
+
+            // 3. Ambil Rekap Kehadiran
+            const { data: listHadir } = await supabase
+                .from('rekap_kehadiran')
+                .select('*')
+                .eq('siswa_id', idSiswa);
+
+            renderMatriksNilai(listNilai || [], listHadir || []);
+            updateTampilanTtd();
+        }
+
+        // Fungsi Membangun Matriks Nilai 12 Kolom
+        function renderMatriksNilai(listNilai, listHadir) {
+            const mapMapel = new Map();
+
+            // Kunci kolom semester: 'K1_1', 'K1_2', 'K2_1', ..., 'K6_2'
+            const kunciSemester = [
+                'K1_1', 'K1_2', 'K2_1', 'K2_2', 'K3_1', 'K3_2',
+                'K4_1', 'K4_2', 'K5_1', 'K5_2', 'K6_1', 'K6_2'
+            ];
+
+            function tentukanKunci(kelasStr, smtStr) {
+                const kls = (kelasStr || '').toLowerCase();
+                const smt = (smtStr || '').toLowerCase();
+                let digitK = '1';
+                if (kls.includes('6')) digitK = '6';
+                else if (kls.includes('5')) digitK = '5';
+                else if (kls.includes('4')) digitK = '4';
+                else if (kls.includes('3')) digitK = '3';
+                else if (kls.includes('2')) digitK = '2';
+                else if (kls.includes('1')) digitK = '1';
+
+                const semDigit = (smt.includes('genap') || smt === '2') ? '2' : '1';
+                return `K${digitK}_${semDigit}`;
+            }
+
+            // Kelompokkan Nilai per Mata Pelajaran
+            listNilai.forEach(n => {
+                const mapel = (n.mata_pelajaran || '').trim();
+                if (!mapel) return;
+
+                if (!mapMapel.has(mapel)) {
+                    mapMapel.set(mapel, {});
+                }
+                const k = tentukanKunci(n.kelas, n.semester);
+                mapMapel.get(mapel)[k] = (n.nilai !== null && n.nilai !== undefined) ? n.nilai : '-';
+            });
+
+            const tbody = document.getElementById('isiMatriksNilai');
+            tbody.innerHTML = '';
+
+            if (mapMapel.size === 0) {
+                tbody.innerHTML = `<tr><td colspan="14" class="text-center p-6 text-slate-400 font-medium">Belum ada rekapan nilai untuk siswa ini.</td></tr>`;
+                return;
+            }
+
+            let idx = 1;
+            const totalPerKolom = {};
+            const countPerKolom = {};
+            kunciSemester.forEach(k => { totalPerKolom[k] = 0; countPerKolom[k] = 0; });
+
+            mapMapel.forEach((nilaiPerSmt, mapelNama) => {
+                const tr = document.createElement('tr');
+                let tdKolom = '';
+
+                kunciSemester.forEach(k => {
+                    const val = nilaiPerSmt[k];
+                    if (val !== undefined && val !== '-' && !isNaN(parseInt(val))) {
+                        const angka = parseInt(val);
+                        totalPerKolom[k] += angka;
+                        countPerKolom[k]++;
+                        tdKolom += `<td class="text-center font-bold">${angka}</td>`;
+                    } else if (val === '-') {
+                        tdKolom += `<td class="text-center text-slate-400">-</td>`;
+                    } else {
+                        tdKolom += `<td class="text-center text-slate-300">-</td>`;
+                    }
+                });
+
+                tr.innerHTML = `
+                    <td class="text-center">${idx++}</td>
+                    <td class="font-bold pl-2">${mapelNama}</td>
+                    ${tdKolom}
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Baris Rata-Rata Nilai
+            const tfoot = document.getElementById('footerMatriksNilai');
+            let tdRata = '';
+            kunciSemester.forEach(k => {
+                if (countPerKolom[k] > 0) {
+                    const avg = Math.round(totalPerKolom[k] / countPerKolom[k]);
+                    tdRata += `<td class="text-center font-black bg-slate-50">${avg}</td>`;
+                } else {
+                    tdRata += `<td class="text-center text-slate-300 bg-slate-50">-</td>`;
+                }
+            });
+
+            tfoot.innerHTML = `
+                <tr class="font-bold border-t-2 border-black">
+                    <td colspan="2" class="text-right pr-2 uppercase text-[8pt]">Rata-rata Nilai</td>
+                    ${tdRata}
+                </tr>
+            `;
+
+            // 4. Render Baris Kehadiran
+            const mapHadir = { sakit: {}, izin: {}, alpa: {} };
+            listHadir.forEach(h => {
+                const k = tentukanKunci(h.kelas, h.semester);
+                mapHadir.sakit[k] = h.sakit || '-';
+                mapHadir.izin[k] = h.izin || '-';
+                mapHadir.alpa[k] = h.alpa || '-';
+            });
+
+            const tbodyHadir = document.getElementById('isiMatriksHadir');
+            function renderRowHadir(label, dataMap) {
+                let tds = '';
+                kunciSemester.forEach(k => {
+                    tds += `<td class="text-center">${dataMap[k] || '-'}</td>`;
+                });
+                return `<tr><td class="pl-2 font-semibold">${label}</td>${tds}</tr>`;
+            }
+
+            tbodyHadir.innerHTML = `
+                ${renderRowHadir('1. Sakit', mapHadir.sakit)}
+                ${renderRowHadir('2. Izin', mapHadir.izin)}
+                ${renderRowHadir('3. Tanpa Keterangan (Alpa)', mapHadir.alpa)}
+            `;
+        }
+
+        await muatBukuInduk();
+    </script>
+</body>
+</html>
